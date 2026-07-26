@@ -1,7 +1,15 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Worker(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="worker_profile"
+    )
     PROFESSION_CHOICES = [
         ("Plumber", "Plumber"),
         ("Electrician", "Electrician"),
@@ -28,7 +36,7 @@ class Worker(models.Model):
 
     rating = models.DecimalField(max_digits=2, decimal_places=1, default=5.0)
     reviews = models.PositiveIntegerField(default=0)
-    verified = models.BooleanField(default=True)
+    vverified = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

@@ -1,5 +1,6 @@
 from django.db import models
 from workers.models import Worker
+from django.contrib.auth.models import User
 
 
 class Booking(models.Model):
@@ -37,3 +38,11 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.customer_name} - {self.worker.name}"
+
+    customer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="customer_bookings",
+        null=True,
+        blank=True
+    )

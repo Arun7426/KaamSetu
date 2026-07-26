@@ -2,30 +2,66 @@
 
 <nav class="navbar">
 
-    <div class="container">
+<div class="container">
 
-        <!-- Logo -->
-        <a href="/" class="logo">
-            <img src="{% static 'images/logo.png' %}" alt="KaamSetu Logo">
-            <span>KaamSetu</span>
-        </a>
+    <!-- Logo -->
+    <a href="/" class="logo">
+        <img src="{% static 'images/logo.png' %}" alt="KaamSetu Logo">
+        <span>KaamSetu</span>
+    </a>
 
-        <!-- Menu -->
-        <ul class="nav-menu">
-            <li><a href="/">Home</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#workers">Workers</a></li>
-            <li><a href="#">Become Worker</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
+    <!-- Menu -->
+    <ul class="nav-menu">
+        <li><a href="/">Home</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#workers">Workers</a></li>
+        <li><a href="#">Become Worker</a></li>
+        <li><a href="#">Contact</a></li>
+    </ul>
 
-        <!-- Buttons -->
-        <div class="nav-buttons">
-            <a href="#" class="btn-login">Login</a>
-            <a href="#" class="btn-signup">Sign Up</a>
-        </div>
+    <!-- Buttons -->
+<div class="nav-buttons">
+
+    {% if user.is_authenticated %}
+    <span style="margin-right:15px;">
+
+        Hello,
+        {{ user.first_name|default:user.username }}
+
+    </span>
+
+    <a href="{% url 'customer_dashboard' %}" class="btn-login">
+        Dashboard
+    </a>
+
+    <a href="{% url 'logout' %}" class="btn-login">
+
+        Logout
+
+    </a>
+
+    {% else %}
+
+    <a href="{% url 'login' %}" class="btn-login">
+
+        Login
+
+    </a>
+
+    <a href="{% url 'register' %}" class="btn-signup">
+
+        Sign Up
+
+    </a>
+    <a href="{% url 'worker_register' %}">
+        Become a Worker
+    </a>
+
+    {% endif %}
 
     </div>
+
+</div>
 
 </nav>

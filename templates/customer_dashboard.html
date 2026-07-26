@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="padding:50px;">
+
+<h1>My Bookings</h1>
+
+<table border="1" cellpadding="12" width="100%">
+
+<tr>
+
+<th>Worker</th>
+
+<th>Profession</th>
+
+<th>Date</th>
+
+<th>Status</th>
+
+<th>Mobile</th>
+
+</tr>
+
+{% for booking in bookings %}
+
+<tr>
+
+<td>{{ booking.worker.name }}</td>
+
+<td>{{ booking.worker.profession }}</td>
+
+<td>{{ booking.work_date }}</td>
+
+<td>
+
+{% if booking.status == "Pending" %}
+
+    <span style="color:#f59e0b;font-weight:bold;">
+        🟡 Pending
+    </span>
+
+{% elif booking.status == "Accepted" %}
+
+    <span style="color:green;font-weight:bold;">
+        🟢 Accepted
+    </span>
+
+{% elif booking.status == "Completed" %}
+
+    <span style="color:blue;font-weight:bold;">
+        🔵 Completed
+    </span>
+
+{% else %}
+
+    <span style="color:red;font-weight:bold;">
+        🔴 Cancelled
+    </span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+{% if booking.status == "Accepted" or booking.status == "Completed" %}
+
+    {{ booking.worker.mobile }}
+
+{% else %}
+
+    <span style="color:#f59e0b;font-weight:bold;">
+        🔒 Available after acceptance
+    </span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="5">
+
+No Bookings Yet
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+{% endblock %}

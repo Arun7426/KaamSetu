@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:800px;margin:60px auto;">
+
+    <div class="success-card">
+
+        <h1>🎉 Booking Successful</h1>
+
+        <p>Your booking has been submitted successfully.</p>
+
+        <hr>
+
+        <h3>Worker Details</h3>
+
+        <p><strong>Name:</strong> {{ booking.worker.name }}</p>
+        {% if booking.status == "Accepted" or booking.status == "Completed" %}
+
+        <p><strong>Worker Mobile:</strong>
+        {{ booking.worker.mobile }}</p>
+
+        {% else %}
+
+        <p><strong>Worker Mobile:</strong>
+
+        🔒 Available after booking acceptance.
+
+        </p>
+
+        {% endif %}
+        <p><strong>Profession:</strong> {{ booking.worker.profession }}</p>
+        <p><strong>City:</strong> {{ booking.worker.city }}</p>
+
+        <hr>
+
+        <h3>Customer Details</h3>
+
+        <p><strong>Name:</strong> {{ booking.customer_name }}</p>
+        <p><strong>Mobile:</strong> {{ booking.customer_mobile }}</p>
+        <p><strong>Date:</strong> {{ booking.work_date }}</p>
+
+        <hr>
+
+        <p><strong>Status:</strong> {{ booking.status }}</p>
+
+        <br>
+
+        <a href="/" class="book-btn">
+            Back to Home
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

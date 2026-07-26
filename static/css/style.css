@@ -876,3 +876,15 @@ html{
     font-weight:bold;
 
 }
+
+.success-card{
+    background:#fff;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.success-card h1{
+    color:#16a34a;
+    margin-bottom:20px;
+}
