@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:700px; margin:60px auto;">
+
+    <h2>Book {{ worker.name }}</h2>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit" class="book-btn">
+            Confirm Booking
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

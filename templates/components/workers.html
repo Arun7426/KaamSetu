@@ -9,43 +9,20 @@
 
         <div class="workers-grid">
 
-            <!-- Worker 1 -->
+            {% for worker in workers %}
+
             <div class="worker-card">
 
-                <img src="https://via.placeholder.com/120"
-                     alt="Worker">
+                {% if worker.profile_photo %}
+                    <img src="{{ worker.profile_photo.url }}" alt="{{ worker.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/120" alt="{{ worker.name }}">
+                {% endif %}
 
-                <h3>राम कुमार</h3>
-
-                <span class="profession">
-                    राजमिस्त्री
-                </span>
-
-                <div class="rating">
-                    ⭐⭐⭐⭐⭐
-                    <span>4.9</span>
-                </div>
-
-                <p>8 वर्ष का अनुभव</p>
-
-                <h4>₹700 / Day</h4>
-
-                <a href="#" class="book-btn">
-                    Book Now
-                </a>
-
-            </div>
-
-            <!-- Worker 2 -->
-            <div class="worker-card">
-
-                <img src="https://via.placeholder.com/120"
-                     alt="Worker">
-
-                <h3>मोहित शर्मा</h3>
+                <h3>{{ worker.name }}</h3>
 
                 <span class="profession">
-                    प्लम्बर
+                    {{ worker.profession }}
                 </span>
 
                 <div class="rating">
@@ -53,69 +30,23 @@
                     <span>4.8</span>
                 </div>
 
-                <p>6 वर्ष का अनुभव</p>
+                <p>{{ worker.experience }} वर्ष का अनुभव</p>
 
-                <h4>₹650 / Day</h4>
+                <h4>₹{{ worker.daily_wage }} / Day</h4>
 
-                <a href="#" class="book-btn">
-                    Book Now
+                <p>📍 {{ worker.city }}</p>
+
+                <a href="{% url 'worker_detail' worker.id %}" class="book-btn">
+                    View Profile
                 </a>
 
             </div>
 
-            <!-- Worker 3 -->
-            <div class="worker-card">
+            {% empty %}
 
-                <img src="https://via.placeholder.com/120"
-                     alt="Worker">
+            <p>अभी कोई Worker उपलब्ध नहीं है।</p>
 
-                <h3>अजय सिंह</h3>
-
-                <span class="profession">
-                    इलेक्ट्रिशियन
-                </span>
-
-                <div class="rating">
-                    ⭐⭐⭐⭐⭐
-                    <span>4.9</span>
-                </div>
-
-                <p>10 वर्ष का अनुभव</p>
-
-                <h4>₹800 / Day</h4>
-
-                <a href="#" class="book-btn">
-                    Book Now
-                </a>
-
-            </div>
-
-            <!-- Worker 4 -->
-            <div class="worker-card">
-
-                <img src="https://via.placeholder.com/120"
-                     alt="Worker">
-
-                <h3>संदीप वर्मा</h3>
-
-                <span class="profession">
-                    पेंटर
-                </span>
-
-                <div class="rating">
-                    ⭐⭐⭐⭐⭐
-                    <span>4.7</span>
-                </div>
-
-                <p>7 वर्ष का अनुभव</p>
-
-                <h4>₹750 / Day</h4>
-
-                <a href="#" class="book-btn">
-                    Book Now
-                </a>
-
-            </div>
+            {% endfor %}
 
         </div>
 

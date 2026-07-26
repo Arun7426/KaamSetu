@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% include "components/navbar.html" %}
+
+<section class="worker-profile">
+
+    <div class="container">
+
+        <div class="profile-card">
+
+            <div class="profile-image">
+
+                {% if worker.profile_photo %}
+                    <img src="{{ worker.profile_photo.url }}" alt="{{ worker.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/250" alt="">
+                {% endif %}
+
+            </div>
+
+            <div class="profile-info">
+
+                <h1>
+                    {{ worker.name }}
+
+                    {% if worker.verified %}
+                        <span class="verified">✔ Verified</span>
+                    {% endif %}
+                </h1>
+
+                <h3>{{ worker.profession }}</h3>
+
+                <p>⭐ {{ worker.rating }} ({{ worker.reviews }} Reviews)</p>
+
+                <p>📍 {{ worker.city }}, {{ worker.area }}</p>
+
+                <p>💼 {{ worker.experience }} Years Experience</p>
+
+                <p class="price">
+                    ₹{{ worker.daily_wage }} / Day
+                </p>
+
+                {% if worker.available %}
+                    <span class="available">
+                        🟢 Available Today
+                    </span>
+                {% else %}
+                    <span class="busy">
+                        🔴 Not Available
+                    </span>
+                {% endif %}
+
+                <div class="about">
+
+                    <h2>About</h2>
+
+                    <p>
+
+                        {% if worker.about %}
+                            {{ worker.about }}
+                        {% else %}
+                            Experienced worker with quality service.
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
+                <a href="{% url 'book_worker' worker.id %}" class="book-btn">
+                    Book Now
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

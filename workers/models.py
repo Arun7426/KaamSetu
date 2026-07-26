@@ -25,5 +25,10 @@ class Worker(models.Model):
     available = models.BooleanField(default=True)
     profile_photo = models.ImageField(upload_to="workers/", blank=True, null=True)
 
+
+    rating = models.DecimalField(max_digits=2, decimal_places=1, default=5.0)
+    reviews = models.PositiveIntegerField(default=0)
+    verified = models.BooleanField(default=True)
+
     def __str__(self):
         return self.name
