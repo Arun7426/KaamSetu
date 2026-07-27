@@ -5,8 +5,14 @@ urlpatterns = [
 
     path(
         "register/",
-        views.register,
+        views.choose_role,
         name="register",
+    ),
+
+    path(
+        "register/customer/",
+        views.register,
+        name="customer_register",
     ),
 
     path(
@@ -20,10 +26,10 @@ urlpatterns = [
         views.user_logout,
         name="logout",
     ),
+
     path(
         "dashboard/",
         views.customer_dashboard,
         name="customer_dashboard",
     ),
-
 ]

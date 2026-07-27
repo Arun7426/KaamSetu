@@ -1,25 +1,159 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Customer Registration | KaamSetu{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/customer_register.css' %}">
+{% endblock %}
 
 {% block content %}
 
-<div class="container" style="max-width:600px;margin:50px auto;">
+<section class="register-section">
 
-<h2>Create Account</h2>
+    <div class="register-container">
 
-<form method="POST">
+        <!-- Left Side -->
 
-{% csrf_token %}
+        <div class="register-left">
 
-{{ form.as_p }}
+            <h1>Hire Trusted Workers</h1>
 
-<button type="submit" class="book-btn">
+            <p>
+                Create your customer account and book verified workers
+                for home, office and business work in just a few clicks.
+            </p>
 
-Register
+            <img
+                src="{% static 'images/customer-register.png' %}"
+                alt="Customer Registration"
+            >
 
-</button>
+        </div>
 
-</form>
 
-</div>
+        <!-- Right Side -->
+
+        <div class="register-card">
+
+            <h2>Create Customer Account</h2>
+
+            <p class="subtitle">
+                Join KaamSetu as a Customer
+            </p>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-group">
+
+                    <label>Full Name</label>
+
+                    {{ form.first_name }}
+
+                    {% if form.first_name.errors %}
+                        <small class="error">
+                            {{ form.first_name.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Username</label>
+
+                    {{ form.username }}
+
+                    {% if form.username.errors %}
+                        <small class="error">
+                            {{ form.username.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Email Address</label>
+
+                    {{ form.email }}
+
+                    {% if form.email.errors %}
+                        <small class="error">
+                            {{ form.email.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Password</label>
+
+                    {{ form.password1 }}
+
+                    {% if form.password1.errors %}
+                        <small class="error">
+                            {{ form.password1.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Confirm Password</label>
+
+                    {{ form.password2 }}
+
+                    {% if form.password2.errors %}
+                        <small class="error">
+                            {{ form.password2.errors.0 }}
+                        </small>
+                    {% endif %}
+
+                </div>
+
+
+                {% if form.non_field_errors %}
+
+                    <div class="error-box">
+
+                        {{ form.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <button type="submit" class="register-btn">
+
+                    Create Account
+
+                </button>
+
+            </form>
+
+            <div class="login-link">
+
+                Already have an account?
+
+                <a href="{% url 'login' %}">
+                    Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
 
 {% endblock %}

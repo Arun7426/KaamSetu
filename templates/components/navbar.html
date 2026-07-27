@@ -2,66 +2,97 @@
 
 <nav class="navbar">
 
-<div class="container">
+    <div class="container">
 
-    <!-- Logo -->
-    <a href="/" class="logo">
-        <img src="{% static 'images/logo.png' %}" alt="KaamSetu Logo">
-        <span>KaamSetu</span>
-    </a>
+        <!-- Logo -->
+        <a href="/" class="logo">
+            <img src="{% static 'images/logo.png' %}" alt="KaamSetu Logo">
+            <span>KaamSetu</span>
+        </a>
 
-    <!-- Menu -->
-    <ul class="nav-menu">
-        <li><a href="/">Home</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#workers">Workers</a></li>
-        <li><a href="#">Become Worker</a></li>
-        <li><a href="#">Contact</a></li>
-    </ul>
+        <!-- Menu -->
+        <ul class="nav-menu">
 
-    <!-- Buttons -->
-<div class="nav-buttons">
+            <li>
+                <a href="/">Home</a>
+            </li>
 
-    {% if user.is_authenticated %}
-    <span style="margin-right:15px;">
+            <li>
+                <a href="#services">Services</a>
+            </li>
 
-        Hello,
-        {{ user.first_name|default:user.username }}
+            <li>
+                <a href="#how-it-works">How It Works</a>
+            </li>
 
-    </span>
+            <li>
+                <a href="#workers">Workers</a>
+            </li>
 
-    <a href="{% url 'customer_dashboard' %}" class="btn-login">
-        Dashboard
-    </a>
+            <li>
+                <a href="{% url 'worker_register' %}">
+                    Become a Worker
+                </a>
+            </li>
 
-    <a href="{% url 'logout' %}" class="btn-login">
+            <li>
+                <a href="#contact">Contact</a>
+            </li>
 
-        Logout
+        </ul>
 
-    </a>
+        <!-- Right Side Buttons -->
+        <div class="nav-buttons">
 
-    {% else %}
+            {% if user.is_authenticated %}
 
-    <a href="{% url 'login' %}" class="btn-login">
+                <span class="welcome-text">
+                    Hello,
+                    {{ user.first_name|default:user.username }}
+                </span>
 
-        Login
+                {% if user.is_staff %}
 
-    </a>
+                    <a href="/admin/" class="btn-login">
+                        Dashboard
+                    </a>
 
-    <a href="{% url 'register' %}" class="btn-signup">
+                {% else %}
 
-        Sign Up
+                    {% if user.worker_profile %}
 
-    </a>
-    <a href="{% url 'worker_register' %}">
-        Become a Worker
-    </a>
+                        <a href="{% url 'worker_dashboard' %}" class="btn-login">
+                            Dashboard
+                        </a>
 
-    {% endif %}
+                    {% else %}
+
+                        <a href="{% url 'customer_dashboard' %}" class="btn-login">
+                            Dashboard
+                        </a>
+
+                    {% endif %}
+
+                {% endif %}
+
+                <a href="{% url 'logout' %}" class="btn-signup">
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a href="{% url 'login' %}" class="btn-login">
+                    Login
+                </a>
+
+                <a href="{% url 'register' %}" class="btn-signup">
+                    Sign Up
+                </a>
+
+            {% endif %}
+
+        </div>
 
     </div>
-
-</div>
 
 </nav>

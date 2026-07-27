@@ -2,17 +2,25 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.home, name="home"),
-    path("worker/<int:worker_id>/", views.worker_detail, name="worker_detail"),
-    path(
-            "register/",
-            views.worker_register,
-            name="worker_register",
-        ),
-    path(
-            "dashboard/",
-            views.worker_dashboard,
-            name="worker_dashboard",
-        )
-]
 
+    path("", views.home, name="home"),
+
+    path(
+        "workers/<int:worker_id>/",
+        views.worker_detail,
+        name="worker_detail",
+    ),
+
+    path(
+        "worker/register/",
+        views.worker_register,
+        name="worker_register",
+    ),
+
+    path(
+        "worker/dashboard/",
+        views.worker_dashboard,
+        name="worker_dashboard",
+    ),
+
+]

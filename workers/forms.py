@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.models import User
 from .models import Worker
 
 
@@ -26,4 +25,48 @@ class WorkerRegistrationForm(forms.ModelForm):
             "profile_photo",
             "username",
             "password",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                "class": "form-control",
+                "placeholder": field.label,
+            })
+
+        self.fields["about"].widget.attrs.update({
+            "rows": 5,
+            "placeholder": "Apne baare mein likhiye..."
+        })
+
+        self.fields["password"].widget.attrs.update({
+            "placeholder": "Password"
+        })
+
+        self.fields["profile_photo"].widget.attrs.update({
+            "class": "form-control-file"
+        })
+
+        # Profession Dropdown
+        self.fields["profession"].choices = [
+            ("", "Select Profession"),
+            ("Electrician", "Electrician"),
+            ("Plumber", "Plumber"),
+            ("Carpenter", "Carpenter"),
+            ("Painter", "Painter"),
+            ("Mason", "Mason"),
+            ("Cleaner", "Cleaner"),
+            ("Welder", "Welder"),
+            ("AC Technician", "AC Technician"),
+            ("Mechanic", "Mechanic"),
+            ("Driver", "Driver"),
+            ("House Maid", "House Maid"),
+            ("Cook", "Cook"),
+            ("Gardener", "Gardener"),
+            ("Labour", "Labour"),
+            ("Tiles Worker", "Tiles Worker"),
+            ("POP Worker", "POP Worker"),
+            ("Other", "Other"),
         ]

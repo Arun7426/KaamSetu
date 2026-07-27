@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sign Up | KaamSetu{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/choose_role.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<div class="role-container">
+
+    <div class="role-header">
+
+        <h1>Create Your Account</h1>
+
+        <p>
+            Choose how you want to use <strong>KaamSetu</strong>
+        </p>
+
+    </div>
+
+    <div class="role-cards">
+
+        <!-- Customer -->
+
+        <div class="role-card">
+
+            <div class="role-icon">
+                👤
+            </div>
+
+            <h2>Hire Workers</h2>
+
+            <p>
+                Find trusted workers near you and
+                book them easily.
+            </p>
+
+            <a href="{% url 'customer_register' %}" class="customer-btn">
+
+                Continue as Customer
+
+            </a>
+
+        </div>
+
+
+        <!-- Worker -->
+
+        <div class="role-card">
+
+            <div class="role-icon">
+                👷
+            </div>
+
+            <h2>Become a Worker</h2>
+
+            <p>
+                Register yourself and start
+                getting work from customers.
+            </p>
+
+            <a href="{% url 'worker_register' %}" class="worker-btn">
+
+                Continue as Worker
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,11 +1,26 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from .forms import CustomerRegistrationForm
+from bookings.models import Booking
 
 
+# ==========================
+# Role Selection Page
+# ==========================
+def choose_role(request):
+
+    return render(
+        request,
+        "choose_role.html"
+    )
+
+
+# ==========================
+# Customer Registration
+# ==========================
 def register(request):
 
     if request.method == "POST":
@@ -32,6 +47,10 @@ def register(request):
         }
     )
 
+
+# ==========================
+# Login
+# ==========================
 def user_login(request):
 
     if request.method == "POST":
@@ -49,38 +68,40 @@ def user_login(request):
 
             login(request, user)
 
-                # Admin
+            # Admin
             if user.is_staff:
                 return redirect("/admin/")
 
-                # Worker
+            # Worker
             elif hasattr(user, "worker_profile"):
                 return redirect("worker_dashboard")
 
-                # Customer
+            # Customer
             else:
                 return redirect("customer_dashboard")
 
         else:
-            messages.error(request, "Invalid Username or Password")
-
-    else:
-
-            messages.error(request, "Invalid Username or Password")
+            messages.error(
+                request,
+                "Invalid Username or Password"
+            )
 
     return render(request, "login.html")
 
 
+# ==========================
+# Logout
+# ==========================
 def user_logout(request):
 
     logout(request)
 
     return redirect("home")
 
-from django.contrib.auth.decorators import login_required
-from bookings.models import Booking
 
-
+# ==========================
+# Customer Dashboard
+# ==========================
 @login_required
 def customer_dashboard(request):
 

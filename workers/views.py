@@ -11,7 +11,15 @@ from django.shortcuts import render
 
 @login_required
 def worker_dashboard(request):
-    return render(request, "worker_dashboard.html")
+    worker = request.user.worker_profile
+
+    return render(
+        request,
+        "worker_dashboard.html",
+        {
+            "worker": worker
+        }
+    )
 
 def home(request):
     workers = Worker.objects.filter(available=True)

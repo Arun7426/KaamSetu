@@ -17,3 +17,31 @@ class CustomerRegistrationForm(UserCreationForm):
             "password1",
             "password2",
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["first_name"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "Full Name",
+        })
+
+        self.fields["username"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "Username",
+        })
+
+        self.fields["email"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "Email Address",
+        })
+
+        self.fields["password1"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "Password",
+        })
+
+        self.fields["password2"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "Confirm Password",
+        })

@@ -1,19 +1,137 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-<h2>Worker Registration</h2>
+<link rel="stylesheet" href="{% static 'css/worker_register.css' %}">
 
-<form method="POST" enctype="multipart/form-data">
+<div class="register-page">
 
-    {% csrf_token %}
+    <div class="register-container">
 
-    {{ form.as_p }}
+        <!-- Left Side -->
 
-    <button type="submit">
-        Register
-    </button>
+        <div class="left-panel">
 
-</form>
+            <h1>👷 Become a Worker</h1>
+
+            <p class="tagline">
+                KaamSetu के साथ जुड़ें और रोज़गार के नए अवसर पाएँ।
+            </p>
+
+            <ul class="benefits">
+
+                <li>✅ Verified Worker Profile</li>
+
+                <li>✅ Daily Job Opportunities</li>
+
+                <li>✅ Trusted Customers</li>
+
+                <li>✅ Secure Booking System</li>
+
+                <li>✅ Grow Your Income</li>
+
+            </ul>
+
+            <img src="{% static 'images/worker-register.png' %}"
+                 alt="Worker"
+                 class="worker-image">
+            <div class="login-box">
+
+                <p>Already have an account?</p>
+
+                <a href="{% url 'login' %}" class="login-link">
+
+                    Login Now →
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Right Side -->
+
+        <div class="right-panel">
+
+            <h2>Worker Registration</h2>
+
+            <form method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        {{ form.name }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        {{ form.mobile }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Profession</label>
+                        {{ form.profession }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Experience (Years)</label>
+                        {{ form.experience }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>City</label>
+                        {{ form.city }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Area</label>
+                        {{ form.area }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Daily Wage (₹)</label>
+                        {{ form.daily_wage }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>About Yourself</label>
+                        {{ form.about }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Profile Photo</label>
+                        {{ form.profile_photo }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Username</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        {{ form.password }}
+                    </div>
+
+                </div>
+
+                <button type="submit" class="register-btn">
+
+                    Register as Worker
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}

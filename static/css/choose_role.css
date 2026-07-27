@@ -1,0 +1,175 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#f4f7fc;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+.role-container{
+
+    max-width:1100px;
+
+    margin:60px auto;
+
+    padding:20px;
+
+}
+
+.role-header{
+
+    text-align:center;
+
+    margin-bottom:50px;
+
+}
+
+.role-header h1{
+
+    font-size:40px;
+
+    color:#17375E;
+
+    margin-bottom:15px;
+
+}
+
+.role-header p{
+
+    color:#666;
+
+    font-size:18px;
+
+}
+
+.role-cards{
+
+    display:flex;
+
+    gap:35px;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+}
+
+.role-card{
+
+    width:450px;
+
+    background:#fff;
+
+    border-radius:20px;
+
+    padding:40px 30px;
+
+    text-align:center;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.08);
+
+    transition:.35s;
+
+}
+
+.role-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 25px 50px rgba(0,0,0,.15);
+
+}
+
+.role-icon{
+
+    font-size:70px;
+
+    margin-bottom:20px;
+
+}
+
+.role-card h2{
+
+    color:#17375E;
+
+    margin-bottom:15px;
+
+    font-size:28px;
+
+}
+
+.role-card p{
+
+    color:#666;
+
+    line-height:1.7;
+
+    margin-bottom:35px;
+
+}
+
+.customer-btn,
+.worker-btn{
+
+    display:inline-block;
+
+    width:100%;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    color:#fff;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+.customer-btn{
+
+    background:#F4A940;
+
+}
+
+.customer-btn:hover{
+
+    background:#e99616;
+
+}
+
+.worker-btn{
+
+    background:#17375E;
+
+}
+
+.worker-btn:hover{
+
+    background:#0f2745;
+
+}
+
+@media(max-width:900px){
+
+    .role-card{
+
+        width:100%;
+
+    }
+
+    .role-header h1{
+
+        font-size:32px;
+
+    }
+
+}

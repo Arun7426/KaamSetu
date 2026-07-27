@@ -1,12 +1,26 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaamSetu</title>
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        KaamSetu
+        {% endblock %}
+    </title>
+
+    <!-- Main CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Page Specific CSS -->
+    {% block extra_css %}
+    {% endblock %}
+
 </head>
 
 <body>
@@ -15,4 +29,5 @@
     {% endblock %}
 
 </body>
+
 </html>
