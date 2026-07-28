@@ -1,39 +1,225 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+KaamSetu Login
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+{% endblock %}
 
 {% block content %}
 
-<div class="container" style="max-width:500px;margin:60px auto;">
+<div class="login-wrapper">
 
-<h2>Customer Login</h2>
+    <!-- LEFT PANEL -->
 
-<form method="POST">
+    <div class="left-panel">
 
-{% csrf_token %}
+        <div class="branding">
 
-<input
-type="text"
-name="username"
-placeholder="Username"
-required>
+            <img
+                src="{% static 'images/logo.png' %}"
+                class="logo"
+                alt="KaamSetu">
 
-<br><br>
+            <h2>
 
-<input
-type="password"
-name="password"
-placeholder="Password"
-required>
+                जहाँ काम मिले,<br>
+                भरोसा मिले।
 
-<br><br>
+            </h2>
 
-<button class="book-btn">
+            <p>
 
-Login
+                भरोसेमंद कारीगर अब आपकी
+                उंगलियों पर।
 
-</button>
+            </p>
 
-</form>
+        </div>
+
+        <div class="worker-image">
+
+            <img
+                src="{% static 'images/hero-worker.png' %}"
+                alt="Worker">
+
+        </div>
+
+    </div>
+
+
+
+    <!-- RIGHT PANEL -->
+
+    <div class="right-panel">
+
+        <div class="login-card">
+
+            <h1 class="login-heading"><span class="blue">Kaam</span><span class="orange">Setu</span> Login</h1>
+
+            <p class="subtitle">
+
+                अपने अकाउंट में लॉगिन करें
+
+            </p>
+
+
+
+            <!-- ROLE -->
+
+            <div class="role-tabs">
+
+                <button
+                    type="button"
+                    class="role-tab active"
+                    id="customerTab">
+
+                    <i class="fa-solid fa-user"></i>
+
+                    Customer
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="role-tab"
+                    id="workerTab">
+
+                    <i class="fa-solid fa-helmet-safety"></i>
+
+                    Worker
+
+                </button>
+
+            </div>
+
+
+
+            {% if messages %}
+
+            {% for message in messages %}
+
+            <div class="alert">
+
+                {{ message }}
+
+            </div>
+
+            {% endfor %}
+
+            {% endif %}
+
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="input-group">
+
+                    <i class="fa-regular fa-user"></i>
+
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        required>
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Password"
+                        required>
+
+                    <span
+                        id="togglePassword"
+                        class="eye">
+
+                        <i class="fa-solid fa-eye"></i>
+
+                    </span>
+
+                </div>
+
+
+
+                <div class="login-options">
+
+                    <label>
+
+                        <input type="checkbox">
+
+                        Remember Me
+
+                    </label>
+
+                    <a href="#">
+
+                        Forgot Password?
+
+                    </a>
+
+                </div>
+
+
+
+                <button
+                    class="login-btn"
+                    type="submit">
+
+                    <i class="fa-solid fa-right-to-bracket"></i>
+
+                    Login
+
+                </button>
+
+            </form>
+
+
+
+            <div class="register-section">
+
+                <p>
+
+                    नया अकाउंट नहीं है?
+
+                </p>
+
+                <a
+                    href="{% url 'register' %}"
+                    class="register-btn">
+
+                    <i class="fa-solid fa-user-plus"></i>
+
+                    Create Account
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
+
+<script src="{% static 'js/login.js' %}"></script>
 
 {% endblock %}

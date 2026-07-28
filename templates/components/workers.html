@@ -7,48 +7,56 @@
             <p>हमारे कुछ भरोसेमंद और सत्यापित कारीगर</p>
         </div>
 
-        <div class="workers-grid">
+        <div class="worker-slider-wrapper">
 
-            {% for worker in workers %}
+    <button class="slider-btn slider-prev">&#10094;</button>
 
-            <div class="worker-card">
+    <div class="worker-slider">
 
-                {% if worker.profile_photo %}
-                    <img src="{{ worker.profile_photo.url }}" alt="{{ worker.name }}">
-                {% else %}
-                    <img src="https://via.placeholder.com/120" alt="{{ worker.name }}">
-                {% endif %}
+        {% for worker in workers %}
 
-                <h3>{{ worker.name }}</h3>
+        <div class="worker-card">
 
-                <span class="profession">
-                    {{ worker.profession }}
-                </span>
+            {% if worker.profile_photo %}
+                <img src="{{ worker.profile_photo.url }}" alt="{{ worker.name }}">
+            {% else %}
+                <img src="https://via.placeholder.com/120" alt="{{ worker.name }}">
+            {% endif %}
 
-                <div class="rating">
-                    ⭐⭐⭐⭐⭐
-                    <span>4.8</span>
-                </div>
+            <h3>{{ worker.name }}</h3>
 
-                <p>{{ worker.experience }} वर्ष का अनुभव</p>
+            <span class="profession">
+                {{ worker.profession }}
+            </span>
 
-                <h4>₹{{ worker.daily_wage }} / Day</h4>
-
-                <p>📍 {{ worker.city }}</p>
-
-                <a href="{% url 'worker_detail' worker.id %}" class="book-btn">
-                    View Profile
-                </a>
-
+            <div class="rating">
+                ⭐⭐⭐⭐⭐
+                <span>4.8</span>
             </div>
 
-            {% empty %}
+            <p>{{ worker.experience }} वर्ष का अनुभव</p>
 
-            <p>अभी कोई Worker उपलब्ध नहीं है।</p>
+            <h4>₹{{ worker.daily_wage }} / Day</h4>
 
-            {% endfor %}
+            <p>📍 {{ worker.city }}</p>
+
+            <a href="{% url 'worker_detail' worker.id %}" class="book-btn">
+                View Profile
+            </a>
 
         </div>
+
+        {% empty %}
+
+        <p>अभी कोई Worker उपलब्ध नहीं है।</p>
+
+        {% endfor %}
+
+    </div>
+
+    <button class="slider-btn slider-next">&#10095;</button>
+
+</div>
 
     </div>
 
