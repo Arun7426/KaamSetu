@@ -1,15 +1,27 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from workers.models import Worker
-
 from .forms import BookingForm
 
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def book_worker(request, worker_id):
 
     worker = get_object_or_404(Worker, id=worker_id)
+    print("Logged in user:", request.user.username)
+    print("Is Worker:", hasattr(request.user, "worker_profile"))
+
+    # Worker cannot book another worker
+    if hasattr(request.user, "worker_profile"):
+
+        messages.error(
+            request,
+            "Only customers can book workers."
+        )
+
+        return redirect("worker_detail", worker_id=worker.id)
 
     if request.method == "POST":
 
@@ -20,7 +32,6 @@ def book_worker(request, worker_id):
             booking = form.save(commit=False)
 
             booking.worker = worker
-
             booking.customer = request.user
 
             booking.save()

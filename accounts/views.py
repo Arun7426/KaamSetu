@@ -74,11 +74,11 @@ def user_login(request):
 
             # Worker
             elif hasattr(user, "worker_profile"):
-                return redirect("worker_dashboard")
+                return redirect("home")
 
             # Customer
             else:
-                return redirect("customer_dashboard")
+                return redirect("home")
 
         else:
             messages.error(

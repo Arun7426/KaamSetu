@@ -9,8 +9,6 @@ class BookingForm(forms.ModelForm):
         model = Booking
 
         fields = [
-            "customer_name",
-            "customer_mobile",
             "customer_address",
             "work_date",
             "work_description",
@@ -18,24 +16,29 @@ class BookingForm(forms.ModelForm):
 
         widgets = {
 
-            "customer_name":
-                forms.TextInput(attrs={"class":"form-control"}),
-
-            "customer_mobile":
-                forms.TextInput(attrs={"class":"form-control"}),
-
             "customer_address":
-                forms.Textarea(attrs={"class":"form-control"}),
+                forms.Textarea(
+                    attrs={
+                        "class": "form-control",
+                        "rows": 3,
+                        "placeholder": "पूरा पता लिखें जहाँ काम करवाना है"
+                    }
+                ),
 
             "work_date":
                 forms.DateInput(
                     attrs={
-                        "type":"date",
-                        "class":"form-control"
+                        "type": "date",
+                        "class": "form-control"
                     }
                 ),
 
             "work_description":
-                forms.Textarea(attrs={"class":"form-control"}),
-
+                forms.Textarea(
+                    attrs={
+                        "class": "form-control",
+                        "rows": 4,
+                        "placeholder": "काम का विवरण लिखें..."
+                    }
+                ),
         }

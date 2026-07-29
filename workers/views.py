@@ -27,8 +27,25 @@ def home(request):
 
 
 def worker_detail(request, worker_id):
+
     worker = get_object_or_404(Worker, id=worker_id)
-    return render(request, "worker_detail.html", {"worker": worker})
+
+    is_worker = False
+
+    if request.user.is_authenticated:
+        is_worker = hasattr(request.user, "worker_profile")
+
+    print("User:", request.user.username if request.user.is_authenticated else "Guest")
+    print("is_worker:", is_worker)
+
+    return render(
+        request,
+        "worker_detail.html",
+        {
+            "worker": worker,
+            "is_worker": is_worker,
+        }
+    )
 
 def worker_register(request):
 

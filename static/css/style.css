@@ -959,3 +959,109 @@ html{
     color:#16a34a;
     margin-bottom:20px;
 }
+
+/* ===========================
+   Booking Form
+=========================== */
+
+.booking-card{
+    background:#fff;
+    border-radius:18px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.booking-title{
+    text-align:center;
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:25px;
+    color:#1f2937;
+}
+
+.info-card{
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:25px;
+    background:#fafafa;
+}
+
+.worker-box{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.worker-photo{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.worker-name{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:5px;
+}
+
+.worker-meta{
+    color:#666;
+    margin:4px 0;
+}
+
+.worker-rate{
+    color:#ff7a00;
+    font-size:18px;
+    font-weight:700;
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#333;
+}
+
+.form-control{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid #dcdcdc;
+    border-radius:10px;
+    font-size:15px;
+    transition:.3s;
+    box-sizing:border-box;
+}
+
+.form-control:focus{
+    outline:none;
+    border-color:#ff7a00;
+    box-shadow:0 0 0 3px rgba(255,122,0,.15);
+}
+
+textarea.form-control{
+    resize:vertical;
+    min-height:100px;
+}
+
+.booking-btn{
+    width:100%;
+    border:none;
+    border-radius:10px;
+    background:#ff7a00;
+    color:#fff;
+    font-size:17px;
+    font-weight:600;
+    padding:14px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.booking-btn:hover{
+    background:#e86d00;
+}
