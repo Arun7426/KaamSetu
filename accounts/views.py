@@ -109,10 +109,38 @@ def customer_dashboard(request):
         customer=request.user
     ).order_by("-created_at")
 
+    total_bookings = bookings.count()
+
+    pending_bookings = bookings.filter(
+        status="Pending"
+    ).count()
+
+    accepted_bookings = bookings.filter(
+        status="Accepted"
+    ).count()
+
+    completed_bookings = bookings.filter(
+        status="Completed"
+    ).count()
+
+    cancelled_bookings = bookings.filter(
+        status="Cancelled"
+    ).count()
+
     return render(
         request,
         "customer_dashboard.html",
         {
-            "bookings": bookings
+            "bookings": bookings,
+
+            "total_bookings": total_bookings,
+
+            "pending_bookings": pending_bookings,
+
+            "accepted_bookings": accepted_bookings,
+
+            "completed_bookings": completed_bookings,
+
+            "cancelled_bookings": cancelled_bookings,
         }
     )

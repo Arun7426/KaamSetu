@@ -9,15 +9,43 @@ from .forms import WorkerRegistrationForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
+from bookings.models import Booking
+
+
 @login_required
 def worker_dashboard(request):
+
     worker = request.user.worker_profile
+
+    bookings = Booking.objects.filter(
+        worker=worker
+    ).order_by("-created_at")
+
+    total_bookings = bookings.count()
+
+    pending_bookings = bookings.filter(
+        status="Pending"
+    ).count()
+
+    accepted_bookings = bookings.filter(
+        status="Accepted"
+    ).count()
+
+    completed_bookings = bookings.filter(
+        status="Completed"
+    ).count()
 
     return render(
         request,
         "worker_dashboard.html",
         {
-            "worker": worker
+            "worker": worker,
+            "bookings": bookings,
+
+            "total_bookings": total_bookings,
+            "pending_bookings": pending_bookings,
+            "accepted_bookings": accepted_bookings,
+            "completed_bookings": completed_bookings,
         }
     )
 
@@ -100,4 +128,22 @@ def worker_register(request):
             "form": form
         }
     )
+@login_required
+def update_booking_status(request, booking_id, status):
 
+    worker = request.user.worker_profile
+
+    booking = Booking.objects.get(
+        id=booking_id,
+        worker=worker
+    )
+
+    if status == "accept":
+        booking.status = "Accepted"
+
+    elif status == "reject":
+        booking.status = "Cancelled"
+
+    booking.save()
+
+    return redirect("worker_dashboard")

@@ -1,100 +1,270 @@
 {% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+{% block title %}
+Customer Dashboard
+{% endblock %}
+
+
 
 {% block content %}
 
-<div class="container" style="padding:50px;">
+<div class="dashboard">
 
-<h1>My Bookings</h1>
+    <!-- Sidebar -->
+    <aside class="sidebar">
 
-<table border="1" cellpadding="12" width="100%">
+        <div class="logo">
+            <h2>KaamSetu</h2>
+            <p>Customer Panel</p>
+        </div>
 
-<tr>
+        <ul class="menu">
 
-<th>Worker</th>
+            <li>
+                <a href="{% url 'customer_dashboard' %}" class="active">
+                    🏠 Dashboard
+                </a>
+            </li>
 
-<th>Profession</th>
+            <li>
+                <a href="{% url 'home' %}">
+                    🔍 Book Worker
+                </a>
+            </li>
 
-<th>Date</th>
+            <li>
+                <a href="#my-bookings">
+                    📋 My Bookings
+                </a>
+            </li>
 
-<th>Status</th>
+            <li>
+                <a href="#">
+                    👤 Edit Profile
+                </a>
+            </li>
 
-<th>Mobile</th>
+            <li>
+                <a href="{% url 'logout' %}">
+                    🚪 Logout
+                </a>
+            </li>
 
-</tr>
+        </ul>
 
-{% for booking in bookings %}
+    </aside>
 
-<tr>
+    <!-- Main Content -->
+    <main class="main-content">
 
-<td>{{ booking.worker.name }}</td>
+        <!-- Header -->
+        <div class="top-bar">
 
-<td>{{ booking.worker.profession }}</td>
+            <h1>
+                Welcome,
+                {{ request.user.first_name|default:request.user.username }}
+            </h1>
 
-<td>{{ booking.work_date }}</td>
+            <p>
+                Manage your bookings and hire trusted workers.
+            </p>
 
-<td>
+        </div>
 
-{% if booking.status == "Pending" %}
+        <!-- Profile Card -->
 
-    <span style="color:#f59e0b;font-weight:bold;">
-        🟡 Pending
-    </span>
+        <div class="profile-card">
 
-{% elif booking.status == "Accepted" %}
+            <div class="profile-image">
 
-    <span style="color:green;font-weight:bold;">
-        🟢 Accepted
-    </span>
+                <img src="{% static 'images/customer.png' %}" alt="Customer">
 
-{% elif booking.status == "Completed" %}
+            </div>
 
-    <span style="color:blue;font-weight:bold;">
-        🔵 Completed
-    </span>
+            <div class="profile-info">
 
-{% else %}
+                <h2>
+                    {{ request.user.first_name|default:request.user.username }}
+                </h2>
 
-    <span style="color:red;font-weight:bold;">
-        🔴 Cancelled
-    </span>
+                <h4>Customer</h4>
 
-{% endif %}
+                <p>
+                    Welcome to KaamSetu.
+                </p>
 
-</td>
+                <p>
+                    You can manage all your bookings from here.
+                </p>
 
-<td>
+            </div>
 
-{% if booking.status == "Accepted" or booking.status == "Completed" %}
+        </div>
 
-    {{ booking.worker.mobile }}
+        <!-- Statistics -->
 
-{% else %}
+        <div class="stats">
 
-    <span style="color:#f59e0b;font-weight:bold;">
-        🔒 Available after acceptance
-    </span>
+            <div class="stat-card">
 
-{% endif %}
+                <h4>Total Bookings</h4>
 
-</td>
+                <h2>{{ total_bookings }}</h2>
 
-</tr>
+            </div>
 
-{% empty %}
+            <div class="stat-card">
 
-<tr>
+                <h4>Pending</h4>
 
-<td colspan="5">
+                <h2>{{ pending_bookings }}</h2>
 
-No Bookings Yet
+            </div>
 
-</td>
+            <div class="stat-card">
 
-</tr>
+                <h4>Accepted</h4>
 
-{% endfor %}
+                <h2>{{ accepted_bookings }}</h2>
 
-</table>
+            </div>
+
+            <div class="stat-card">
+
+                <h4>Completed</h4>
+
+                <h2>{{ completed_bookings }}</h2>
+
+            </div>
+
+        </div>
+
+        <!-- Step 2B starts from here -->
+
+        <div id="my-bookings" style="margin-top:40px;">
+
+    <div class="profile-card">
+
+        <div style="width:100%;">
+
+            <h2 style="color:#17375E;margin-bottom:20px;">
+                My Bookings
+            </h2>
+
+            <div style="overflow-x:auto;">
+
+                <table class="booking-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Worker</th>
+                            <th>Profession</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Mobile</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for booking in bookings %}
+
+                        <tr>
+
+                            <td>
+                                {{ booking.worker.name }}
+                            </td>
+
+                            <td>
+                                {{ booking.worker.profession }}
+                            </td>
+
+                            <td>
+                                {{ booking.work_date }}
+                            </td>
+
+                            <td>
+
+                                {% if booking.status == "Pending" %}
+
+                                    <span class="status pending">
+                                        🟡 Pending
+                                    </span>
+
+                                {% elif booking.status == "Accepted" %}
+
+                                    <span class="status accepted">
+                                        🟢 Accepted
+                                    </span>
+
+                                {% elif booking.status == "Completed" %}
+
+                                    <span class="status completed">
+                                        🔵 Completed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status cancelled">
+                                        🔴 Cancelled
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if booking.status == "Accepted" or booking.status == "Completed" %}
+
+                                    {{ booking.worker.mobile }}
+
+                                {% else %}
+
+                                    <span style="color:#f4a940;font-weight:600;">
+                                        🔒 Available after acceptance
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="5" style="text-align:center;padding:30px;">
+
+                                No Bookings Yet
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    </main>
 
 </div>
 

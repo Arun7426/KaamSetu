@@ -22,5 +22,10 @@ urlpatterns = [
         views.worker_dashboard,
         name="worker_dashboard",
     ),
+    path(
+        "booking/<int:booking_id>/<str:status>/",
+        views.update_booking_status,
+        name="update_booking_status",
+    ),
 
 ]
