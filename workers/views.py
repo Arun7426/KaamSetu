@@ -53,6 +53,21 @@ def home(request):
     workers = Worker.objects.filter(available=True)
     return render(request, "home.html", {"workers": workers})
 
+def workers_by_profession(request, profession):
+
+    workers = Worker.objects.filter(
+        profession=profession,
+        available=True
+    )
+
+    return render(
+        request,
+        "workers_list.html",
+        {
+            "workers": workers,
+            "profession": profession,
+        },
+    )
 
 def worker_detail(request, worker_id):
 
@@ -139,10 +154,18 @@ def update_booking_status(request, booking_id, status):
     )
 
     if status == "accept":
+
         booking.status = "Accepted"
 
     elif status == "reject":
+
         booking.status = "Cancelled"
+
+    elif status == "complete":
+
+        # Safety check: sirf accepted booking hi complete ho sakti hai
+        if booking.status == "Accepted":
+            booking.status = "Completed"
 
     booking.save()
 

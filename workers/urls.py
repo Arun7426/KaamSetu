@@ -27,5 +27,10 @@ urlpatterns = [
         views.update_booking_status,
         name="update_booking_status",
     ),
+    path(
+        "profession/<str:profession>/",
+        views.workers_by_profession,
+        name="workers_by_profession",
+    ),
 
 ]

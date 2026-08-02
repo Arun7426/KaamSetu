@@ -11,16 +11,15 @@ class Worker(models.Model):
         related_name="worker_profile"
     )
     PROFESSION_CHOICES = [
-        ("Plumber", "Plumber"),
-        ("Electrician", "Electrician"),
-        ("Carpenter", "Carpenter"),
-        ("Painter", "Painter"),
-        ("Mason", "Mason"),
-        ("Welder", "Welder"),
-        ("Cleaner", "Cleaner"),
-        ("Driver", "Driver"),
-        ("Other", "Other"),
-    ]
+    ("Rajmistri", "राजमिस्त्री"),
+    ("Plumber", "प्लम्बर"),
+    ("Electrician", "इलेक्ट्रिशियन"),
+    ("Painter", "पेंटर"),
+    ("Carpenter", "कारपेंटर"),
+    ("Welder", "वेल्डर"),
+    ("Helper", "हेल्पर"),
+    ("AC Repair", "AC रिपेयर"),
+]
 
     name = models.CharField(max_length=100)
     mobile = models.CharField(max_length=15)

@@ -34,6 +34,16 @@ def book_worker(request, worker_id):
             booking.worker = worker
             booking.customer = request.user
 
+            # Auto-fill customer details
+            booking.customer_name = (
+                request.user.get_full_name()
+                or request.user.first_name
+                or request.user.username
+            )
+
+            # Mobile customer profile se aayega
+            booking.customer_mobile = ""
+
             booking.save()
 
             return redirect("booking_success", booking.id)

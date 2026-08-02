@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% include "components/navbar.html" %}
+
+<section class="featured-workers" style="padding-top:50px;">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <h2>
+                उपलब्ध {{ profession }}
+            </h2>
+
+            <p>
+                {{ workers|length }} Worker Available
+            </p>
+
+        </div>
+
+        <div class="worker-list-grid">
+
+            {% for worker in workers %}
+
+            <div class="worker-card">
+
+                {% if worker.profile_photo %}
+                    <img src="{{ worker.profile_photo.url }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/120">
+                {% endif %}
+
+                <h3>{{ worker.name }}</h3>
+
+                <span class="profession">
+                    {{ worker.profession }}
+                </span>
+
+                <div class="rating">
+                    ⭐⭐⭐⭐⭐
+                    <span>4.8</span>
+                </div>
+
+                <p>
+                    {{ worker.experience }} वर्ष का अनुभव
+                </p>
+
+                <h4>
+                    ₹{{ worker.daily_wage }} / Day
+                </h4>
+
+                <p>
+                    📍 {{ worker.city }}
+                </p>
+
+                <a
+                    href="{% url 'worker_detail' worker.id %}"
+                    class="book-btn">
+
+                    View Profile
+
+                </a>
+
+            </div>
+
+            {% empty %}
+
+            <div
+                style="
+                width:100%;
+                text-align:center;
+                padding:60px;
+                ">
+
+                <h2>
+                    😔
+                </h2>
+
+                <h3>
+                    अभी कोई Worker उपलब्ध नहीं है।
+                </h3>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% include "components/footer.html" %}
+
+{% endblock %}

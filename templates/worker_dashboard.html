@@ -86,11 +86,11 @@ Worker Dashboard
 
                 {% if worker.profile_photo %}
 
-                    <img src="{{ worker.profile_photo.url }}" alt="Worker">
+                <img src="{{ worker.profile_photo.url }}" alt="Worker">
 
                 {% else %}
 
-                    <img src="{% static 'images/worker.png' %}" alt="Worker">
+                <img src="{% static 'images/worker.png' %}" alt="Worker">
 
                 {% endif %}
 
@@ -148,15 +148,15 @@ Worker Dashboard
 
                 {% if worker.available %}
 
-                    <h2 class="available">
-                        🟢 Available
-                    </h2>
+                <h2 class="available">
+                    🟢 Available
+                </h2>
 
                 {% else %}
 
-                    <h2 class="busy">
-                        🔴 Busy
-                    </h2>
+                <h2 class="busy">
+                    🔴 Busy
+                </h2>
 
                 {% endif %}
 
@@ -175,7 +175,7 @@ Worker Dashboard
                     <h2 style="margin-bottom:20px;">
                         Booking Requests
                     </h2>
-                                        <div style="overflow-x:auto;">
+                    <div style="overflow-x:auto;">
 
                         <table class="booking-table">
 
@@ -185,6 +185,8 @@ Worker Dashboard
 
                                     <th>Customer</th>
                                     <th>Mobile</th>
+                                    <th>Address</th>
+                                    <th>Work</th>
                                     <th>Work Date</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -206,14 +208,48 @@ Worker Dashboard
                                     </td>
 
                                     <td>
-
                                         {{ booking.customer_mobile }}
+                                    </td>
 
+                                    <td>
+                                        {{ booking.customer_address }}
+                                    </td>
+
+                                    <td>
+                                        {{ booking.work_description }}
+                                    </td>
+
+                                    <td>
+                                        {{ booking.work_date }}
                                     </td>
 
                                     <td>
 
-                                        {{ booking.work_date }}
+                                        {% if booking.status == "Pending" %}
+
+                                        <span class="status pending">
+                                            🟡 Pending
+                                        </span>
+
+                                        {% elif booking.status == "Accepted" %}
+
+                                        <span class="status accepted">
+                                            🟢 Accepted
+                                        </span>
+
+                                        {% elif booking.status == "Completed" %}
+
+                                        <span class="status completed">
+                                            🔵 Completed
+                                        </span>
+
+                                        {% elif booking.status == "Cancelled" %}
+
+                                        <span class="status rejected">
+                                            🔴 Cancelled
+                                        </span>
+
+                                        {% endif %}
 
                                     </td>
 
@@ -221,92 +257,54 @@ Worker Dashboard
 
                                         {% if booking.status == "Pending" %}
 
-                                            <span class="status pending">
+                                        <a href="{% url 'update_booking_status' booking.id 'accept' %}"
+                                            style="background:#16a34a;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;margin-right:6px;display:inline-block;">
 
-                                                🟡 Pending
+                                            Accept
 
-                                            </span>
+                                        </a>
+
+                                        <a href="{% url 'update_booking_status' booking.id 'reject' %}"
+                                            style="background:#dc2626;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
+
+                                            Reject
+
+                                        </a>
 
                                         {% elif booking.status == "Accepted" %}
 
-                                            <span class="status accepted">
+                                        <a href="{% url 'update_booking_status' booking.id 'complete' %}"
+                                            style="background:#2563eb;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
 
-                                                🟢 Accepted
+                                            ✅ Complete Work
 
-                                            </span>
+                                        </a>
 
                                         {% elif booking.status == "Completed" %}
 
-                                            <span class="status completed">
+                                        <span style="color:#16a34a;font-weight:600;">
+                                            ✔ Completed
+                                        </span>
 
-                                                🔵 Completed
+                                        {% elif booking.status == "Cancelled" %}
 
-                                            </span>
-
-                                        {% else %}
-
-                                        
-
-                                            <span class="status cancelled">
-
-                                                🔴 Cancelled
-
-                                            </span>
+                                        <span style="color:#dc2626;font-weight:600;">
+                                            ✖ Cancelled
+                                        </span>
 
                                         {% endif %}
 
                                     </td>
-                                    <td>
-                                            {% if booking.status == "Pending" %}
-                                            <a href="{% url 'update_booking_status' booking.id 'accept' %}"
-                                                style="background:#16a34a;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;margin-right:6px;display:inline-block;">
-
-                                                    Accept
-
-                                            </a>
-
-                                            <a href="{% url 'update_booking_status' booking.id 'reject' %}"
-                                                style="background:#dc2626;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
-
-                                                    Reject
-
-                                            </a>
-
-                                            {% else %}
-
-                                            —
-
-                                            {% endif %}
-
-                                        </td>
 
                                 </tr>
 
-                                <tr>
-
-                                    <td colspan="4">
-
-                                        <strong>Address :</strong>
-
-                                        {{ booking.customer_address }}
-
-                                        <br><br>
-
-                                        <strong>Work :</strong>
-
-                                        {{ booking.work_description }}
-
-                                    </td>
-
-                                </tr>
+                                
 
                                 {% empty %}
 
                                 <tr>
 
-                                    <td colspan="4"
-
-                                        style="text-align:center;padding:35px;">
+                                    <td colspan="4" style="text-align:center;padding:35px;">
 
                                         No Booking Requests
 
