@@ -175,6 +175,7 @@ Worker Dashboard
                     <h2 style="margin-bottom:20px;">
                         Booking Requests
                     </h2>
+
                     <div style="overflow-x:auto;">
 
                         <table class="booking-table">
@@ -202,13 +203,21 @@ Worker Dashboard
                                 <tr>
 
                                     <td>
-
                                         {{ booking.customer_name }}
-
                                     </td>
 
                                     <td>
-                                        {{ booking.customer_mobile }}
+
+                                        {% if booking.status == "Accepted" or booking.status == "Completed" %}
+
+                                            {{ booking.customer_mobile }}
+
+                                        {% else %}
+
+                                            {{ booking.customer_mobile|slice:":4" }}XXXXXX
+
+                                        {% endif %}
+
                                     </td>
 
                                     <td>
@@ -258,14 +267,14 @@ Worker Dashboard
                                         {% if booking.status == "Pending" %}
 
                                         <a href="{% url 'update_booking_status' booking.id 'accept' %}"
-                                            style="background:#16a34a;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;margin-right:6px;display:inline-block;">
+                                           style="background:#16a34a;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;margin-right:6px;display:inline-block;">
 
                                             Accept
 
                                         </a>
 
                                         <a href="{% url 'update_booking_status' booking.id 'reject' %}"
-                                            style="background:#dc2626;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
+                                           style="background:#dc2626;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
 
                                             Reject
 
@@ -274,7 +283,7 @@ Worker Dashboard
                                         {% elif booking.status == "Accepted" %}
 
                                         <a href="{% url 'update_booking_status' booking.id 'complete' %}"
-                                            style="background:#2563eb;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
+                                           style="background:#2563eb;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
 
                                             ✅ Complete Work
 
@@ -298,13 +307,11 @@ Worker Dashboard
 
                                 </tr>
 
-                                
-
                                 {% empty %}
 
                                 <tr>
 
-                                    <td colspan="4" style="text-align:center;padding:35px;">
+                                    <td colspan="7" style="text-align:center;padding:35px;">
 
                                         No Booking Requests
 

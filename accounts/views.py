@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from .forms import CustomerRegistrationForm
+from .models import CustomerProfile
 from bookings.models import Booking
 
 
@@ -30,6 +31,11 @@ def register(request):
         if form.is_valid():
 
             user = form.save()
+
+            CustomerProfile.objects.create(
+                user=user,
+                mobile=form.cleaned_data["mobile"]
+            )
 
             login(request, user)
 
@@ -132,15 +138,10 @@ def customer_dashboard(request):
         "customer_dashboard.html",
         {
             "bookings": bookings,
-
             "total_bookings": total_bookings,
-
             "pending_bookings": pending_bookings,
-
             "accepted_bookings": accepted_bookings,
-
             "completed_bookings": completed_bookings,
-
             "cancelled_bookings": cancelled_bookings,
         }
     )

@@ -1,6 +1,6 @@
 from django.db import models
-from workers.models import Worker
 from django.contrib.auth.models import User
+from workers.models import Worker
 
 
 class Booking(models.Model):
@@ -18,9 +18,22 @@ class Booking(models.Model):
         related_name="bookings"
     )
 
-    customer_name = models.CharField(max_length=100)
+    customer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="customer_bookings",
+        null=True,
+        blank=True
+    )
 
-    customer_mobile = models.CharField(max_length=15)
+    customer_name = models.CharField(
+        max_length=100
+    )
+
+    customer_mobile = models.CharField(
+        max_length=15,
+        blank=True
+    )
 
     customer_address = models.TextField()
 
@@ -34,15 +47,9 @@ class Booking(models.Model):
         default="Pending"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return f"{self.customer_name} - {self.worker.name}"
-
-    customer = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="customer_bookings",
-        null=True,
-        blank=True
-    )

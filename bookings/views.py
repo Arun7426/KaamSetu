@@ -3,13 +3,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from workers.models import Worker
+from accounts.models import CustomerProfile
 from .forms import BookingForm
+from .models import Booking
 
 
 @login_required
 def book_worker(request, worker_id):
 
     worker = get_object_or_404(Worker, id=worker_id)
+
     print("Logged in user:", request.user.username)
     print("Is Worker:", hasattr(request.user, "worker_profile"))
 
@@ -34,15 +37,18 @@ def book_worker(request, worker_id):
             booking.worker = worker
             booking.customer = request.user
 
-            # Auto-fill customer details
+            # Auto-fill customer name
             booking.customer_name = (
                 request.user.get_full_name()
                 or request.user.first_name
                 or request.user.username
             )
 
-            # Mobile customer profile se aayega
-            booking.customer_mobile = ""
+            # Auto-fill customer mobile
+            try:
+                booking.customer_mobile = request.user.customer_profile.mobile
+            except CustomerProfile.DoesNotExist:
+                booking.customer_mobile = ""
 
             booking.save()
 
@@ -61,10 +67,14 @@ def book_worker(request, worker_id):
         }
     )
 
-from .models import Booking
 
+@login_required
 def booking_success(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id)
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id
+    )
 
     return render(
         request,
