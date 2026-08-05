@@ -28,8 +28,14 @@ Worker Dashboard
         <ul class="menu">
 
             <li>
+                <a href="{% url 'home' %}">
+                    🏠 Home
+                </a>
+            </li>
+
+            <li>
                 <a href="{% url 'worker_dashboard' %}" class="active">
-                    🏠 Dashboard
+                    📊 Dashboard
                 </a>
             </li>
 
@@ -210,11 +216,11 @@ Worker Dashboard
 
                                         {% if booking.status == "Accepted" or booking.status == "Completed" %}
 
-                                            {{ booking.customer_mobile }}
+                                        {{ booking.customer_mobile }}
 
                                         {% else %}
 
-                                            {{ booking.customer_mobile|slice:":4" }}XXXXXX
+                                        {{ booking.customer_mobile|slice:":4" }}XXXXXX
 
                                         {% endif %}
 
@@ -267,14 +273,14 @@ Worker Dashboard
                                         {% if booking.status == "Pending" %}
 
                                         <a href="{% url 'update_booking_status' booking.id 'accept' %}"
-                                           style="background:#16a34a;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;margin-right:6px;display:inline-block;">
+                                            style="background:#16a34a;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;margin-right:6px;display:inline-block;">
 
                                             Accept
 
                                         </a>
 
                                         <a href="{% url 'update_booking_status' booking.id 'reject' %}"
-                                           style="background:#dc2626;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
+                                            style="background:#dc2626;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
 
                                             Reject
 
@@ -283,7 +289,7 @@ Worker Dashboard
                                         {% elif booking.status == "Accepted" %}
 
                                         <a href="{% url 'update_booking_status' booking.id 'complete' %}"
-                                           style="background:#2563eb;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
+                                            style="background:#2563eb;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
 
                                             ✅ Complete Work
 
