@@ -9,54 +9,76 @@
 
         <div class="worker-slider-wrapper">
 
-    <button class="slider-btn slider-prev">&#10094;</button>
+            <button class="slider-btn slider-prev">&#10094;</button>
 
-    <div class="worker-slider">
+            <div class="worker-slider">
 
-        {% for worker in workers %}
+                {% for worker in workers %}
 
-        <div class="worker-card">
+                <div class="worker-card">
 
-            {% if worker.profile_photo %}
-                <img src="{{ worker.profile_photo.url }}" alt="{{ worker.name }}">
-            {% else %}
-                <img src="https://via.placeholder.com/120" alt="{{ worker.name }}">
-            {% endif %}
+                    {% if worker.profile_photo %}
+                    <img src="{{ worker.profile_photo.url }}" alt="{{ worker.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/120" alt="{{ worker.name }}">
+                    {% endif %}
 
-            <h3>{{ worker.name }}</h3>
+                    <h3>{{ worker.name }}</h3>
 
-            <span class="profession">
-                {{ worker.profession }}
-            </span>
+                    <span class="profession">
+                        {{ worker.profession }}
+                    </span>
 
-            <div class="rating">
-                ⭐⭐⭐⭐⭐
-                <span>4.8</span>
+                    <div class="rating">
+
+                        {% if worker.reviews > 0 %}
+
+                        ⭐⭐⭐⭐⭐
+                        <span>{{ worker.rating }}</span>
+
+                        <br>
+
+                        <small style="color:#666;">
+                            {{ worker.reviews }} Review{{ worker.reviews|pluralize }}
+                        </small>
+
+                        {% else %}
+
+                        ⭐ New Worker
+
+                        <br>
+
+                        <small style="color:#666;">
+                            No Reviews Yet
+                        </small>
+
+                        {% endif %}
+
+                    </div>
+
+                    <p>{{ worker.experience }} वर्ष का अनुभव</p>
+
+                    <h4>₹{{ worker.daily_wage }} / Day</h4>
+
+                    <p>📍 {{ worker.city }}</p>
+
+                    <a href="{% url 'worker_detail' worker.id %}" class="book-btn">
+                        View Profile
+                    </a>
+
+                </div>
+
+                {% empty %}
+
+                <p>अभी कोई Worker उपलब्ध नहीं है।</p>
+
+                {% endfor %}
+
             </div>
 
-            <p>{{ worker.experience }} वर्ष का अनुभव</p>
-
-            <h4>₹{{ worker.daily_wage }} / Day</h4>
-
-            <p>📍 {{ worker.city }}</p>
-
-            <a href="{% url 'worker_detail' worker.id %}" class="book-btn">
-                View Profile
-            </a>
+            <button class="slider-btn slider-next">&#10095;</button>
 
         </div>
-
-        {% empty %}
-
-        <p>अभी कोई Worker उपलब्ध नहीं है।</p>
-
-        {% endfor %}
-
-    </div>
-
-    <button class="slider-btn slider-next">&#10095;</button>
-
-</div>
 
     </div>
 

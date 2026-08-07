@@ -109,7 +109,7 @@ Worker Dashboard
                 <h4>{{ worker.profession }}</h4>
 
                 <p>
-                    ⭐ Rating : {{ worker.rating }}
+                    ⭐ {{ worker.rating }}/5 ({{ worker.reviews }} Review{{ worker.reviews|pluralize }})
                 </p>
 
                 <p>
@@ -163,6 +163,30 @@ Worker Dashboard
                 <h2 class="busy">
                     🔴 Busy
                 </h2>
+
+                {% endif %}
+
+            </div>
+
+            <div class="stat-card">
+
+                <h4>My Rating</h4>
+
+                {% if worker.reviews > 0 %}
+
+                <h2>⭐ {{ worker.rating }}/5</h2>
+
+                <p style="margin-top:10px;color:#666;">
+                    {{ worker.reviews }} Review{{ worker.reviews|pluralize }}
+                </p>
+
+                {% else %}
+
+                <h2>⭐ New</h2>
+
+                <p style="margin-top:10px;color:#666;">
+                    No Reviews Yet
+                </p>
 
                 {% endif %}
 
