@@ -387,3 +387,73 @@ body{
 
 }
 
+/* ==========================================
+   Review Form
+========================================== */
+
+.form-group{
+    margin-bottom:20px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#17375E;
+}
+
+.form-control{
+    width:100%;
+    padding:12px 15px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:15px;
+    outline:none;
+    transition:.3s;
+}
+
+.form-control:focus{
+    border-color:#17375E;
+    box-shadow:0 0 6px rgba(23,55,94,.15);
+}
+
+.btn-primary{
+    background:#17375E;
+    color:#fff;
+    border:none;
+    padding:12px 30px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.btn-primary:hover{
+    background:#f4a940;
+    color:#17375E;
+}
+
+/* Review Button */
+
+.review-btn{
+    display:inline-block;
+    background:#17375E;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:8px;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.review-btn:hover{
+    background:#f4a940;
+    color:#17375E;
+}
+
+.reviewed{
+    color:#15803d;
+    font-weight:600;
+}

@@ -5,8 +5,9 @@ from django.contrib import messages
 from workers.models import Worker
 from accounts.models import CustomerProfile
 from .forms import BookingForm
-from .models import Booking
-
+from django.db.models import Avg
+from .models import Booking, Review
+from .forms import BookingForm, ReviewForm
 
 @login_required
 def book_worker(request, worker_id):
@@ -81,5 +82,76 @@ def booking_success(request, booking_id):
         "booking_success.html",
         {
             "booking": booking
+        }
+    )
+
+@login_required
+def add_review(request, booking_id):
+
+    booking = get_object_or_404(
+        Booking,
+        id=booking_id,
+        customer=request.user
+    )
+
+    # Review only after completed work
+    if booking.status != "Completed":
+        messages.error(
+            request,
+            "You can review only after the work is completed."
+        )
+        return redirect("customer_dashboard")
+
+    # Prevent duplicate review
+    if hasattr(booking, "review"):
+        messages.warning(
+            request,
+            "You have already reviewed this booking."
+        )
+        return redirect("customer_dashboard")
+
+    if request.method == "POST":
+
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+
+            review = form.save(commit=False)
+
+            review.booking = booking
+            review.worker = booking.worker
+            review.customer = request.user
+
+            review.save()
+
+            # ---------- Update Worker Rating ----------
+            worker = booking.worker
+
+            avg_rating = worker.worker_reviews.aggregate(
+                Avg("rating")
+            )["rating__avg"]
+
+            worker.rating = round(avg_rating, 1)
+            worker.reviews = worker.worker_reviews.count()
+
+            worker.save()
+
+            messages.success(
+                request,
+                "Thank you! Your review has been submitted."
+            )
+
+            return redirect("customer_dashboard")
+
+    else:
+
+        form = ReviewForm()
+
+    return render(
+        request,
+        "review_form.html",
+        {
+            "form": form,
+            "booking": booking,
         }
     )

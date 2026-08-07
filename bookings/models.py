@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from workers.models import Worker
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Booking(models.Model):
@@ -53,3 +54,51 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.customer_name} - {self.worker.name}"
+
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+class Review(models.Model):
+
+    booking = models.OneToOneField(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name="review"
+    )
+
+    worker = models.ForeignKey(
+        Worker,
+        on_delete=models.CASCADE,
+        related_name="worker_reviews"
+    )
+
+    customer = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    rating = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5)
+        ]
+    )
+
+    title = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    comment = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def __str__(self):
+        return f"{self.worker.name} ({self.rating}⭐)"

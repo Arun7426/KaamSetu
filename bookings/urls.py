@@ -14,4 +14,9 @@ urlpatterns = [
         views.booking_success,
         name="booking_success",
     ),
+    path(
+        "review/<int:booking_id>/",
+        views.add_review,
+        name="add_review",
+    ),
 ]

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import CustomerRegistrationForm
 from .models import CustomerProfile
-from bookings.models import Booking
+from bookings.models import Booking, Review
 
 
 # ==========================
@@ -111,9 +111,26 @@ def user_logout(request):
 @login_required
 def customer_dashboard(request):
 
-    bookings = Booking.objects.filter(
+    bookings = Booking.objects.select_related(
+        "worker"
+    ).filter(
         customer=request.user
     ).order_by("-created_at")
+
+    reviewed_booking_ids = set(
+        Review.objects.filter(
+            customer=request.user
+        ).values_list("booking_id", flat=True)
+    )
+
+    review_ratings = {
+        review.booking_id: review.rating
+        for review in Review.objects.filter(customer=request.user)
+    }
+
+    for booking in bookings:
+        booking.has_review = booking.id in reviewed_booking_ids
+        booking.review_rating = review_ratings.get(booking.id)
 
     total_bookings = bookings.count()
 

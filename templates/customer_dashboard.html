@@ -146,123 +146,150 @@ Customer Dashboard
 
         <div id="my-bookings" style="margin-top:40px;">
 
-    <div class="profile-card">
+            <div class="profile-card">
 
-        <div style="width:100%;">
+                <div style="width:100%;">
 
-            <h2 style="color:#17375E;margin-bottom:20px;">
-                My Bookings
-            </h2>
+                    <h2 style="color:#17375E;margin-bottom:20px;">
+                        My Bookings
+                    </h2>
 
-            <div style="overflow-x:auto;">
+                    <div style="overflow-x:auto;">
 
-                <table class="booking-table">
+                        <table class="booking-table">
 
-                    <thead>
+                            <thead>
 
-                        <tr>
+                                <tr>
 
-                            <th>Worker</th>
-                            <th>Profession</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Mobile</th>
+                                    <th>Worker</th>
+                                    <th>Profession</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Mobile</th>
+                                    <th>Action</th>
 
-                        </tr>
+                                </tr>
 
-                    </thead>
+                            </thead>
 
-                    <tbody>
+                            <tbody>
 
-                        {% for booking in bookings %}
+                                {% for booking in bookings %}
 
-                        <tr>
+                                <tr>
 
-                            <td>
-                                {{ booking.worker.name }}
-                            </td>
+                                    <td>
+                                        {{ booking.worker.name }}
+                                    </td>
 
-                            <td>
-                                {{ booking.worker.profession }}
-                            </td>
+                                    <td>
+                                        {{ booking.worker.profession }}
+                                    </td>
 
-                            <td>
-                                {{ booking.work_date }}
-                            </td>
+                                    <td>
+                                        {{ booking.work_date }}
+                                    </td>
 
-                            <td>
+                                    <td>
 
-                                {% if booking.status == "Pending" %}
+                                        {% if booking.status == "Pending" %}
 
-                                    <span class="status pending">
-                                        🟡 Pending
-                                    </span>
+                                        <span class="status pending">
+                                            🟡 Pending
+                                        </span>
 
-                                {% elif booking.status == "Accepted" %}
+                                        {% elif booking.status == "Accepted" %}
 
-                                    <span class="status accepted">
-                                        🟢 Accepted
-                                    </span>
+                                        <span class="status accepted">
+                                            🟢 Accepted
+                                        </span>
 
-                                {% elif booking.status == "Completed" %}
+                                        {% elif booking.status == "Completed" %}
 
-                                    <span class="status completed">
-                                        🔵 Completed
-                                    </span>
+                                        <span class="status completed">
+                                            🔵 Completed
+                                        </span>
 
-                                {% else %}
+                                        {% else %}
 
-                                    <span class="status cancelled">
-                                        🔴 Cancelled
-                                    </span>
+                                        <span class="status cancelled">
+                                            🔴 Cancelled
+                                        </span>
 
-                                {% endif %}
+                                        {% endif %}
 
-                            </td>
+                                    </td>
 
-                            <td>
+                                    <td>
 
-                                {% if booking.status == "Accepted" or booking.status == "Completed" %}
+                                        {% if booking.status == "Accepted" or booking.status == "Completed" %}
 
-                                    {{ booking.worker.mobile }}
+                                        {{ booking.worker.mobile }}
 
-                                {% else %}
+                                        {% else %}
 
-                                    <span style="color:#f4a940;font-weight:600;">
-                                        🔒 Available after acceptance
-                                    </span>
+                                        <span style="color:#f4a940;font-weight:600;">
+                                            🔒 Available after acceptance
+                                        </span>
 
-                                {% endif %}
+                                        {% endif %}
 
-                            </td>
+                                    </td>
 
-                        </tr>
+                                    <td>
 
-                        {% empty %}
+                                        {% if booking.status == "Completed" %}
 
-                        <tr>
+                                        {% if booking.has_review %}
 
-                            <td colspan="5" style="text-align:center;padding:30px;">
+                                        <span class="reviewed">
+                                            ⭐ {{ booking.review_rating }}/5 Reviewed
+                                        </span>
 
-                                No Bookings Yet
+                                        {% else %}
 
-                            </td>
+                                        <a href="{% url 'add_review' booking.id %}" class="review-btn">
+                                            ⭐ Rate Worker
+                                        </a>
 
-                        </tr>
+                                        {% endif %}
 
-                        {% endfor %}
+                                        {% else %}
 
-                    </tbody>
+                                        -
 
-                </table>
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                                {% empty %}
+
+                                <tr>
+
+                                    <td colspan="6" style="text-align:center;padding:30px;">
+
+                                        No Bookings Yet
+
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
 
             </div>
 
         </div>
-
-    </div>
-
-</div>
 
     </main>
 
