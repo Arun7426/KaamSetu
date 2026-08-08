@@ -23,26 +23,23 @@
                 अब एक ही जगह।
             </p>
 
-            <div class="hero-search">
+            <form method="GET" action="{% url 'home' %}" class="hero-search">
 
-                <input
-                    type="text"
-                    placeholder="आपको कौन-सी सेवा चाहिए?"
-                >
+                <input type="text" name="q" value="{{ search_query }}" placeholder="आपको कौन-सी सेवा चाहिए?">
 
-                <button>
+                <button type="submit">
                     खोजें
                 </button>
 
-            </div>
+            </form>
 
             <div class="hero-buttons">
 
-                <a href="#" class="btn-primary">
+                <a href="{% url 'register' %}" class="btn-primary">
                     काम बुक करें
                 </a>
 
-                <a href="#" class="btn-secondary">
+                <a href="{% url 'worker_register' %}" class="btn-secondary">
                     मैं कारीगर हूँ
                 </a>
 
@@ -54,37 +51,34 @@
 
         <div class="hero-image-box">
 
-    <div class="hero-worker">
+            <div class="hero-worker">
 
-        <div class="hero-circle"></div>
+                <div class="hero-circle"></div>
 
-        <img
-            src="{% static 'images/hero-worker.png' %}"
-            alt="Worker"
-            class="hero-image">
+                <img src="{% static 'images/hero-worker.png' %}" alt="Worker" class="hero-image">
 
-    </div>
+            </div>
 
-    <div class="hero-stats">
+            <div class="hero-stats">
 
-        <div class="hero-card">
-            ⭐ <strong>4.8 Rating</strong><br>
-            Trusted by Customers
+                <div class="hero-card">
+                    ⭐ <strong>4.8 Rating</strong><br>
+                    Trusted by Customers
+                </div>
+
+                <div class="hero-card">
+                    👷 <strong>10,000+</strong><br>
+                    Verified Workers
+                </div>
+
+                <div class="hero-card">
+                    📅 <strong>50,000+</strong><br>
+                    Jobs Completed
+                </div>
+
+            </div>
+
         </div>
-
-        <div class="hero-card">
-            👷 <strong>10,000+</strong><br>
-            Verified Workers
-        </div>
-
-        <div class="hero-card">
-            📅 <strong>50,000+</strong><br>
-            Jobs Completed
-        </div>
-
-    </div>
-
-</div>
 
     </div>
 
