@@ -32,4 +32,9 @@ urlpatterns = [
         views.customer_dashboard,
         name="customer_dashboard",
     ),
+    path(
+        "customer/update-location/",
+        views.update_customer_location,
+        name="update_customer_location",
+    ),
 ]

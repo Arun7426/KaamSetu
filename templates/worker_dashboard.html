@@ -216,6 +216,79 @@ Worker Dashboard
 
             </div>
 
+            <div class="stat-card">
+
+                <h4>My Work Location</h4>
+
+                <p id="location-status" role="status" style="margin:10px 0;color:#666;">
+                    {% if worker.latitude is not None and worker.longitude is not None %}
+                    Location saved. You can update it anytime.
+                    {% else %}
+                    Location not set yet.
+                    {% endif %}
+                </p>
+
+                <button id="set-location-button" type="button"
+                    style="background:#2563eb;color:white;padding:8px 14px;border:0;border-radius:8px;cursor:pointer;">
+                    Set My Location
+                </button>
+
+            </div>
+            <div class="stat-card">
+
+                <h4>My Work Range</h4>
+
+                <p style="margin:10px 0;color:#666;">
+                    Choose how far you are ready to travel for work.
+                </p>
+
+                <select id="work-range-select" style="padding:8px;border:1px solid #ccc;border-radius:8px;">
+
+                    <option value="5" {% if worker.work_range == 5 %}selected{% endif %}>
+                        5 KM
+                    </option>
+
+                    <option value="10" {% if worker.work_range == 10 %}selected{% endif %}>
+                        10 KM
+                    </option>
+
+                    <option value="15" {% if worker.work_range == 15 %}selected{% endif %}>
+                        15 KM
+                    </option>
+
+                    <option value="20" {% if worker.work_range == 20 %}selected{% endif %}>
+                        20 KM
+                    </option>
+
+                    <option value="25" {% if worker.work_range == 25 %}selected{% endif %}>
+                        25 KM
+                    </option>
+
+                    <option value="30" {% if worker.work_range == 30 %}selected{% endif %}>
+                        30 KM
+                    </option>
+
+                    <option value="50" {% if worker.work_range == 50 %}selected{% endif %}>
+                        50 KM
+                    </option>
+
+                </select>
+
+                <button id="save-work-range-button" type="button"
+                    style="margin-left:6px;background:#16a34a;color:white;padding:8px 14px;border:0;border-radius:8px;cursor:pointer;">
+
+                    Save Range
+
+                </button>
+
+                <p id="work-range-status" style="margin:10px 0 0;color:#666;">
+
+                    Current range: {{ worker.work_range }} KM
+
+                </p>
+
+            </div>
+
         </div>
 
         <!-- Booking Requests -->
@@ -390,5 +463,146 @@ Worker Dashboard
     </main>
 
 </div>
+
+<script>
+    (function () {
+        const locationButton = document.getElementById("set-location-button");
+        const locationStatus = document.getElementById("location-status");
+        const locationUrl = "{% url 'update_worker_location' %}";
+        const workRangeSelect = document.getElementById("work-range-select");
+        const saveWorkRangeButton = document.getElementById("save-work-range-button");
+        const workRangeStatus = document.getElementById("work-range-status");
+        const workRangeUrl = "{% url 'update_work_range' %}";
+
+        function showStatus(message, color) {
+            locationStatus.textContent = message;
+            locationStatus.style.color = color;
+        }
+
+        let lastSavedLocation;
+
+        function saveLocation(position, forceUpdate) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const moved = !lastSavedLocation || Math.hypot(
+                latitude - lastSavedLocation.latitude,
+                longitude - lastSavedLocation.longitude
+            ) > 0.00025; // about 25 metres; avoids saving GPS jitter
+            if (!forceUpdate && !moved) return;
+
+            const formData = new FormData();
+            formData.append("latitude", latitude);
+            formData.append("longitude", longitude);
+            formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+            fetch(locationUrl, { method: "POST", body: formData, credentials: "same-origin" })
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        if (!response.ok) throw new Error(data.message || "Could not save your location.");
+                        return data;
+                    });
+                })
+                .then(function (data) {
+                    lastSavedLocation = { latitude: latitude, longitude: longitude };
+                    showStatus(forceUpdate ? data.message : "Location is being updated automatically.", "#16a34a");
+                })
+                .catch(function (error) {
+                    showStatus(error.message || "Could not save your location. Please try again.", "#dc2626");
+                })
+                .finally(function () {
+                    locationButton.disabled = false;
+                    locationButton.textContent = "Update My Location";
+                });
+        }
+
+        function locationError(error) {
+            const messages = {
+                1: "Location permission was denied. Please allow it and try again.",
+                2: "Your location could not be determined. Please try again.",
+                3: "Location request timed out. Please try again."
+            };
+            showStatus(messages[error.code] || "Could not get your location. Please try again.", "#dc2626");
+            locationButton.disabled = false;
+            locationButton.textContent = "Update My Location";
+        }
+
+        if (navigator.geolocation) {
+            showStatus("Keeping your work location up to date…", "#666");
+            navigator.geolocation.watchPosition(
+                function (position) { saveLocation(position, false); },
+                locationError,
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+            );
+        }
+
+        locationButton.addEventListener("click", function () {
+            if (!navigator.geolocation) {
+                showStatus("Location is not supported by this browser.", "#dc2626");
+                return;
+            }
+            locationButton.disabled = true;
+            locationButton.textContent = "Getting location...";
+            navigator.geolocation.getCurrentPosition(
+                function (position) { saveLocation(position, true); },
+                locationError,
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        });
+        saveWorkRangeButton.addEventListener("click", function () {
+
+            const formData = new FormData();
+
+            formData.append("work_range", workRangeSelect.value);
+
+            formData.append(
+                "csrfmiddlewaretoken",
+                "{{ csrf_token }}"
+            );
+
+            saveWorkRangeButton.disabled = true;
+
+            saveWorkRangeButton.textContent = "Saving...";
+
+            fetch(workRangeUrl, {
+                method: "POST",
+                body: formData,
+                credentials: "same-origin"
+            })
+                .then(function (response) {
+
+                    return response.json().then(function (data) {
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                data.message || "Could not save the work range."
+                            );
+                        }
+
+                        return data;
+                    });
+                })
+                .then(function (data) {
+
+                    workRangeStatus.textContent = data.message;
+
+                    workRangeStatus.style.color = "#16a34a";
+                })
+                .catch(function (error) {
+
+                    workRangeStatus.textContent =
+                        error.message ||
+                        "Could not save the work range. Please try again.";
+
+                    workRangeStatus.style.color = "#dc2626";
+                })
+                .finally(function () {
+
+                    saveWorkRangeButton.disabled = false;
+
+                    saveWorkRangeButton.textContent = "Save Range";
+                });
+        });
+    })();
+</script>
 
 {% endblock %}

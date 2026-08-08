@@ -28,6 +28,16 @@ urlpatterns = [
         name="toggle_availability",
     ),
     path(
+        "worker/update-location/",
+        views.update_worker_location,
+        name="update_worker_location",
+    ),
+    path(
+        "worker/update-work-range/",
+        views.update_work_range,
+        name="update_work_range",
+    ),
+    path(
         "booking/<int:booking_id>/<str:status>/",
         views.update_booking_status,
         name="update_booking_status",

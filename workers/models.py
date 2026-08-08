@@ -27,6 +27,24 @@ class Worker(models.Model):
     experience = models.PositiveIntegerField(help_text="Experience in years")
     city = models.CharField(max_length=100)
     area = models.CharField(max_length=100)
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True
+    )
+    work_range = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=10.00,
+        help_text="Maximum distance in KM"
+    )
     daily_wage = models.DecimalField(max_digits=8, decimal_places=2)
     about = models.TextField(blank=True)
     available = models.BooleanField(default=True)

@@ -10,6 +10,11 @@
     <div class="container">
 
         <div class="section-title">
+            {% if nearby_filter_active %}
+            <p style="color:#2563eb;">Showing workers who serve your current area.</p>
+            {% elif customer_location_required %}
+            <p id="customer-location-status" style="color:#666;">Finding workers near you…</p>
+            {% endif %}
 
             <h2>
                 उपलब्ध {{ profession }}
@@ -56,6 +61,9 @@
                 <p>
                     📍 {{ worker.city }}
                 </p>
+                {% if nearby_filter_active %}
+                <p style="color:#2563eb;">{{ worker.distance_km }} km away</p>
+                {% endif %}
 
                 <a href="{% url 'worker_detail' worker.id %}" class="book-btn">
 
@@ -92,5 +100,24 @@
 </section>
 
 {% include "components/footer.html" %}
+
+{% if customer_location_required %}
+<script>
+    (function () {
+        const status = document.getElementById("customer-location-status");
+        if (!navigator.geolocation) { status.textContent = "Location is not supported by this browser."; return; }
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const formData = new FormData();
+            formData.append("latitude", position.coords.latitude);
+            formData.append("longitude", position.coords.longitude);
+            formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+            fetch("{% url 'update_customer_location' %}", {method: "POST", body: formData, credentials: "same-origin"})
+                .then(function (response) { if (!response.ok) throw new Error(); return response.json(); })
+                .then(function () { window.location.reload(); })
+                .catch(function () { status.textContent = "We could not save your location."; });
+        }, function () { status.textContent = "Allow location access to see workers who serve your area."; }, {enableHighAccuracy: true, timeout: 15000, maximumAge: 60000});
+    }());
+</script>
+{% endif %}
 
 {% endblock %}

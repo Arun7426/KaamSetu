@@ -13,6 +13,8 @@ class CustomerProfile(models.Model):
         max_length=10,
         unique=True
     )
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
     def __str__(self):
         return self.user.username
