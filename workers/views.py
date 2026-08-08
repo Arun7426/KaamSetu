@@ -49,6 +49,16 @@ def worker_dashboard(request):
         }
     )
 
+@login_required
+def toggle_availability(request):
+
+    worker = request.user.worker_profile
+
+    worker.available = not worker.available
+    worker.save()
+
+    return redirect("worker_dashboard")
+
 def home(request):
     workers = Worker.objects.filter(available=True)
     return render(request, "home.html", {"workers": workers})

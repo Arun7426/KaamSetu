@@ -28,9 +28,9 @@
             <div class="worker-card">
 
                 {% if worker.profile_photo %}
-                    <img src="{{ worker.profile_photo.url }}">
+                <img src="{{ worker.profile_photo.url }}">
                 {% else %}
-                    <img src="https://via.placeholder.com/120">
+                <img src="https://via.placeholder.com/120">
                 {% endif %}
 
                 <h3>{{ worker.name }}</h3>
@@ -41,7 +41,8 @@
 
                 <div class="rating">
                     ⭐⭐⭐⭐⭐
-                    <span>4.8</span>
+                    <span>{{ worker.rating }}</span>
+                    <small>({{ worker.reviews }} Reviews)</small>
                 </div>
 
                 <p>
@@ -56,9 +57,7 @@
                     📍 {{ worker.city }}
                 </p>
 
-                <a
-                    href="{% url 'worker_detail' worker.id %}"
-                    class="book-btn">
+                <a href="{% url 'worker_detail' worker.id %}" class="book-btn">
 
                     View Profile
 
@@ -68,8 +67,7 @@
 
             {% empty %}
 
-            <div
-                style="
+            <div style="
                 width:100%;
                 text-align:center;
                 padding:60px;
