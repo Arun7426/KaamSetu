@@ -1,45 +1,96 @@
+{% extends "base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}
+Make an Offer | KaamSetu
+{% endblock %}
 
-    <title>Make an Offer | KaamSetu</title>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/negotiation.css' %}">
+{% endblock %}
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+{% block content %}
 
-<body>
+<div class="negotiation-page">
 
-<div class="container">
+    <div class="negotiation-card">
 
-    <div class="offer-card">
+        <!-- Header -->
+        <div class="negotiation-header">
 
-        <h2>Make an Offer</h2>
+            <div class="negotiation-icon">
+                💰
+            </div>
 
-        <p>
-            Worker:
-            <strong>{{ booking.worker.name }}</strong>
-        </p>
+            <h1>
+                Make an Offer
+            </h1>
 
-        <p>
-            Worker Charges:
-            <strong>₹{{ booking.original_amount }}</strong>
-        </p>
+            <p>
+                Choose a suitable amount for this booking.
+            </p>
 
-        <p class="offer-help">
-            Choose your offer amount
-        </p>
+        </div>
 
-        <form method="POST">
 
-            {% csrf_token %}
+        <!-- Worker Information -->
+        <div class="worker-summary">
 
-            <div class="offer-options">
+            <div class="worker-avatar">
+                👷
+            </div>
 
-                {% for amount in suggestions %}
+            <div class="worker-info">
+
+                <span class="info-label">
+                    Worker
+                </span>
+
+                <h2>
+                    {{ booking.worker.name }}
+                </h2>
+
+                <span class="worker-profession">
+                    {{ booking.worker.profession }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Original Amount -->
+        <div class="original-amount-box">
+
+            <span>
+                Worker Charges
+            </span>
+
+            <strong>
+                ₹{{ booking.original_amount }}
+            </strong>
+
+        </div>
+
+
+        <!-- Offer Section -->
+        <div class="offer-section">
+
+            <h3>
+                Choose Your Offer
+            </h3>
+
+            <p class="offer-description">
+                Select one of the suggested amounts below.
+            </p>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="offer-options">
+
+                    {% for amount in suggestions %}
 
                     <label class="offer-option">
 
@@ -50,28 +101,51 @@
                             required
                         >
 
-                        <span>
+                        <span class="offer-amount">
                             ₹{{ amount }}
+                        </span>
+
+                        <span class="offer-select">
+                            Select
                         </span>
 
                     </label>
 
-                {% endfor %}
+                    {% endfor %}
 
-            </div>
+                </div>
 
-            <button
-                type="submit"
-                class="btn-primary"
-            >
-                Send Offer
-            </button>
 
-        </form>
+                <button
+                    type="submit"
+                    class="send-offer-btn"
+                >
+                    <span>💰</span>
+                    Send Offer
+                </button>
 
+            </form>
+
+        </div>
+
+
+        <!-- Information -->
+        <div class="negotiation-note">
+
+            <span>ℹ️</span>
+
+            <p>
+                The worker can accept your offer or send
+                a counter offer.
+            </p>
+
+        </div>
+
+
+        <!-- Back -->
         <a
             href="{% url 'customer_dashboard' %}"
-            class="back-link"
+            class="back-dashboard"
         >
             ← Back to Dashboard
         </a>
@@ -80,5 +154,4 @@
 
 </div>
 
-</body>
-</html>
+{% endblock %}

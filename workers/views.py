@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from bookings.models import Booking
+from bookings.notifications import create_notification
 
 from .forms import WorkerRegistrationForm
 from .location import nearby_workers
@@ -241,7 +242,7 @@ def update_booking_status(request, booking_id, status):
     )
 
     # -----------------------------------------
-    # WORKER ACCEPTS BOOKING
+    # ACCEPT BOOKING
     # -----------------------------------------
 
     if status == "accept":
@@ -253,12 +254,25 @@ def update_booking_status(request, booking_id, status):
                 "This booking is no longer pending."
             )
 
-            return redirect("worker_dashboard")
+            return redirect(
+                "worker_dashboard"
+            )
 
         booking.status = "Accepted"
 
         booking.save(
             update_fields=["status"]
+        )
+
+        # Notify customer
+        create_notification(
+            recipient=booking.customer,
+            booking=booking,
+            notification_type="accepted",
+            message=(
+                f"{worker.name} accepted your booking. "
+                f"You can now make an offer."
+            )
         )
 
         messages.success(
@@ -268,7 +282,7 @@ def update_booking_status(request, booking_id, status):
 
 
     # -----------------------------------------
-    # WORKER REJECTS BOOKING
+    # REJECT BOOKING
     # -----------------------------------------
 
     elif status == "reject":
@@ -280,12 +294,24 @@ def update_booking_status(request, booking_id, status):
                 "This booking cannot be rejected now."
             )
 
-            return redirect("worker_dashboard")
+            return redirect(
+                "worker_dashboard"
+            )
 
         booking.status = "Cancelled"
 
         booking.save(
             update_fields=["status"]
+        )
+
+        # Notify customer
+        create_notification(
+            recipient=booking.customer,
+            booking=booking,
+            notification_type="rejected",
+            message=(
+                f"{worker.name} rejected your booking request."
+            )
         )
 
         messages.success(
@@ -295,16 +321,11 @@ def update_booking_status(request, booking_id, status):
 
 
     # -----------------------------------------
-    # WORKER COMPLETES WORK
+    # COMPLETE WORK
     # -----------------------------------------
 
     elif status == "complete":
 
-        # Work can be completed ONLY after:
-        #
-        # 1. Booking is Accepted
-        # 2. Negotiation is successfully Accepted
-        #
         if booking.status != "Accepted":
 
             messages.error(
@@ -312,8 +333,9 @@ def update_booking_status(request, booking_id, status):
                 "This booking is not active."
             )
 
-            return redirect("worker_dashboard")
-
+            return redirect(
+                "worker_dashboard"
+            )
 
         if booking.negotiation_status != "Accepted":
 
@@ -322,10 +344,10 @@ def update_booking_status(request, booking_id, status):
                 "You can complete the work only after the negotiation is completed and the booking is finally confirmed."
             )
 
-            return redirect("worker_dashboard")
+            return redirect(
+                "worker_dashboard"
+            )
 
-
-        # Final safety check
         if booking.final_amount is None:
 
             messages.error(
@@ -333,13 +355,24 @@ def update_booking_status(request, booking_id, status):
                 "Final amount is not available. The booking cannot be completed."
             )
 
-            return redirect("worker_dashboard")
-
+            return redirect(
+                "worker_dashboard"
+            )
 
         booking.status = "Completed"
 
         booking.save(
             update_fields=["status"]
+        )
+
+        # Notify customer
+        create_notification(
+            recipient=booking.customer,
+            booking=booking,
+            notification_type="completed",
+            message=(
+                f"{worker.name} marked your work as completed."
+            )
         )
 
         messages.success(
@@ -359,11 +392,13 @@ def update_booking_status(request, booking_id, status):
             "Invalid booking status."
         )
 
-        return redirect("worker_dashboard")
+        return redirect(
+            "worker_dashboard"
+        )
 
-
-    return redirect("worker_dashboard")
-
+    return redirect(
+        "worker_dashboard"
+    )
 
 @login_required
 @require_POST

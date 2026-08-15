@@ -1,45 +1,85 @@
+{% extends "base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
+{% block title %}
+Respond to Offer | KaamSetu
+{% endblock %}
 
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/negotiation.css' %}">
+{% endblock %}
 
-    <title>Respond to Offer | KaamSetu</title>
 
-    <link
-        rel="stylesheet"
-        href="{% static 'css/style.css' %}"
-    >
+{% block content %}
 
-</head>
+<div class="negotiation-page">
 
-<body>
+    <div class="negotiation-card">
 
-<div class="container">
+        <!-- Header -->
 
-    <div class="offer-card">
+        <div class="negotiation-header">
 
-        <h2>Customer Offer</h2>
+            <div class="negotiation-icon">
+                💰
+            </div>
 
-        <p>
-            Customer:
-            <strong>{{ booking.customer_name }}</strong>
-        </p>
+            <h1>
+                Customer Offer
+            </h1>
 
-        <p>
-            Your Charges:
-            <strong>₹{{ booking.original_amount }}</strong>
-        </p>
+            <p>
+                Review the customer's offer and choose your response.
+            </p>
 
-        <div class="customer-offer">
+        </div>
 
-            <span>Customer Offered</span>
+
+        <!-- Customer Information -->
+
+        <div class="worker-summary">
+
+            <div class="worker-avatar">
+                👤
+            </div>
+
+            <div class="worker-info">
+
+                <span class="info-label">
+                    Customer
+                </span>
+
+                <h2>
+                    {{ booking.customer_name }}
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <!-- Your Original Charges -->
+
+        <div class="original-amount-box">
+
+            <span>
+                Your Charges
+            </span>
+
+            <strong>
+                ₹{{ booking.original_amount }}
+            </strong>
+
+        </div>
+
+
+        <!-- Customer Offer -->
+
+        <div class="customer-offer-highlight">
+
+            <span>
+                Customer Offered
+            </span>
 
             <strong>
                 ₹{{ booking.customer_offer }}
@@ -48,9 +88,7 @@
         </div>
 
 
-        <!-- ============================= -->
-        <!-- ACCEPT CUSTOMER OFFER -->
-        <!-- ============================= -->
+        <!-- Accept Offer -->
 
         <form method="POST">
 
@@ -64,36 +102,44 @@
 
             <button
                 type="submit"
-                class="btn-primary"
+                class="send-offer-btn accept-offer-btn"
             >
+                <span>✅</span>
                 Accept ₹{{ booking.customer_offer }}
             </button>
 
         </form>
 
 
-        <hr>
+        <!-- Divider -->
+
+        <div class="negotiation-divider">
+
+            <span>OR</span>
+
+        </div>
 
 
-        <!-- ============================= -->
-        <!-- COUNTER OFFER -->
-        <!-- ============================= -->
+        <!-- Counter Offer -->
 
-        <h3>
-            Or Make a Counter Offer
-        </h3>
+        <div class="offer-section">
 
-        <p class="offer-help">
-            Choose your counter offer
-        </p>
+            <h3>
+                Make a Counter Offer
+            </h3>
 
-        <form method="POST">
+            <p class="offer-description">
+                Choose one of the suggested amounts below.
+            </p>
 
-            {% csrf_token %}
 
-            <div class="offer-options">
+            <form method="POST">
 
-                {% for amount in suggestions %}
+                {% csrf_token %}
+
+                <div class="offer-options">
+
+                    {% for amount in suggestions %}
 
                     <label class="offer-option">
 
@@ -104,35 +150,61 @@
                             required
                         >
 
-                        <span>
+                        <span class="offer-amount">
                             ₹{{ amount }}
+                        </span>
+
+                        <span class="offer-select">
+                            Select
                         </span>
 
                     </label>
 
-                {% endfor %}
+                    {% endfor %}
 
-            </div>
+                </div>
 
-            <input
-                type="hidden"
-                name="action"
-                value="counter"
-            >
 
-            <button
-                type="submit"
-                class="btn-secondary"
-            >
-                Send Counter Offer
-            </button>
+                <input
+                    type="hidden"
+                    name="action"
+                    value="counter"
+                >
 
-        </form>
 
+                <button
+                    type="submit"
+                    class="send-offer-btn counter-offer-btn"
+                >
+                    <span>💰</span>
+                    Send Counter Offer
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- Information -->
+
+        <div class="negotiation-note">
+
+            <span>ℹ️</span>
+
+            <p>
+                You can accept the customer's offer or send
+                a counter offer. Once accepted, the final amount
+                will be confirmed.
+            </p>
+
+        </div>
+
+
+        <!-- Back -->
 
         <a
             href="{% url 'worker_dashboard' %}"
-            class="back-link"
+            class="back-dashboard"
         >
             ← Back to Dashboard
         </a>
@@ -141,5 +213,4 @@
 
 </div>
 
-</body>
-</html>
+{% endblock %}

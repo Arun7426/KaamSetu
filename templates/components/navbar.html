@@ -5,33 +5,52 @@
     <div class="container">
 
         <!-- Logo -->
+
         <a href="/" class="logo">
 
             <img src="{% static 'images/logo.png' %}" alt="KaamSetu Logo">
 
             <div class="logo-text">
-                <span class="logo-blue">Kaam</span><span class="logo-orange">Setu</span>
+
+                <span class="logo-blue">
+                    Kaam
+                </span>
+
+                <span class="logo-orange">
+                    Setu
+                </span>
+
             </div>
 
         </a>
 
+
         <!-- Menu -->
+
         <ul class="nav-menu">
 
             <li>
-                <a href="/">Home</a>
+                <a href="/">
+                    Home
+                </a>
             </li>
 
             <li>
-                <a href="#services">Services</a>
+                <a href="#services">
+                    Services
+                </a>
             </li>
 
             <li>
-                <a href="#how-it-works">How It Works</a>
+                <a href="#how-it-works">
+                    How It Works
+                </a>
             </li>
 
             <li>
-                <a href="#workers">Workers</a>
+                <a href="#workers">
+                    Workers
+                </a>
             </li>
 
             <li>
@@ -41,58 +60,84 @@
             </li>
 
             <li>
-                <a href="#contact">Contact</a>
+                <a href="#contact">
+                    Contact
+                </a>
             </li>
 
         </ul>
 
-        <!-- Right Side Buttons -->
+
+        <!-- Right Side -->
+
         <div class="nav-buttons">
 
             {% if user.is_authenticated %}
 
-                <span class="welcome-text">
-                    Hello,
-                    {{ user.first_name|default:user.username }}
+            <span class="welcome-text">
+
+                Hello,
+                {{ user.first_name|default:user.username }}
+
+            </span>
+
+
+            <!-- Notification Bell -->
+
+            <a href="{% url 'notifications' %}" class="notification-bell" title="Notifications">
+
+                🔔
+
+                {% if unread_notification_count > 0 %}
+
+                <span class="notification-badge">
+                    {{ unread_notification_count }}
                 </span>
-
-                {% if user.is_staff %}
-
-                    <a href="/admin/" class="btn-login">
-                        Dashboard
-                    </a>
-
-                {% else %}
-
-                    {% if user.worker_profile %}
-
-                        <a href="{% url 'worker_dashboard' %}" class="btn-login">
-                            Dashboard
-                        </a>
-
-                    {% else %}
-
-                        <a href="{% url 'customer_dashboard' %}" class="btn-login">
-                            Dashboard
-                        </a>
-
-                    {% endif %}
 
                 {% endif %}
 
-                <a href="{% url 'logout' %}" class="btn-signup">
-                    Logout
-                </a>
+            </a>
+
+
+            {% if user.is_staff %}
+
+            <a href="/admin/" class="btn-login">
+                Dashboard
+            </a>
 
             {% else %}
 
-                <a href="{% url 'login' %}" class="btn-login">
-                    Login
-                </a>
+            {% if user.worker_profile %}
 
-                <a href="{% url 'register' %}" class="btn-signup">
-                    Sign Up
-                </a>
+            <a href="{% url 'worker_dashboard' %}" class="btn-login">
+                Dashboard
+            </a>
+
+            {% else %}
+
+            <a href="{% url 'customer_dashboard' %}" class="btn-login">
+                Dashboard
+            </a>
+
+            {% endif %}
+
+            {% endif %}
+
+
+            <a href="{% url 'logout' %}" class="btn-signup">
+                Logout
+            </a>
+
+
+            {% else %}
+
+            <a href="{% url 'login' %}" class="btn-login">
+                Login
+            </a>
+
+            <a href="{% url 'register' %}" class="btn-signup">
+                Sign Up
+            </a>
 
             {% endif %}
 

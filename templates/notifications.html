@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Notifications | KaamSetu
+{% endblock %}
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{% static 'css/notification.css' %}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="notification-page">
+
+    <div class="notification-container">
+
+
+        <!-- Header -->
+
+        <div class="notification-header">
+
+            <div>
+
+                <h1>
+                    Notifications
+                </h1>
+
+                <p>
+                    Stay updated with your bookings and offers.
+                </p>
+
+            </div>
+
+
+            {% if notifications %}
+
+            <form
+                method="POST"
+                action="{% url 'mark_all_notifications_read' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="mark-all-btn"
+                >
+                    Mark all as read
+                </button>
+
+            </form>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Notifications -->
+
+        <div class="notification-list">
+
+            {% for notification in notifications %}
+
+            <div
+                class="notification-item
+                {% if not notification.is_read %}
+                    unread
+                {% endif %}"
+            >
+
+                <div class="notification-icon">
+
+                    {% if notification.notification_type == "booking" %}
+                        📋
+
+                    {% elif notification.notification_type == "offer" %}
+                        💰
+
+                    {% elif notification.notification_type == "counter_offer" %}
+                        🤝
+
+                    {% elif notification.notification_type == "accepted" %}
+                        ✅
+
+                    {% elif notification.notification_type == "rejected" %}
+                        ❌
+
+                    {% elif notification.notification_type == "completed" %}
+                        ✔️
+
+                    {% else %}
+                        🔔
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="notification-content">
+
+                    <p>
+                        {{ notification.message }}
+                    </p>
+
+                    <span class="notification-time">
+                        {{ notification.created_at|timesince }} ago
+                    </span>
+
+                </div>
+
+
+                {% if not notification.is_read %}
+
+                <form
+                    method="POST"
+                    action="{% url 'mark_notification_read' notification.id %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="read-btn"
+                    >
+                        Mark as read
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+
+            {% empty %}
+
+            <div class="no-notifications">
+
+                <div class="empty-icon">
+                    🔔
+                </div>
+
+                <h2>
+                    No Notifications
+                </h2>
+
+                <p>
+                    You're all caught up!
+                </p>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- Back -->
+
+        <a
+            href="{% if user.worker_profile %}
+                {% url 'worker_dashboard' %}
+            {% else %}
+                {% url 'customer_dashboard' %}
+            {% endif %}"
+            class="back-dashboard"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
