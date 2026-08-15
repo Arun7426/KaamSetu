@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 {% endblock %}
+
 {% block title %}
 Customer Dashboard
 {% endblock %}
-
 
 
 {% block content %}
@@ -57,6 +58,7 @@ Customer Dashboard
 
     </aside>
 
+
     <!-- Main Content -->
     <main class="main-content">
 
@@ -74,13 +76,17 @@ Customer Dashboard
 
         </div>
 
+
         <!-- Profile Card -->
 
         <div class="profile-card">
 
             <div class="profile-image">
 
-                <img src="{% static 'images/customer.png' %}" alt="Customer">
+                <img
+                    src="{% static 'images/customer.png' %}"
+                    alt="Customer"
+                >
 
             </div>
 
@@ -104,6 +110,7 @@ Customer Dashboard
 
         </div>
 
+
         <!-- Statistics -->
 
         <div class="stats">
@@ -116,6 +123,7 @@ Customer Dashboard
 
             </div>
 
+
             <div class="stat-card">
 
                 <h4>Pending</h4>
@@ -124,6 +132,7 @@ Customer Dashboard
 
             </div>
 
+
             <div class="stat-card">
 
                 <h4>Accepted</h4>
@@ -131,6 +140,7 @@ Customer Dashboard
                 <h2>{{ accepted_bookings }}</h2>
 
             </div>
+
 
             <div class="stat-card">
 
@@ -142,7 +152,8 @@ Customer Dashboard
 
         </div>
 
-        <!-- Step 2B starts from here -->
+
+        <!-- My Bookings -->
 
         <div id="my-bookings" style="margin-top:40px;">
 
@@ -153,6 +164,7 @@ Customer Dashboard
                     <h2 style="color:#17375E;margin-bottom:20px;">
                         My Bookings
                     </h2>
+
 
                     <div style="overflow-x:auto;">
 
@@ -173,23 +185,35 @@ Customer Dashboard
 
                             </thead>
 
+
                             <tbody>
 
                                 {% for booking in bookings %}
 
                                 <tr>
 
+                                    <!-- Worker -->
+
                                     <td>
                                         {{ booking.worker.name }}
                                     </td>
+
+
+                                    <!-- Profession -->
 
                                     <td>
                                         {{ booking.worker.profession }}
                                     </td>
 
+
+                                    <!-- Date -->
+
                                     <td>
                                         {{ booking.work_date }}
                                     </td>
+
+
+                                    <!-- Booking Status -->
 
                                     <td>
 
@@ -221,6 +245,9 @@ Customer Dashboard
 
                                     </td>
 
+
+                                    <!-- Worker Mobile -->
+
                                     <td>
 
                                         {% if booking.status == "Accepted" or booking.status == "Completed" %}
@@ -229,7 +256,12 @@ Customer Dashboard
 
                                         {% else %}
 
-                                        <span style="color:#f4a940;font-weight:600;">
+                                        <span
+                                            style="
+                                                color:#f4a940;
+                                                font-weight:600;
+                                            "
+                                        >
                                             🔒 Available after acceptance
                                         </span>
 
@@ -237,27 +269,209 @@ Customer Dashboard
 
                                     </td>
 
+
+                                    <!-- Action -->
+
                                     <td>
 
-                                        {% if booking.status == "Completed" %}
+                                        <!-- ================================= -->
+                                        <!-- PENDING BOOKING -->
+                                        <!-- ================================= -->
 
-                                        {% if booking.has_review %}
+                                        {% if booking.status == "Pending" %}
 
-                                        <span class="reviewed">
-                                            ⭐ {{ booking.review_rating }}/5 Reviewed
-                                        </span>
+                                            <span style="color:#888;">
+                                                Waiting for worker
+                                            </span>
+
+
+                                        <!-- ================================= -->
+                                        <!-- ACCEPTED BOOKING -->
+                                        <!-- ================================= -->
+
+                                        {% elif booking.status == "Accepted" %}
+
+
+                                            <!-- ============================== -->
+                                            <!-- NEGOTIATION NOT STARTED -->
+                                            <!-- ============================== -->
+
+                                            {% if booking.negotiation_status == "Not Started" %}
+
+                                                <a
+                                                    href="{% url 'customer_make_offer' booking.id %}"
+                                                    class="review-btn"
+                                                >
+                                                    💰 Make an Offer
+                                                </a>
+
+
+                                            <!-- ============================== -->
+                                            <!-- CUSTOMER OFFER SENT -->
+                                            <!-- ============================== -->
+
+                                            {% elif booking.negotiation_status == "Customer Offered" %}
+
+                                                <span
+                                                    style="
+                                                        color:#f4a940;
+                                                        font-weight:600;
+                                                    "
+                                                >
+                                                    ⏳ Waiting for Worker
+                                                </span>
+
+                                                <br>
+
+                                                <small>
+                                                    Your Offer:
+                                                    <strong>
+                                                        ₹{{ booking.customer_offer }}
+                                                    </strong>
+                                                </small>
+
+
+                                            <!-- ============================== -->
+                                            <!-- WORKER COUNTER OFFER -->
+                                            <!-- ============================== -->
+
+                                            {% elif booking.negotiation_status == "Worker Countered" %}
+
+                                                <a
+                                                    href="{% url 'customer_respond_counter' booking.id %}"
+                                                    class="review-btn"
+                                                >
+                                                    💰 View Counter Offer
+                                                </a>
+
+                                                <br>
+
+                                                <small>
+                                                    Worker Offer:
+                                                    <strong>
+                                                        ₹{{ booking.worker_counter_offer }}
+                                                    </strong>
+                                                </small>
+
+
+                                            <!-- ============================== -->
+                                            <!-- NEGOTIATION ACCEPTED -->
+                                            <!-- ============================== -->
+
+                                            {% elif booking.negotiation_status == "Accepted" %}
+
+                                                <span
+                                                    style="
+                                                        color:#198754;
+                                                        font-weight:700;
+                                                    "
+                                                >
+                                                    ✅ Final Amount
+                                                </span>
+
+                                                <br>
+
+                                                <strong>
+                                                    ₹{{ booking.final_amount }}
+                                                </strong>
+
+
+                                            <!-- ============================== -->
+                                            <!-- NEGOTIATION REJECTED -->
+                                            <!-- ============================== -->
+
+                                            {% elif booking.negotiation_status == "Rejected" %}
+
+                                                <span
+                                                    style="
+                                                        color:#dc3545;
+                                                        font-weight:600;
+                                                    "
+                                                >
+                                                    ❌ Offer Rejected
+                                                </span>
+
+                                            {% endif %}
+
+
+                                        <!-- ================================= -->
+                                        <!-- COMPLETED BOOKING -->
+                                        <!-- ================================= -->
+
+                                        {% elif booking.status == "Completed" %}
+
+                                            {% if booking.negotiation_status == "Accepted" %}
+
+                                                <div>
+                                                    <span
+                                                        style="
+                                                            color:#198754;
+                                                            font-weight:700;
+                                                        "
+                                                    >
+                                                        💰 Final Amount
+                                                    </span>
+
+                                                    <br>
+
+                                                    <strong>
+                                                        ₹{{ booking.final_amount }}
+                                                    </strong>
+                                                </div>
+
+                                            {% endif %}
+
+
+                                            <div style="margin-top:8px;">
+
+                                                {% if booking.has_review %}
+
+                                                    <span class="reviewed">
+                                                        ⭐
+                                                        {{ booking.review_rating }}/5
+                                                        Reviewed
+                                                    </span>
+
+                                                {% else %}
+
+                                                    <a
+                                                        href="{% url 'add_review' booking.id %}"
+                                                        class="review-btn"
+                                                    >
+                                                        ⭐ Rate Worker
+                                                    </a>
+
+                                                {% endif %}
+
+                                            </div>
+
+
+                                        <!-- ================================= -->
+                                        <!-- CANCELLED BOOKING -->
+                                        <!-- ================================= -->
 
                                         {% else %}
 
-                                        <a href="{% url 'add_review' booking.id %}" class="review-btn">
-                                            ⭐ Rate Worker
-                                        </a>
+                                            {% if booking.negotiation_status == "Rejected" %}
 
-                                        {% endif %}
+                                                <span
+                                                    style="
+                                                        color:#dc3545;
+                                                        font-weight:600;
+                                                    "
+                                                >
+                                                    ❌ Negotiation Rejected
+                                                </span>
 
-                                        {% else %}
+                                            {% else %}
 
-                                        -
+                                                <span
+                                                    style="color:#888;"
+                                                >
+                                                    -
+                                                </span>
+
+                                            {% endif %}
 
                                         {% endif %}
 
@@ -265,14 +479,19 @@ Customer Dashboard
 
                                 </tr>
 
+
                                 {% empty %}
 
                                 <tr>
 
-                                    <td colspan="6" style="text-align:center;padding:30px;">
-
+                                    <td
+                                        colspan="6"
+                                        style="
+                                            text-align:center;
+                                            padding:30px;
+                                        "
+                                    >
                                         No Bookings Yet
-
                                     </td>
 
                                 </tr>

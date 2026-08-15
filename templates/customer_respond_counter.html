@@ -1,0 +1,122 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Worker Counter Offer | KaamSetu</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}"
+    >
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="offer-card">
+
+        <h2>Worker Counter Offer</h2>
+
+        <p>
+            Worker:
+            <strong>{{ booking.worker.name }}</strong>
+        </p>
+
+        <p>
+            Your Offer:
+            <strong>₹{{ booking.customer_offer }}</strong>
+        </p>
+
+        <div class="customer-offer">
+
+            <span>
+                Worker Counter Offer
+            </span>
+
+            <strong>
+                ₹{{ booking.worker_counter_offer }}
+            </strong>
+
+        </div>
+
+
+        <p class="offer-help">
+            Do you accept the worker's counter offer?
+        </p>
+
+
+        <!-- ============================= -->
+        <!-- ACCEPT -->
+        <!-- ============================= -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="accept"
+            >
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+                Accept ₹{{ booking.worker_counter_offer }}
+            </button>
+
+        </form>
+
+
+        <!-- ============================= -->
+        <!-- REJECT -->
+        <!-- ============================= -->
+
+        <form
+            method="POST"
+            style="margin-top: 10px;"
+        >
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="reject"
+            >
+
+            <button
+                type="submit"
+                class="btn-danger"
+            >
+                Reject Offer
+            </button>
+
+        </form>
+
+
+        <a
+            href="{% url 'customer_dashboard' %}"
+            class="back-link"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

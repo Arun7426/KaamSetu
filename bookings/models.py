@@ -13,6 +13,14 @@ class Booking(models.Model):
         ("Cancelled", "Cancelled"),
     ]
 
+    NEGOTIATION_STATUS_CHOICES = [
+        ("Not Started", "Not Started"),
+        ("Customer Offered", "Customer Offered"),
+        ("Worker Countered", "Worker Countered"),
+        ("Accepted", "Accepted"),
+        ("Rejected", "Rejected"),
+    ]
+
     worker = models.ForeignKey(
         Worker,
         on_delete=models.CASCADE,
@@ -48,6 +56,52 @@ class Booking(models.Model):
         default="Pending"
     )
 
+    # ---------------------------------
+    # Negotiation Fields
+    # ---------------------------------
+
+    original_amount = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(9999)
+        ],
+        null=True,
+        blank=True
+    )
+
+    customer_offer = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(9999)
+        ],
+        null=True,
+        blank=True
+    )
+
+    worker_counter_offer = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(9999)
+        ],
+        null=True,
+        blank=True
+    )
+
+    final_amount = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(9999)
+        ],
+        null=True,
+        blank=True
+    )
+
+    negotiation_status = models.CharField(
+        max_length=20,
+        choices=NEGOTIATION_STATUS_CHOICES,
+        default="Not Started"
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
@@ -55,7 +109,6 @@ class Booking(models.Model):
     def __str__(self):
         return f"{self.customer_name} - {self.worker.name}"
 
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Review(models.Model):
 

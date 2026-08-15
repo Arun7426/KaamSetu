@@ -14,15 +14,11 @@ Worker Dashboard
 <div class="dashboard">
 
     <!-- Sidebar -->
-
     <aside class="sidebar">
 
         <div class="logo">
-
             <h2>KaamSetu</h2>
-
             <p>Worker Panel</p>
-
         </div>
 
         <ul class="menu">
@@ -67,10 +63,11 @@ Worker Dashboard
 
     </aside>
 
-    <!-- Main Content -->
 
+    <!-- Main Content -->
     <main class="main-content">
 
+        <!-- Header -->
         <div class="top-bar">
 
             <h1>
@@ -84,8 +81,8 @@ Worker Dashboard
 
         </div>
 
-        <!-- Profile -->
 
+        <!-- Profile -->
         <div class="profile-card">
 
             <div class="profile-image">
@@ -102,6 +99,7 @@ Worker Dashboard
 
             </div>
 
+
             <div class="profile-info">
 
                 <h2>{{ worker.name }}</h2>
@@ -109,7 +107,9 @@ Worker Dashboard
                 <h4>{{ worker.profession }}</h4>
 
                 <p>
-                    ⭐ {{ worker.rating }}/5 ({{ worker.reviews }} Review{{ worker.reviews|pluralize }})
+                    ⭐ {{ worker.rating }}/5
+                    ({{ worker.reviews }}
+                    Review{{ worker.reviews|pluralize }})
                 </p>
 
                 <p>
@@ -119,6 +119,7 @@ Worker Dashboard
             </div>
 
         </div>
+
 
         <!-- Dashboard Cards -->
 
@@ -132,6 +133,7 @@ Worker Dashboard
 
             </div>
 
+
             <div class="stat-card">
 
                 <h4>Pending Requests</h4>
@@ -140,6 +142,7 @@ Worker Dashboard
 
             </div>
 
+
             <div class="stat-card">
 
                 <h4>Completed Jobs</h4>
@@ -147,6 +150,9 @@ Worker Dashboard
                 <h2>{{ completed_bookings }}</h2>
 
             </div>
+
+
+            <!-- Availability -->
 
             <div class="stat-card">
 
@@ -158,16 +164,16 @@ Worker Dashboard
                     🟢 Available
                 </h2>
 
-                <a href="{% url 'toggle_availability' %}" style="display:inline-block;
-          margin-top:10px;
-          background:#dc2626;
-          color:white;
-          padding:8px 14px;
-          border-radius:8px;
-          text-decoration:none;">
-
+                <a href="{% url 'toggle_availability' %}" style="
+                        display:inline-block;
+                        margin-top:10px;
+                        background:#dc2626;
+                        color:white;
+                        padding:8px 14px;
+                        border-radius:8px;
+                        text-decoration:none;
+                    ">
                     Go Offline
-
                 </a>
 
                 {% else %}
@@ -176,21 +182,24 @@ Worker Dashboard
                     🔴 Offline
                 </h2>
 
-                <a href="{% url 'toggle_availability' %}" style="display:inline-block;
-          margin-top:10px;
-          background:#16a34a;
-          color:white;
-          padding:8px 14px;
-          border-radius:8px;
-          text-decoration:none;">
-
+                <a href="{% url 'toggle_availability' %}" style="
+                        display:inline-block;
+                        margin-top:10px;
+                        background:#16a34a;
+                        color:white;
+                        padding:8px 14px;
+                        border-radius:8px;
+                        text-decoration:none;
+                    ">
                     Go Online
-
                 </a>
 
                 {% endif %}
 
             </div>
+
+
+            <!-- Rating -->
 
             <div class="stat-card">
 
@@ -198,10 +207,13 @@ Worker Dashboard
 
                 {% if worker.reviews > 0 %}
 
-                <h2>⭐ {{ worker.rating }}/5</h2>
+                <h2>
+                    ⭐ {{ worker.rating }}/5
+                </h2>
 
                 <p style="margin-top:10px;color:#666;">
-                    {{ worker.reviews }} Review{{ worker.reviews|pluralize }}
+                    {{ worker.reviews }}
+                    Review{{ worker.reviews|pluralize }}
                 </p>
 
                 {% else %}
@@ -216,24 +228,45 @@ Worker Dashboard
 
             </div>
 
+
+            <!-- Work Location -->
+
             <div class="stat-card">
 
                 <h4>My Work Location</h4>
 
                 <p id="location-status" role="status" style="margin:10px 0;color:#666;">
+
                     {% if worker.latitude is not None and worker.longitude is not None %}
-                    Location saved. You can update it anytime.
+
+                    Location saved.
+                    You can update it anytime.
+
                     {% else %}
+
                     Location not set yet.
+
                     {% endif %}
+
                 </p>
 
-                <button id="set-location-button" type="button"
-                    style="background:#2563eb;color:white;padding:8px 14px;border:0;border-radius:8px;cursor:pointer;">
+
+                <button id="set-location-button" type="button" style="
+                        background:#2563eb;
+                        color:white;
+                        padding:8px 14px;
+                        border:0;
+                        border-radius:8px;
+                        cursor:pointer;
+                    ">
                     Set My Location
                 </button>
 
             </div>
+
+
+            <!-- Work Range -->
+
             <div class="stat-card">
 
                 <h4>My Work Range</h4>
@@ -242,7 +275,12 @@ Worker Dashboard
                     Choose how far you are ready to travel for work.
                 </p>
 
-                <select id="work-range-select" style="padding:8px;border:1px solid #ccc;border-radius:8px;">
+
+                <select id="work-range-select" style="
+                        padding:8px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                    ">
 
                     <option value="5" {% if worker.work_range == 5 %}selected{% endif %}>
                         5 KM
@@ -274,22 +312,28 @@ Worker Dashboard
 
                 </select>
 
-                <button id="save-work-range-button" type="button"
-                    style="margin-left:6px;background:#16a34a;color:white;padding:8px 14px;border:0;border-radius:8px;cursor:pointer;">
 
+                <button id="save-work-range-button" type="button" style="
+                        margin-left:6px;
+                        background:#16a34a;
+                        color:white;
+                        padding:8px 14px;
+                        border:0;
+                        border-radius:8px;
+                        cursor:pointer;
+                    ">
                     Save Range
-
                 </button>
 
+
                 <p id="work-range-status" style="margin:10px 0 0;color:#666;">
-
                     Current range: {{ worker.work_range }} KM
-
                 </p>
 
             </div>
 
         </div>
+
 
         <!-- Booking Requests -->
 
@@ -302,6 +346,7 @@ Worker Dashboard
                     <h2 style="margin-bottom:20px;">
                         Booking Requests
                     </h2>
+
 
                     <div style="overflow-x:auto;">
 
@@ -323,15 +368,21 @@ Worker Dashboard
 
                             </thead>
 
+
                             <tbody>
 
                                 {% for booking in bookings %}
 
                                 <tr>
 
+                                    <!-- Customer -->
+
                                     <td>
                                         {{ booking.customer_name }}
                                     </td>
+
+
+                                    <!-- Mobile -->
 
                                     <td>
 
@@ -347,17 +398,29 @@ Worker Dashboard
 
                                     </td>
 
+
+                                    <!-- Address -->
+
                                     <td>
                                         {{ booking.customer_address }}
                                     </td>
+
+
+                                    <!-- Work -->
 
                                     <td>
                                         {{ booking.work_description }}
                                     </td>
 
+
+                                    <!-- Work Date -->
+
                                     <td>
                                         {{ booking.work_date }}
                                     </td>
+
+
+                                    <!-- Status -->
 
                                     <td>
 
@@ -389,44 +452,200 @@ Worker Dashboard
 
                                     </td>
 
+
+                                    <!-- Action -->
+
                                     <td>
+
+                                        <!-- ================================= -->
+                                        <!-- PENDING BOOKING -->
+                                        <!-- ================================= -->
 
                                         {% if booking.status == "Pending" %}
 
-                                        <a href="{% url 'update_booking_status' booking.id 'accept' %}"
-                                            style="background:#16a34a;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;margin-right:6px;display:inline-block;">
-
+                                        <a href="{% url 'update_booking_status' booking.id 'accept' %}" style="
+                background:#16a34a;
+                color:white;
+                padding:8px 14px;
+                text-decoration:none;
+                border-radius:8px;
+                margin-right:6px;
+                display:inline-block;
+            ">
                                             Accept
-
                                         </a>
 
-                                        <a href="{% url 'update_booking_status' booking.id 'reject' %}"
-                                            style="background:#dc2626;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
-
+                                        <a href="{% url 'update_booking_status' booking.id 'reject' %}" style="
+                background:#dc2626;
+                color:white;
+                padding:8px 14px;
+                text-decoration:none;
+                border-radius:8px;
+                display:inline-block;
+            ">
                                             Reject
-
                                         </a>
+
+
+                                        <!-- ================================= -->
+                                        <!-- ACCEPTED BOOKING -->
+                                        <!-- ================================= -->
 
                                         {% elif booking.status == "Accepted" %}
 
-                                        <a href="{% url 'update_booking_status' booking.id 'complete' %}"
-                                            style="background:#2563eb;color:white;padding:8px 14px;text-decoration:none;border-radius:8px;display:inline-block;">
 
-                                            ✅ Complete Work
+                                        <!-- Customer has made an offer -->
 
+                                        {% if booking.negotiation_status == "Customer Offered" %}
+
+                                        <a href="{% url 'worker_respond_offer' booking.id %}" style="
+                    background:#f59e0b;
+                    color:white;
+                    padding:8px 14px;
+                    text-decoration:none;
+                    border-radius:8px;
+                    display:inline-block;
+                    font-weight:600;
+                ">
+                                            💰 View Offer
                                         </a>
+
+                                        <br>
+
+                                        <small style="
+                    display:inline-block;
+                    margin-top:6px;
+                    color:#555;
+                ">
+                                            Customer Offer:
+                                            <strong>
+                                                ₹{{ booking.customer_offer }}
+                                            </strong>
+                                        </small>
+
+
+                                        <!-- Worker has sent counter offer -->
+
+                                        {% elif booking.negotiation_status == "Worker Countered" %}
+
+                                        <span style="
+                    color:#f59e0b;
+                    font-weight:600;
+                ">
+                                            ⏳ Waiting for Customer
+                                        </span>
+
+                                        <br>
+
+                                        <small>
+                                            Your Counter Offer:
+                                            <strong>
+                                                ₹{{ booking.worker_counter_offer }}
+                                            </strong>
+                                        </small>
+
+
+                                        <!-- Negotiation completed successfully -->
+
+                                        {% elif booking.negotiation_status == "Accepted" %}
+
+                                        <div>
+
+                                            <span style="
+                        color:#16a34a;
+                        font-weight:700;
+                    ">
+                                                ✅ Booking Confirmed
+                                            </span>
+
+                                            <br>
+
+                                            <strong>
+                                                Final Amount: ₹{{ booking.final_amount }}
+                                            </strong>
+
+                                        </div>
+
+                                        <a href="{% url 'update_booking_status' booking.id 'complete' %}" style="
+                    margin-top:8px;
+                    background:#2563eb;
+                    color:white;
+                    padding:8px 14px;
+                    text-decoration:none;
+                    border-radius:8px;
+                    display:inline-block;
+                ">
+                                            ✅ Complete Work
+                                        </a>
+
+
+                                        <!-- Negotiation not started -->
+
+                                        {% elif booking.negotiation_status == "Not Started" %}
+
+                                        <span style="
+                    color:#666;
+                    font-weight:600;
+                ">
+                                            ⏳ Waiting for Customer Offer
+                                        </span>
+
+                                        <br>
+
+                                        <small style="
+                    display:inline-block;
+                    margin-top:6px;
+                    color:#888;
+                ">
+                                            Original Amount:
+                                            <strong>
+                                                ₹{{ booking.original_amount }}
+                                            </strong>
+                                        </small>
+
+
+                                        {% endif %}
+
+
+                                        <!-- ================================= -->
+                                        <!-- COMPLETED -->
+                                        <!-- ================================= -->
 
                                         {% elif booking.status == "Completed" %}
 
-                                        <span style="color:#16a34a;font-weight:600;">
+                                        <span style="
+                color:#16a34a;
+                font-weight:600;
+            ">
                                             ✔ Completed
                                         </span>
 
+
+                                        <!-- ================================= -->
+                                        <!-- CANCELLED -->
+                                        <!-- ================================= -->
+
                                         {% elif booking.status == "Cancelled" %}
 
-                                        <span style="color:#dc2626;font-weight:600;">
+                                        {% if booking.negotiation_status == "Rejected" %}
+
+                                        <span style="
+                    color:#dc2626;
+                    font-weight:600;
+                ">
+                                            ❌ Negotiation Rejected
+                                        </span>
+
+                                        {% else %}
+
+                                        <span style="
+                    color:#dc2626;
+                    font-weight:600;
+                ">
                                             ✖ Cancelled
                                         </span>
+
+                                        {% endif %}
 
                                         {% endif %}
 
@@ -434,14 +653,16 @@ Worker Dashboard
 
                                 </tr>
 
+
                                 {% empty %}
 
                                 <tr>
 
-                                    <td colspan="7" style="text-align:center;padding:35px;">
-
+                                    <td colspan="7" style="
+                                            text-align:center;
+                                            padding:35px;
+                                        ">
                                         No Booking Requests
-
                                     </td>
 
                                 </tr>
@@ -464,145 +685,360 @@ Worker Dashboard
 
 </div>
 
+
+<!-- ===================================================== -->
+<!-- LOCATION + WORK RANGE JAVASCRIPT -->
+<!-- ===================================================== -->
+
 <script>
+
     (function () {
-        const locationButton = document.getElementById("set-location-button");
-        const locationStatus = document.getElementById("location-status");
-        const locationUrl = "{% url 'update_worker_location' %}";
-        const workRangeSelect = document.getElementById("work-range-select");
-        const saveWorkRangeButton = document.getElementById("save-work-range-button");
-        const workRangeStatus = document.getElementById("work-range-status");
-        const workRangeUrl = "{% url 'update_work_range' %}";
+
+        const locationButton =
+            document.getElementById("set-location-button");
+
+        const locationStatus =
+            document.getElementById("location-status");
+
+        const locationUrl =
+            "{% url 'update_worker_location' %}";
+
+        const workRangeSelect =
+            document.getElementById("work-range-select");
+
+        const saveWorkRangeButton =
+            document.getElementById("save-work-range-button");
+
+        const workRangeStatus =
+            document.getElementById("work-range-status");
+
+        const workRangeUrl =
+            "{% url 'update_work_range' %}";
+
 
         function showStatus(message, color) {
+
             locationStatus.textContent = message;
             locationStatus.style.color = color;
+
         }
+
 
         let lastSavedLocation;
 
+
         function saveLocation(position, forceUpdate) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            const moved = !lastSavedLocation || Math.hypot(
-                latitude - lastSavedLocation.latitude,
-                longitude - lastSavedLocation.longitude
-            ) > 0.00025; // about 25 metres; avoids saving GPS jitter
-            if (!forceUpdate && !moved) return;
 
-            const formData = new FormData();
-            formData.append("latitude", latitude);
-            formData.append("longitude", longitude);
-            formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
-            fetch(locationUrl, { method: "POST", body: formData, credentials: "same-origin" })
-                .then(function (response) {
-                    return response.json().then(function (data) {
-                        if (!response.ok) throw new Error(data.message || "Could not save your location.");
-                        return data;
-                    });
-                })
-                .then(function (data) {
-                    lastSavedLocation = { latitude: latitude, longitude: longitude };
-                    showStatus(forceUpdate ? data.message : "Location is being updated automatically.", "#16a34a");
-                })
-                .catch(function (error) {
-                    showStatus(error.message || "Could not save your location. Please try again.", "#dc2626");
-                })
-                .finally(function () {
-                    locationButton.disabled = false;
-                    locationButton.textContent = "Update My Location";
-                });
-        }
+            const latitude =
+                position.coords.latitude;
 
-        function locationError(error) {
-            const messages = {
-                1: "Location permission was denied. Please allow it and try again.",
-                2: "Your location could not be determined. Please try again.",
-                3: "Location request timed out. Please try again."
-            };
-            showStatus(messages[error.code] || "Could not get your location. Please try again.", "#dc2626");
-            locationButton.disabled = false;
-            locationButton.textContent = "Update My Location";
-        }
+            const longitude =
+                position.coords.longitude;
 
-        if (navigator.geolocation) {
-            showStatus("Keeping your work location up to date…", "#666");
-            navigator.geolocation.watchPosition(
-                function (position) { saveLocation(position, false); },
-                locationError,
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
-            );
-        }
 
-        locationButton.addEventListener("click", function () {
-            if (!navigator.geolocation) {
-                showStatus("Location is not supported by this browser.", "#dc2626");
+            const moved =
+                !lastSavedLocation ||
+                Math.hypot(
+                    latitude -
+                    lastSavedLocation.latitude,
+
+                    longitude -
+                    lastSavedLocation.longitude
+                ) > 0.00025;
+
+
+            if (!forceUpdate && !moved) {
                 return;
             }
-            locationButton.disabled = true;
-            locationButton.textContent = "Getting location...";
-            navigator.geolocation.getCurrentPosition(
-                function (position) { saveLocation(position, true); },
-                locationError,
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-            );
-        });
-        saveWorkRangeButton.addEventListener("click", function () {
+
 
             const formData = new FormData();
 
-            formData.append("work_range", workRangeSelect.value);
+            formData.append(
+                "latitude",
+                latitude
+            );
+
+            formData.append(
+                "longitude",
+                longitude
+            );
 
             formData.append(
                 "csrfmiddlewaretoken",
                 "{{ csrf_token }}"
             );
 
-            saveWorkRangeButton.disabled = true;
 
-            saveWorkRangeButton.textContent = "Saving...";
+            fetch(
+                locationUrl,
+                {
+                    method: "POST",
+                    body: formData,
+                    credentials: "same-origin"
+                }
+            )
 
-            fetch(workRangeUrl, {
-                method: "POST",
-                body: formData,
-                credentials: "same-origin"
-            })
                 .then(function (response) {
 
-                    return response.json().then(function (data) {
+                    return response.json()
+                        .then(function (data) {
 
-                        if (!response.ok) {
+                            if (!response.ok) {
 
-                            throw new Error(
-                                data.message || "Could not save the work range."
-                            );
-                        }
+                                throw new Error(
+                                    data.message ||
+                                    "Could not save your location."
+                                );
 
-                        return data;
-                    });
+                            }
+
+                            return data;
+
+                        });
+
                 })
+
                 .then(function (data) {
 
-                    workRangeStatus.textContent = data.message;
+                    lastSavedLocation = {
+                        latitude: latitude,
+                        longitude: longitude
+                    };
 
-                    workRangeStatus.style.color = "#16a34a";
+                    showStatus(
+                        forceUpdate
+                            ? data.message
+                            : "Location is being updated automatically.",
+                        "#16a34a"
+                    );
+
                 })
+
                 .catch(function (error) {
 
-                    workRangeStatus.textContent =
+                    showStatus(
                         error.message ||
-                        "Could not save the work range. Please try again.";
+                        "Could not save your location. Please try again.",
+                        "#dc2626"
+                    );
 
-                    workRangeStatus.style.color = "#dc2626";
                 })
+
                 .finally(function () {
 
-                    saveWorkRangeButton.disabled = false;
+                    locationButton.disabled = false;
 
-                    saveWorkRangeButton.textContent = "Save Range";
+                    locationButton.textContent =
+                        "Update My Location";
+
                 });
-        });
+
+        }
+
+
+        function locationError(error) {
+
+            const messages = {
+
+                1:
+                    "Location permission was denied. Please allow it and try again.",
+
+                2:
+                    "Your location could not be determined. Please try again.",
+
+                3:
+                    "Location request timed out. Please try again."
+
+            };
+
+
+            showStatus(
+                messages[error.code] ||
+                "Could not get your location. Please try again.",
+                "#dc2626"
+            );
+
+
+            locationButton.disabled = false;
+
+            locationButton.textContent =
+                "Update My Location";
+
+        }
+
+
+        if (navigator.geolocation) {
+
+            showStatus(
+                "Keeping your work location up to date…",
+                "#666"
+            );
+
+
+            navigator.geolocation.watchPosition(
+
+                function (position) {
+
+                    saveLocation(
+                        position,
+                        false
+                    );
+
+                },
+
+                locationError,
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 60000
+                }
+
+            );
+
+        }
+
+
+        locationButton.addEventListener(
+            "click",
+            function () {
+
+                if (!navigator.geolocation) {
+
+                    showStatus(
+                        "Location is not supported by this browser.",
+                        "#dc2626"
+                    );
+
+                    return;
+
+                }
+
+
+                locationButton.disabled = true;
+
+                locationButton.textContent =
+                    "Getting location...";
+
+
+                navigator.geolocation.getCurrentPosition(
+
+                    function (position) {
+
+                        saveLocation(
+                            position,
+                            true
+                        );
+
+                    },
+
+                    locationError,
+
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 0
+                    }
+
+                );
+
+            }
+        );
+
+
+        saveWorkRangeButton.addEventListener(
+            "click",
+            function () {
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "work_range",
+                    workRangeSelect.value
+                );
+
+
+                formData.append(
+                    "csrfmiddlewaretoken",
+                    "{{ csrf_token }}"
+                );
+
+
+                saveWorkRangeButton.disabled = true;
+
+                saveWorkRangeButton.textContent =
+                    "Saving...";
+
+
+                fetch(
+                    workRangeUrl,
+                    {
+                        method: "POST",
+                        body: formData,
+                        credentials: "same-origin"
+                    }
+                )
+
+                    .then(function (response) {
+
+                        return response.json()
+                            .then(function (data) {
+
+                                if (!response.ok) {
+
+                                    throw new Error(
+                                        data.message ||
+                                        "Could not save the work range."
+                                    );
+
+                                }
+
+                                return data;
+
+                            });
+
+                    })
+
+                    .then(function (data) {
+
+                        workRangeStatus.textContent =
+                            data.message;
+
+                        workRangeStatus.style.color =
+                            "#16a34a";
+
+                    })
+
+                    .catch(function (error) {
+
+                        workRangeStatus.textContent =
+                            error.message ||
+                            "Could not save the work range. Please try again.";
+
+                        workRangeStatus.style.color =
+                            "#dc2626";
+
+                    })
+
+                    .finally(function () {
+
+                        saveWorkRangeButton.disabled =
+                            false;
+
+                        saveWorkRangeButton.textContent =
+                            "Save Range";
+
+                    });
+
+            }
+        );
+
     })();
+
 </script>
+
 
 {% endblock %}

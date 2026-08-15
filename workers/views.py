@@ -225,26 +225,142 @@ def worker_register(request):
     )
 
 
+# =========================================================
+# UPDATE BOOKING STATUS
+# =========================================================
+
 @login_required
 def update_booking_status(request, booking_id, status):
+
     worker = request.user.worker_profile
 
-    booking = Booking.objects.get(
+    booking = get_object_or_404(
+        Booking,
         id=booking_id,
         worker=worker
     )
 
+    # -----------------------------------------
+    # WORKER ACCEPTS BOOKING
+    # -----------------------------------------
+
     if status == "accept":
+
+        if booking.status != "Pending":
+
+            messages.error(
+                request,
+                "This booking is no longer pending."
+            )
+
+            return redirect("worker_dashboard")
+
         booking.status = "Accepted"
 
+        booking.save(
+            update_fields=["status"]
+        )
+
+        messages.success(
+            request,
+            "Booking accepted. Customer can now make an offer."
+        )
+
+
+    # -----------------------------------------
+    # WORKER REJECTS BOOKING
+    # -----------------------------------------
+
     elif status == "reject":
+
+        if booking.status != "Pending":
+
+            messages.error(
+                request,
+                "This booking cannot be rejected now."
+            )
+
+            return redirect("worker_dashboard")
+
         booking.status = "Cancelled"
 
-    elif status == "complete":
-        if booking.status == "Accepted":
-            booking.status = "Completed"
+        booking.save(
+            update_fields=["status"]
+        )
 
-    booking.save()
+        messages.success(
+            request,
+            "Booking has been cancelled."
+        )
+
+
+    # -----------------------------------------
+    # WORKER COMPLETES WORK
+    # -----------------------------------------
+
+    elif status == "complete":
+
+        # Work can be completed ONLY after:
+        #
+        # 1. Booking is Accepted
+        # 2. Negotiation is successfully Accepted
+        #
+        if booking.status != "Accepted":
+
+            messages.error(
+                request,
+                "This booking is not active."
+            )
+
+            return redirect("worker_dashboard")
+
+
+        if booking.negotiation_status != "Accepted":
+
+            messages.error(
+                request,
+                "You can complete the work only after the negotiation is completed and the booking is finally confirmed."
+            )
+
+            return redirect("worker_dashboard")
+
+
+        # Final safety check
+        if booking.final_amount is None:
+
+            messages.error(
+                request,
+                "Final amount is not available. The booking cannot be completed."
+            )
+
+            return redirect("worker_dashboard")
+
+
+        booking.status = "Completed"
+
+        booking.save(
+            update_fields=["status"]
+        )
+
+        messages.success(
+            request,
+            "Work marked as completed successfully."
+        )
+
+
+    # -----------------------------------------
+    # INVALID STATUS
+    # -----------------------------------------
+
+    else:
+
+        messages.error(
+            request,
+            "Invalid booking status."
+        )
+
+        return redirect("worker_dashboard")
+
 
     return redirect("worker_dashboard")
 
@@ -293,7 +409,12 @@ def update_worker_location(request):
 
     worker.latitude = latitude
     worker.longitude = longitude
-    worker.save(update_fields=["latitude", "longitude"])
+    worker.save(
+        update_fields=[
+            "latitude",
+            "longitude"
+        ]
+    )
 
     return JsonResponse(
         {
@@ -307,7 +428,9 @@ def update_worker_location(request):
 @require_POST
 def update_work_range(request):
     try:
-        work_range = Decimal(request.POST.get("work_range", ""))
+        work_range = Decimal(
+            request.POST.get("work_range", "")
+        )
 
     except (InvalidOperation, TypeError):
         return JsonResponse(
@@ -338,8 +461,12 @@ def update_work_range(request):
         )
 
     worker = request.user.worker_profile
+
     worker.work_range = work_range
-    worker.save(update_fields=["work_range"])
+
+    worker.save(
+        update_fields=["work_range"]
+    )
 
     return JsonResponse(
         {

@@ -1,0 +1,145 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Respond to Offer | KaamSetu</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}"
+    >
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="offer-card">
+
+        <h2>Customer Offer</h2>
+
+        <p>
+            Customer:
+            <strong>{{ booking.customer_name }}</strong>
+        </p>
+
+        <p>
+            Your Charges:
+            <strong>₹{{ booking.original_amount }}</strong>
+        </p>
+
+        <div class="customer-offer">
+
+            <span>Customer Offered</span>
+
+            <strong>
+                ₹{{ booking.customer_offer }}
+            </strong>
+
+        </div>
+
+
+        <!-- ============================= -->
+        <!-- ACCEPT CUSTOMER OFFER -->
+        <!-- ============================= -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="accept"
+            >
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+                Accept ₹{{ booking.customer_offer }}
+            </button>
+
+        </form>
+
+
+        <hr>
+
+
+        <!-- ============================= -->
+        <!-- COUNTER OFFER -->
+        <!-- ============================= -->
+
+        <h3>
+            Or Make a Counter Offer
+        </h3>
+
+        <p class="offer-help">
+            Choose your counter offer
+        </p>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="offer-options">
+
+                {% for amount in suggestions %}
+
+                    <label class="offer-option">
+
+                        <input
+                            type="radio"
+                            name="counter_amount"
+                            value="{{ amount }}"
+                            required
+                        >
+
+                        <span>
+                            ₹{{ amount }}
+                        </span>
+
+                    </label>
+
+                {% endfor %}
+
+            </div>
+
+            <input
+                type="hidden"
+                name="action"
+                value="counter"
+            >
+
+            <button
+                type="submit"
+                class="btn-secondary"
+            >
+                Send Counter Offer
+            </button>
+
+        </form>
+
+
+        <a
+            href="{% url 'worker_dashboard' %}"
+            class="back-link"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

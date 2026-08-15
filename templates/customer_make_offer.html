@@ -1,0 +1,84 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Make an Offer | KaamSetu</title>
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="offer-card">
+
+        <h2>Make an Offer</h2>
+
+        <p>
+            Worker:
+            <strong>{{ booking.worker.name }}</strong>
+        </p>
+
+        <p>
+            Worker Charges:
+            <strong>₹{{ booking.original_amount }}</strong>
+        </p>
+
+        <p class="offer-help">
+            Choose your offer amount
+        </p>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="offer-options">
+
+                {% for amount in suggestions %}
+
+                    <label class="offer-option">
+
+                        <input
+                            type="radio"
+                            name="offer_amount"
+                            value="{{ amount }}"
+                            required
+                        >
+
+                        <span>
+                            ₹{{ amount }}
+                        </span>
+
+                    </label>
+
+                {% endfor %}
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+                Send Offer
+            </button>
+
+        </form>
+
+        <a
+            href="{% url 'customer_dashboard' %}"
+            class="back-link"
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
