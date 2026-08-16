@@ -59,11 +59,13 @@
                 </a>
             </li>
 
+            
             <li>
-                <a href="#contact">
+                <a href="{% url 'home' %}#contact">
                     Contact
                 </a>
             </li>
+            
 
         </ul>
 
@@ -85,7 +87,6 @@
             <!-- Notification Bell -->
 
             <a href="{% url 'notifications' %}" class="notification-bell" title="Notifications">
-
                 🔔
 
                 {% if unread_notification_count > 0 %}

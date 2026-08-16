@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Terms & Conditions | KaamSetu
+{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{% static 'css/company-pages.css' %}"
+>
+{% endblock %}
+
+{% block content %}
+
+{% include "components/navbar.html" %}
+
+<main class="company-page">
+
+    <div class="company-container">
+
+        <div class="company-hero">
+
+            <span class="company-badge">
+                Terms & Conditions
+            </span>
+
+            <h1>
+                Terms & Conditions
+            </h1>
+
+            <p>
+                KaamSetu platform का उपयोग करने से पहले
+                कृपया इन terms को ध्यान से पढ़ें।
+            </p>
+
+        </div>
+
+
+        <section class="company-card">
+
+            <h2>
+                1. Platform Usage
+            </h2>
+
+            <p>
+                KaamSetu customers और workers को connect करने
+                वाला platform है। Platform का उपयोग केवल
+                genuine और lawful purposes के लिए किया जाना चाहिए।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                2. User Information
+            </h2>
+
+            <p>
+                Registration के समय दी गई information सही और
+                updated होनी चाहिए। किसी अन्य व्यक्ति की
+                गलत या misleading information का उपयोग नहीं
+                किया जाना चाहिए।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                3. Booking
+            </h2>
+
+            <p>
+                Customer द्वारा booking request भेजने के बाद
+                worker request को accept या reject कर सकता है।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                4. Negotiation
+            </h2>
+
+            <p>
+                जहाँ negotiation सुविधा उपलब्ध है, customer
+                और worker platform द्वारा उपलब्ध offer और
+                counter-offer process के माध्यम से final
+                amount पर सहमति बना सकते हैं।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                5. User Responsibility
+            </h2>
+
+            <p>
+                Customer और worker दोनों अपने द्वारा दिए गए
+                information, commitments और platform पर किए
+                गए interactions के लिए जिम्मेदार हैं।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                6. Prohibited Activities
+            </h2>
+
+            <p>
+                Platform का उपयोग fraud, harassment, spam,
+                misleading information या किसी भी unlawful
+                activity के लिए नहीं किया जाना चाहिए।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                7. Changes to Terms
+            </h2>
+
+            <p>
+                KaamSetu platform में होने वाले बदलावों या
+                applicable requirements के अनुसार इन Terms &
+                Conditions को समय-समय पर update कर सकता है।
+            </p>
+
+        </section>
+
+
+        <div class="company-back">
+
+            <a href="{% url 'home' %}">
+                ← Back to Home
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% include "components/footer.html" %}
+
+{% endblock %}

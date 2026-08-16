@@ -17,6 +17,11 @@ urlpatterns = [
     # Account URLs
     path("", include("accounts.urls")),
 
+    path(
+    "payments/",
+    include("payments.urls")
+),
+
 ]
 
 if settings.DEBUG:

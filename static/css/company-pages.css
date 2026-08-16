@@ -1,0 +1,246 @@
+/* =========================================================
+   KaamSetu - Company Pages
+   About / Privacy / Terms
+   ========================================================= */
+
+.company-page {
+    min-height: 70vh;
+
+    background: #f5f7fb;
+
+    padding: 55px 20px 70px;
+}
+
+
+.company-container {
+    width: 100%;
+
+    max-width: 950px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   Hero
+   ========================================================= */
+
+.company-hero {
+    text-align: center;
+
+    margin-bottom: 35px;
+}
+
+
+.company-badge {
+    display: inline-block;
+
+    padding: 8px 18px;
+
+    border-radius: 30px;
+
+    background: #eaf2ff;
+
+    color: #17375E;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-bottom: 18px;
+}
+
+
+.company-hero h1 {
+    margin: 0 auto 15px;
+
+    max-width: 800px;
+
+    color: #17375E;
+
+    font-size: 38px;
+
+    line-height: 1.25;
+}
+
+
+.company-hero p {
+    max-width: 750px;
+
+    margin: 0 auto;
+
+    color: #667085;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   Cards
+   ========================================================= */
+
+.company-card {
+    background: #ffffff;
+
+    padding: 30px 35px;
+
+    margin-bottom: 20px;
+
+    border: 1px solid #e7ebf1;
+
+    border-radius: 16px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+}
+
+
+.company-card h2 {
+    margin: 0 0 14px;
+
+    color: #17375E;
+
+    font-size: 22px;
+}
+
+
+.company-card h3 {
+    margin: 10px 0 7px;
+
+    color: #17375E;
+
+    font-size: 17px;
+}
+
+
+.company-card p {
+    margin: 0 0 15px;
+
+    color: #596579;
+
+    font-size: 15px;
+
+    line-height: 1.75;
+}
+
+
+.company-card p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   Features
+   ========================================================= */
+
+.company-features {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 18px;
+
+    margin-top: 25px;
+}
+
+
+.company-features > div {
+    padding: 20px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 12px;
+}
+
+
+.company-features span {
+    font-size: 28px;
+}
+
+
+.company-features p {
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   Back Link
+   ========================================================= */
+
+.company-back {
+    text-align: center;
+
+    margin-top: 30px;
+}
+
+
+.company-back a {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 12px 22px;
+
+    border: 2px solid #17375E;
+
+    border-radius: 9px;
+
+    color: #17375E;
+
+    background: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.company-back a:hover {
+    background: #17375E;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .company-page {
+        padding: 35px 15px 50px;
+    }
+
+
+    .company-hero h1 {
+        font-size: 29px;
+    }
+
+
+    .company-hero p {
+        font-size: 15px;
+    }
+
+
+    .company-card {
+        padding: 23px 20px;
+    }
+
+
+    .company-features {
+        grid-template-columns: 1fr;
+    }
+
+}

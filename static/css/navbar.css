@@ -1,0 +1,490 @@
+/* =========================================================
+   KaamSetu Professional Navbar
+   ========================================================= */
+
+.navbar {
+    width: 100%;
+    background: #ffffff;
+
+    border-bottom: 1px solid #e8edf3;
+
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+    position: relative;
+    z-index: 1000;
+}
+
+
+/* =========================================================
+   Navbar Container
+   ========================================================= */
+
+.navbar > .container {
+    max-width: 1400px;
+
+    min-height: 76px;
+
+    margin: 0 auto;
+
+    padding: 0 24px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 28px;
+}
+
+
+/* =========================================================
+   Logo
+   ========================================================= */
+
+.navbar .logo {
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    text-decoration: none;
+}
+
+
+.navbar .logo img {
+    width: 62px;
+    height: 62px;
+
+    object-fit: contain;
+
+    display: block;
+}
+
+
+.navbar .logo-text {
+    display: flex;
+
+    align-items: center;
+
+    white-space: nowrap;
+
+    font-size: 29px;
+
+    font-weight: 700;
+
+    letter-spacing: -1px;
+}
+
+
+.navbar .logo-blue {
+    color: #5b21b6;
+}
+
+
+.navbar .logo-orange {
+    color: #ff7a00;
+}
+
+
+/* =========================================================
+   Navigation Menu
+   ========================================================= */
+
+.navbar .nav-menu {
+    flex: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 28px;
+
+    margin: 0;
+
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.navbar .nav-menu li {
+    margin: 0;
+
+    padding: 0;
+}
+
+
+.navbar .nav-menu a {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    height: 76px;
+
+    padding: 0 2px;
+
+    color: #333333;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    transition:
+        color 0.2s ease;
+}
+
+
+.navbar .nav-menu a:hover {
+    color: #17375E;
+}
+
+
+/* =========================================================
+   Right Side
+   ========================================================= */
+
+.navbar .nav-buttons {
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+/* =========================================================
+   Welcome Text
+   ========================================================= */
+
+.navbar .welcome-text {
+    color: #4b5563;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   Notification Bell
+   ========================================================= */
+
+.navbar .notification-bell {
+    position: relative;
+
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: #17375E;
+
+    text-decoration: none;
+
+    font-size: 20px;
+
+    line-height: 1;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.navbar .notification-bell:hover {
+    background: #f1f5f9;
+
+    transform: translateY(-1px);
+}
+
+
+/* Notification Count */
+
+.navbar .notification-badge {
+    position: absolute;
+
+    top: 1px;
+    right: 0;
+
+    min-width: 17px;
+    height: 17px;
+
+    padding: 0 4px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background: #ef4444;
+
+    color: #ffffff;
+
+    border: 2px solid #ffffff;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   Dashboard Button
+   ========================================================= */
+
+.navbar .btn-login {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 105px;
+
+    height: 44px;
+
+    padding: 0 18px;
+
+    border: 2px solid #17375E;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #17375E;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.navbar .btn-login:hover {
+    background: #17375E;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   Logout / Sign Up
+   ========================================================= */
+
+.navbar .btn-signup {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 90px;
+
+    height: 44px;
+
+    padding: 0 18px;
+
+    border: 2px solid #ff7a00;
+
+    border-radius: 9px;
+
+    background: #ff7a00;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.navbar .btn-signup:hover {
+    background: #e86f00;
+
+    border-color: #e86f00;
+}
+
+
+/* =========================================================
+   Tablet
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .navbar > .container {
+        gap: 18px;
+
+        padding: 0 18px;
+    }
+
+
+    .navbar .logo-text {
+        font-size: 25px;
+    }
+
+
+    .navbar .logo img {
+        width: 56px;
+        height: 56px;
+    }
+
+
+    .navbar .nav-menu {
+        gap: 18px;
+    }
+
+
+    .navbar .nav-menu a {
+        font-size: 14px;
+    }
+
+
+    .navbar .welcome-text {
+        display: none;
+    }
+
+}
+
+
+/* =========================================================
+   Smaller Screens
+   ========================================================= */
+
+@media (max-width: 950px) {
+
+    .navbar > .container {
+        flex-wrap: wrap;
+
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+
+    .navbar .nav-menu {
+        order: 3;
+
+        width: 100%;
+
+        justify-content: center;
+
+        overflow-x: auto;
+
+        padding-bottom: 5px;
+    }
+
+
+    .navbar .nav-menu a {
+        height: 40px;
+    }
+
+}
+
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .navbar > .container {
+        min-height: 65px;
+
+        gap: 10px;
+
+        padding: 8px 14px;
+    }
+
+
+    .navbar .logo img {
+        width: 48px;
+        height: 48px;
+    }
+
+
+    .navbar .logo-text {
+        font-size: 21px;
+    }
+
+
+    .navbar .nav-buttons {
+        margin-left: auto;
+
+        gap: 6px;
+    }
+
+
+    .navbar .notification-bell {
+        width: 34px;
+        height: 34px;
+
+        font-size: 18px;
+    }
+
+
+    .navbar .btn-login,
+    .navbar .btn-signup {
+        min-width: auto;
+
+        height: 38px;
+
+        padding: 0 11px;
+
+        font-size: 12px;
+    }
+
+
+    .navbar .nav-menu {
+        justify-content: flex-start;
+
+        gap: 20px;
+    }
+
+}

@@ -15,7 +15,7 @@ from bookings.notifications import create_notification
 from .forms import WorkerRegistrationForm
 from .location import nearby_workers
 from .models import Worker
-
+from payments.services import get_worker_outstanding
 
 # Hindi service words → database profession names
 SEARCH_ALIASES = {
@@ -44,6 +44,8 @@ def worker_dashboard(request):
     accepted_bookings = bookings.filter(status="Accepted").count()
     completed_bookings = bookings.filter(status="Completed").count()
 
+    worker_outstanding = get_worker_outstanding(worker)
+
     return render(
         request,
         "worker_dashboard.html",
@@ -54,6 +56,7 @@ def worker_dashboard(request):
             "pending_bookings": pending_bookings,
             "accepted_bookings": accepted_bookings,
             "completed_bookings": completed_bookings,
+            "worker_outstanding": worker_outstanding,
         }
     )
 
@@ -162,12 +165,28 @@ def filter_workers_for_customer(request, workers):
 
 
 def worker_detail(request, worker_id):
-    worker = get_object_or_404(Worker, id=worker_id)
+    worker = get_object_or_404(
+        Worker,
+        id=worker_id
+    )
 
     is_worker = False
+    can_book = True
 
     if request.user.is_authenticated:
-        is_worker = hasattr(request.user, "worker_profile")
+
+        is_worker = hasattr(
+            request.user,
+            "worker_profile"
+        )
+
+        # Check whether worker can receive new bookings
+        if not is_worker:
+            from payments.services import can_worker_receive_booking
+
+            can_book = can_worker_receive_booking(
+                worker
+            )
 
     return render(
         request,
@@ -175,9 +194,9 @@ def worker_detail(request, worker_id):
         {
             "worker": worker,
             "is_worker": is_worker,
+            "can_book": can_book,
         }
     )
-
 
 def worker_register(request):
     if request.method == "POST":
@@ -508,4 +527,24 @@ def update_work_range(request):
             "success": True,
             "message": f"Work range updated to {work_range} KM.",
         }
+    )
+
+def about(request):
+    return render(
+        request,
+        "about.html"
+    )
+
+
+def privacy_policy(request):
+    return render(
+        request,
+        "privacy_policy.html"
+    )
+
+
+def terms_conditions(request):
+    return render(
+        request,
+        "terms_conditions.html"
     )

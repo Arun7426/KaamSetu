@@ -18,6 +18,7 @@
 
             </div>
 
+
             <!-- Quick Links -->
             <div class="footer-column">
 
@@ -25,17 +26,34 @@
 
                 <ul>
 
-                    <li><a href="/">Home</a></li>
+                    <li>
+                        <a href="{% url 'home' %}">
+                            Home
+                        </a>
+                    </li>
 
-                    <li><a href="#services">Services</a></li>
+                    <li>
+                        <a href="{% url 'home' %}#services">
+                            Services
+                        </a>
+                    </li>
 
-                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li>
+                        <a href="{% url 'home' %}#how-it-works">
+                            How It Works
+                        </a>
+                    </li>
 
-                    <li><a href="#workers">Workers</a></li>
+                    <li>
+                        <a href="{% url 'home' %}#workers">
+                            Workers
+                        </a>
+                    </li>
 
                 </ul>
 
             </div>
+
 
             <!-- Company -->
             <div class="footer-column">
@@ -44,36 +62,75 @@
 
                 <ul>
 
-                    <li><a href="#">About Us</a></li>
+                    <li>
+                        <a href="{% url 'about' %}">
+                            About Us
+                        </a>
+                    </li>
 
-                    <li><a href="#">Privacy Policy</a></li>
+                    <li>
+                        <a href="{% url 'privacy_policy' %}">
+                            Privacy Policy
+                        </a>
+                    </li>
 
-                    <li><a href="#">Terms & Conditions</a></li>
+                    <li>
+                        <a href="{% url 'terms_conditions' %}">
+                            Terms & Conditions
+                        </a>
+                    </li>
 
-                    <li><a href="#">Contact Us</a></li>
+                    <li>
+                        <a href="{% url 'home' %}#contact">
+                            Contact Us
+                        </a>
+                    </li>
 
                 </ul>
 
             </div>
 
+
             <!-- Contact -->
             <div class="footer-column">
 
-                <h3>Contact</h3>
+                <h3 id="contact">
+                    Contact
+                </h3>
 
-                <p>📍 Noida, Uttar Pradesh</p>
+                <p>
+                    📍 Noida, Uttar Pradesh
+                </p>
 
-                <p>📧 support@kaamsetu.in</p>
+                <p>
+                    📧
+                    <a href="mailto:support@kaamsetu.in"
+                        style="color:#ffffff !important; text-decoration:none !important;">
+                        support@kaamsetu.in
+                    </a>
+                </p>
 
-                <p>📞 +91-8057890236</p>
+                <p>
+                    📞
+                    <a href="tel:+918057890236" style="color:#ffffff !important; text-decoration:none !important;">
+                        +91-8057890236
+                    </a>
+                </p>
+
 
                 <div class="social-links">
 
-                    <a href="#">Facebook</a>
+                    <a href="https://wa.me/918057890236" target="_blank" rel="noopener noreferrer">
+                        WhatsApp
+                    </a>
 
-                    <a href="#">Instagram</a>
+                    <a href="#">
+                        Facebook
+                    </a>
 
-                    <a href="#">WhatsApp</a>
+                    <a href="#">
+                        Instagram
+                    </a>
 
                 </div>
 
@@ -81,14 +138,14 @@
 
         </div>
 
+
         <hr>
+
 
         <div class="footer-bottom">
 
             <p>
-
                 © 2026 KaamSetu. All Rights Reserved.
-
             </p>
 
         </div>

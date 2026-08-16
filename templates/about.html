@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+About Us | KaamSetu
+{% endblock %}
+
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="{% static 'css/company-pages.css' %}"
+>
+
+{% endblock %}
+
+
+{% block content %}
+
+{% include "components/navbar.html" %}
+
+
+<main class="company-page">
+
+    <div class="company-container">
+
+        <div class="company-hero">
+
+            <span class="company-badge">
+                About KaamSetu
+            </span>
+
+            <h1>
+                भारत में काम और भरोसे को जोड़ने का एक नया तरीका
+            </h1>
+
+            <p>
+                KaamSetu एक ऐसा प्लेटफ़ॉर्म है जहाँ ग्राहक अपने
+                आसपास के भरोसेमंद और अनुभवी कारीगरों को आसानी से
+                खोज सकते हैं और सीधे उनसे काम के लिए जुड़ सकते हैं।
+            </p>
+
+        </div>
+
+
+        <section class="company-card">
+
+            <h2>
+                KaamSetu क्या है?
+            </h2>
+
+            <p>
+                KaamSetu का उद्देश्य ग्राहकों और स्थानीय कारीगरों
+                के बीच एक आसान, पारदर्शी और भरोसेमंद connection
+                बनाना है।
+            </p>
+
+            <p>
+                ग्राहक अपने क्षेत्र में उपलब्ध Plumber, Electrician,
+                Painter, Carpenter, Rajmistri और अन्य skilled workers
+                खोज सकते हैं और अपनी जरूरत के अनुसार worker को
+                book कर सकते हैं।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                हमारा उद्देश्य
+            </h2>
+
+            <p>
+                हमारा लक्ष्य स्थानीय skilled workers को डिजिटल
+                platform उपलब्ध कराना और customers को सही worker
+                तक आसानी से पहुँचाना है।
+            </p>
+
+            <div class="company-features">
+
+                <div>
+                    <span>🔎</span>
+                    <h3>Easy Discovery</h3>
+                    <p>
+                        अपने आसपास के workers आसानी से खोजें।
+                    </p>
+                </div>
+
+                <div>
+                    <span>🤝</span>
+                    <h3>Direct Connection</h3>
+                    <p>
+                        Customer और worker सीधे जुड़ सकते हैं।
+                    </p>
+                </div>
+
+                <div>
+                    <span>⭐</span>
+                    <h3>Ratings & Reviews</h3>
+                    <p>
+                        Previous customer reviews देखकर बेहतर
+                        decision लें।
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                KaamSetu क्यों?
+            </h2>
+
+            <p>
+                हम मानते हैं कि अच्छा काम करने वाले स्थानीय
+                कारीगरों को सही customers तक पहुँचने का मौका
+                मिलना चाहिए और customers को भरोसेमंद worker
+                चुनने का आसान तरीका मिलना चाहिए।
+            </p>
+
+            <p>
+                इसी सोच के साथ KaamSetu को बनाया जा रहा है।
+            </p>
+
+        </section>
+
+
+        <div class="company-back">
+
+            <a href="{% url 'home' %}">
+                ← Back to Home
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+{% include "components/footer.html" %}
+
+{% endblock %}

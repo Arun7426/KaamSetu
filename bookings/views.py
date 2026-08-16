@@ -10,6 +10,11 @@ from accounts.models import CustomerProfile
 from .forms import BookingForm, ReviewForm
 from .models import Booking, Review, Notification
 from .notifications import create_notification
+from payments.services import (
+    create_booking_fee,
+    can_worker_receive_booking,
+)
+
 
 
 # =========================================================
@@ -23,6 +28,23 @@ def book_worker(request, worker_id):
         Worker,
         id=worker_id
     )
+
+    # -----------------------------------------
+    # OUTSTANDING FEE CHECK
+    # -----------------------------------------
+
+    if not can_worker_receive_booking(worker):
+
+        messages.error(
+            request,
+            "यह कामगार अभी नई बुकिंग स्वीकार नहीं कर रहा है। "
+            "कृपया किसी अन्य कामगार को चुनें।"
+        )
+
+        return redirect(
+            "worker_detail",
+            worker_id=worker.id
+        )
 
     # Worker cannot book another worker
     if hasattr(request.user, "worker_profile"):
@@ -358,6 +380,9 @@ def worker_respond_offer(request, booking_id):
                 ]
             )
 
+            # Create KaamSetu platform fee
+            create_booking_fee(booking)
+
             # Notify customer
             create_notification(
                 recipient=booking.customer,
@@ -524,6 +549,9 @@ def customer_respond_counter(request, booking_id):
                     "negotiation_status"
                 ]
             )
+
+            # Create KaamSetu platform fee
+            create_booking_fee(booking)
 
             # Notify worker
             create_notification(

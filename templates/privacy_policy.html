@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Privacy Policy | KaamSetu
+{% endblock %}
+
+{% block extra_css %}
+<link
+    rel="stylesheet"
+    href="{% static 'css/company-pages.css' %}"
+>
+{% endblock %}
+
+{% block content %}
+
+{% include "components/navbar.html" %}
+
+<main class="company-page">
+
+    <div class="company-container">
+
+        <div class="company-hero">
+
+            <span class="company-badge">
+                Privacy Policy
+            </span>
+
+            <h1>
+                Privacy Policy
+            </h1>
+
+            <p>
+                आपकी privacy और personal information
+                हमारे लिए महत्वपूर्ण है।
+            </p>
+
+        </div>
+
+
+        <section class="company-card">
+
+            <h2>
+                1. Information We Collect
+            </h2>
+
+            <p>
+                KaamSetu पर registration, booking और platform
+                services का उपयोग करते समय आवश्यक information
+                जैसे नाम, mobile number, address और अन्य
+                booking-related details collect की जा सकती हैं।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                2. Location Information
+            </h2>
+
+            <p>
+                Local workers को खोजने और nearby services
+                उपलब्ध कराने के लिए location information का
+                उपयोग किया जा सकता है, जहाँ user द्वारा
+                location permission दी गई हो।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                3. How We Use Information
+            </h2>
+
+            <p>
+                User information का उपयोग booking management,
+                worker discovery, notifications और KaamSetu
+                services को बेहतर बनाने के लिए किया जाता है।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                4. Information Protection
+            </h2>
+
+            <p>
+                KaamSetu user information को सुरक्षित रखने के
+                लिए उचित security measures अपनाने का प्रयास
+                करता है।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                5. Information Sharing
+            </h2>
+
+            <p>
+                User information को केवल platform services
+                प्रदान करने के आवश्यक उद्देश्य से उपयोग किया
+                जाएगा और बिना उचित आवश्यकता के public नहीं
+                किया जाएगा।
+            </p>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <h2>
+                6. Policy Updates
+            </h2>
+
+            <p>
+                KaamSetu आवश्यकता के अनुसार इस Privacy Policy
+                को समय-समय पर update कर सकता है।
+            </p>
+
+        </section>
+
+
+        <div class="company-back">
+
+            <a href="{% url 'home' %}">
+                ← Back to Home
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% include "components/footer.html" %}
+
+{% endblock %}

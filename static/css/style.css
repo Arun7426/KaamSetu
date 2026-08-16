@@ -1132,3 +1132,65 @@ textarea.form-control{
 .booking-btn:hover{
     background:#e86d00;
 }
+
+/* =========================================================
+   Footer Links
+   ========================================================= */
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: #ff7a00;
+    text-decoration: none;
+}
+
+
+/* Contact Email & Phone */
+
+.footer-column p a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.footer-column p a:hover {
+    color: #ff7a00;
+    text-decoration: none;
+}
+
+/* =========================================================
+   FIX FOOTER EMAIL & PHONE LINK COLORS
+   ========================================================= */
+
+.footer .footer-column p a,
+.footer .footer-column p a:link,
+.footer .footer-column p a:visited,
+.footer .footer-column p a:hover,
+.footer .footer-column p a:active {
+
+    color: #ffffff !important;
+
+    text-decoration: none !important;
+}
+
+
+/* Social buttons */
+
+.footer .social-links a,
+.footer .social-links a:link,
+.footer .social-links a:visited {
+
+    color: #ffffff !important;
+
+    text-decoration: none !important;
+}
+
+
+.footer .social-links a:hover {
+
+    color: #ffffff !important;
+
+    text-decoration: none !important;
+}
