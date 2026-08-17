@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:750px; margin:50px auto;">
+
+    <div class="booking-card">
+
+        <h2 class="booking-title">
+            🔄 Book Worker Again
+        </h2>
+
+        <!-- Worker Details -->
+
+        <div class="info-card">
+
+            <div class="worker-box">
+
+                {% if worker.photo %}
+                <img
+                    src="{{ worker.photo.url }}"
+                    alt="{{ worker.name }}"
+                    class="worker-photo">
+                {% endif %}
+
+                <div>
+
+                    <div class="worker-name">
+                        {{ worker.name }}
+                    </div>
+
+                    <div class="worker-meta">
+                        {{ worker.profession }}
+                    </div>
+
+                    <div class="worker-meta">
+                        📍 {{ worker.city }}
+                    </div>
+
+                    <div class="worker-rate">
+                        Previous Final Amount:
+                        ₹{{ previous_booking.final_amount }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Rebook Information -->
+
+        <div class="info-card">
+
+            <p style="color:#666; margin:0;">
+                आपकी पिछली booking की details यहाँ automatically भर दी गई हैं।
+            </p>
+
+            <p style="color:#16a34a; font-weight:600; margin-top:8px;">
+                💰 Previous Final Amount:
+                ₹{{ previous_booking.final_amount }}
+            </p>
+
+        </div>
+
+
+        <!-- Customer Details -->
+
+        <div class="info-card">
+
+            <h3 style="margin-bottom:18px;">
+                👤 Customer Details
+            </h3>
+
+            <div class="form-group">
+
+                <label>Name</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ request.user.get_full_name|default:request.user.username }}"
+                    readonly>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Mobile</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="**********"
+                    readonly>
+
+            </div>
+
+        </div>
+
+
+        <!-- Rebook Form -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="form-group">
+
+                <label>
+                    📍 Service Address
+                </label>
+
+                {{ form.customer_address }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    📅 New Preferred Date
+                </label>
+
+                {{ form.work_date }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    📝 Work Description
+                </label>
+
+                {{ form.work_description }}
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="booking-btn">
+
+                🔄 Confirm Rebooking
+
+            </button>
+
+        </form>
+
+
+        <a
+            href="{% url 'customer_dashboard' %}"
+            style="
+                display:inline-block;
+                margin-top:15px;
+                color:#666;
+                text-decoration:none;
+            "
+        >
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

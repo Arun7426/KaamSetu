@@ -127,6 +127,139 @@ def book_worker(request, worker_id):
 
 
 # =========================================================
+# CUSTOMER - REBOOK COMPLETED WORKER
+# =========================================================
+
+@login_required
+def rebook_worker(request, booking_id):
+
+    # Only the customer who made the original booking
+    # can rebook that booking.
+    previous_booking = get_object_or_404(
+        Booking,
+        id=booking_id,
+        customer=request.user,
+        status="Completed",
+        negotiation_status="Accepted",
+    )
+
+    worker = previous_booking.worker
+
+    # -----------------------------------------
+    # OUTSTANDING FEE CHECK
+    # -----------------------------------------
+
+    if not can_worker_receive_booking(worker):
+
+        messages.error(
+            request,
+            "यह कामगार अभी नई बुकिंग स्वीकार नहीं कर रहा है। "
+            "कृपया किसी अन्य कामगार को चुनें।"
+        )
+
+        return redirect("customer_dashboard")
+
+    # -----------------------------------------
+    # POST - CREATE NEW REBOOKING
+    # -----------------------------------------
+
+    if request.method == "POST":
+
+        form = BookingForm(request.POST)
+
+        if form.is_valid():
+
+            booking = form.save(commit=False)
+
+            # Same worker
+            booking.worker = worker
+
+            # Same customer
+            booking.customer = request.user
+
+            # Auto-fill customer name
+            booking.customer_name = (
+                request.user.get_full_name()
+                or request.user.first_name
+                or request.user.username
+            )
+
+            # Auto-fill customer mobile
+            try:
+
+                booking.customer_mobile = (
+                    request.user.customer_profile.mobile
+                )
+
+            except CustomerProfile.DoesNotExist:
+
+                booking.customer_mobile = ""
+
+            # -----------------------------------------
+            # IMPORTANT:
+            # Use previous FINAL amount
+            # instead of worker's current daily wage.
+            # -----------------------------------------
+
+            booking.original_amount = previous_booking.final_amount
+
+            # New booking starts fresh
+            booking.status = "Pending"
+            booking.negotiation_status = "Not Started"
+
+            booking.customer_offer = None
+            booking.worker_counter_offer = None
+            booking.final_amount = None
+
+            booking.save()
+
+            # -----------------------------------------
+            # Notify Worker
+            # -----------------------------------------
+
+            create_notification(
+                recipient=worker.user,
+                booking=booking,
+                notification_type="booking",
+                message=(
+                    f"New rebooking request from "
+                    f"{booking.customer_name}."
+                )
+            )
+
+            messages.success(
+                request,
+                f"{worker.name} के लिए आपकी नई booking request भेज दी गई है।"
+            )
+
+            return redirect(
+                "booking_success",
+                booking.id
+            )
+
+    else:
+
+        # Pre-fill previous address and work description
+        form = BookingForm(
+            initial={
+                "customer_address": previous_booking.customer_address,
+                "work_description": previous_booking.work_description,
+            }
+        )
+
+    return render(
+        request,
+        "rebook_form.html",
+        {
+            "form": form,
+            "worker": worker,
+            "previous_booking": previous_booking,
+        }
+    )
+
+
+
+# =========================================================
 # BOOKING SUCCESS
 # =========================================================
 

@@ -77,4 +77,14 @@ urlpatterns = [
         views.add_review,
         name="add_review",
     ),
+
+    # =========================================
+    # Customer - Rebook
+    # =========================================
+
+    path(
+        "rebook/<int:booking_id>/",
+        views.rebook_worker,
+        name="rebook_worker",
+    ),
 ]

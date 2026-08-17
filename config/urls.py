@@ -7,6 +7,11 @@ from django.conf.urls.static import static
 urlpatterns = [
 
     path("admin/", admin.site.urls),
+    path(
+        "admin-control/",
+        include("admin_dashboard.urls")
+    ),
+
 
     # Booking & Negotiation URLs first
     path("", include("bookings.urls")),

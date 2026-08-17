@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Control Dashboard
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .admin-dashboard {
+        max-width: 1250px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .admin-header {
+        margin-bottom: 30px;
+    }
+
+    .admin-header h1 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        color: #1f2937;
+    }
+
+    .admin-header p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 15px;
+    }
+
+
+    /* ==========================
+       SECTION
+    ========================== */
+
+    .dashboard-section {
+        margin-top: 35px;
+    }
+
+    .dashboard-section h2 {
+        margin-bottom: 18px;
+        font-size: 20px;
+        color: #1f2937;
+    }
+
+
+    /* ==========================
+       CARDS GRID
+    ========================== */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+
+
+    /* ==========================
+       STAT CARD
+    ========================== */
+
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    }
+
+
+    .stat-icon {
+        font-size: 25px;
+        margin-bottom: 12px;
+    }
+
+    .stat-title {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 7px;
+    }
+
+    .stat-value {
+        font-size: 30px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+
+    /* ==========================
+       PAYMENT CARDS
+    ========================== */
+
+    .payment-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .payment-value {
+        font-size: 28px;
+        font-weight: 700;
+        margin-top: 8px;
+        color: #111827;
+    }
+
+
+    /* ==========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 900px) {
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .admin-dashboard {
+            margin: 20px auto;
+            padding: 15px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-header h1 {
+            font-size: 24px;
+        }
+
+    }
+</style>
+
+
+<div class="admin-dashboard">
+
+
+    <!-- ==========================
+         HEADER
+    ========================== -->
+
+    <div class="admin-header">
+
+        <h1>
+            KaamSetu Admin Control Dashboard
+        </h1>
+
+        <p>
+            Welcome,
+            {{ request.user.get_full_name|default:request.user.username }}
+        </p>
+
+    </div>
+
+
+
+    <!-- ==========================
+         USER OVERVIEW
+    ========================== -->
+
+    <div class="dashboard-section">
+
+        <h2>
+            User Overview
+        </h2>
+
+        <div class="stats-grid">
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    👥
+                </div>
+
+                <div class="stat-title">
+                    Total Users
+                </div>
+
+                <div class="stat-value">
+                    {{ total_users }}
+                </div>
+
+            </div>
+
+
+            <a href="{% url 'admin_workers' %}" style="
+        text-decoration:none;
+        color:inherit;
+    ">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        👷
+                    </div>
+
+                    <div class="stat-title">
+                        Total Workers
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_workers }}
+                    </div>
+
+                </div>
+
+            </a>
+
+
+            <a href="{% url 'admin_customers' %}" style="
+                    text-decoration:none;
+                    color:inherit;
+                ">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        👤
+                    </div>
+
+                    <div class="stat-title">
+                        Total Customers
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_customers }}
+                    </div>
+
+                </div>
+
+            </a>
+
+
+            <a href="{% url 'admin_bookings' %}" style="
+                    text-decoration:none;
+                    color:inherit;
+            ">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📋
+                    </div>
+
+                    <div class="stat-title">
+                        Total Bookings
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_bookings }}
+                    </div>
+
+                </div>
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==========================
+         BOOKING OVERVIEW
+    ========================== -->
+
+    <div class="dashboard-section">
+
+        <h2>
+            Booking Overview
+        </h2>
+
+        <div class="stats-grid">
+
+
+            <a href="{% url 'admin_bookings' %}?status=Pending" style="text-decoration:none; color:inherit;">
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🟡
+                    </div>
+
+                    <div class="stat-title">
+                        Pending Bookings
+                    </div>
+
+                    <div class="stat-value">
+                        {{ pending_bookings }}
+                    </div>
+
+                </div>
+            </a>
+
+
+            <a href="{% url 'admin_bookings' %}?status=Accepted" style="text-decoration:none; color:inherit;">
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🔵
+                    </div>
+
+                    <div class="stat-title">
+                        Accepted Bookings
+                    </div>
+
+                    <div class="stat-value">
+                        {{ accepted_bookings }}
+                    </div>
+
+                </div>
+            </a>
+
+
+            <a href="{% url 'admin_bookings' %}?status=Completed" style="text-decoration:none; color:inherit;">
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🟢
+                    </div>
+
+                    <div class="stat-title">
+                        Completed Bookings
+                    </div>
+
+                    <div class="stat-value">
+                        {{ completed_bookings }}
+                    </div>
+
+                </div>
+            </a>
+
+
+            <a href="{% url 'admin_bookings' %}?status=Cancelled" style="text-decoration:none; color:inherit;">
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🔴
+                    </div>
+
+                    <div class="stat-title">
+                        Cancelled Bookings
+                    </div>
+
+                    <div class="stat-value">
+                        {{ cancelled_bookings }}
+                    </div>
+
+                </div>
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==========================
+         PAYMENT OVERVIEW
+    ========================== -->
+
+    <div class="dashboard-section">
+
+        <h2>
+            Payment Overview
+        </h2>
+
+        <div class="stats-grid">
+
+
+            <div class="payment-card">
+
+                <div class="stat-icon">
+                    💰
+                </div>
+
+                <div class="stat-title">
+                    Total Outstanding Fees
+                </div>
+
+                <div class="payment-value">
+                    ₹{{ total_outstanding }}
+                </div>
+
+            </div>
+
+
+            <div class="payment-card">
+
+                <div class="stat-icon">
+                    ✅
+                </div>
+
+                <div class="stat-title">
+                    Total Paid Fees
+                </div>
+
+                <div class="payment-value">
+                    ₹{{ total_paid }}
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}
