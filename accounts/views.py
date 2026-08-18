@@ -68,7 +68,6 @@ def user_login(request):
         password = request.POST.get("password")
         selected_role = request.POST.get("role")
 
-
         # ==========================
         # Validate selected role
         # ==========================
@@ -85,7 +84,6 @@ def user_login(request):
                 "login.html"
             )
 
-
         # ==========================
         # Authenticate credentials
         # ==========================
@@ -95,7 +93,6 @@ def user_login(request):
             username=username,
             password=password
         )
-
 
         if user is None:
 
@@ -109,7 +106,6 @@ def user_login(request):
                 "login.html"
             )
 
-
         # ==========================
         # Admin
         # ==========================
@@ -119,7 +115,6 @@ def user_login(request):
             login(request, user)
 
             return redirect("/admin/")
-
 
         # ==========================
         # Worker Login
@@ -143,7 +138,6 @@ def user_login(request):
 
             return redirect("home")
 
-
         # ==========================
         # Customer Login
         # ==========================
@@ -165,7 +159,6 @@ def user_login(request):
             login(request, user)
 
             return redirect("home")
-
 
     return render(
         request,
@@ -246,21 +239,72 @@ def customer_dashboard(request):
 @require_POST
 def update_customer_location(request):
     """Save a customer's browser-provided coordinates for nearby-worker search."""
+
     if hasattr(request.user, "worker_profile"):
-        return JsonResponse({"success": False, "message": "Only customers can update this location."}, status=403)
+
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Only customers can update this location."
+            },
+            status=403
+        )
 
     try:
-        latitude = Decimal(request.POST.get("latitude", ""))
-        longitude = Decimal(request.POST.get("longitude", ""))
-    except (InvalidOperation, TypeError):
-        return JsonResponse({"success": False, "message": "Invalid location coordinates received."}, status=400)
 
-    if not latitude.is_finite() or not longitude.is_finite() or not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
-        return JsonResponse({"success": False, "message": "Location coordinates are outside the valid range."}, status=400)
+        latitude = Decimal(
+            request.POST.get("latitude", "")
+        )
+
+        longitude = Decimal(
+            request.POST.get("longitude", "")
+        )
+
+    except (InvalidOperation, TypeError):
+
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Invalid location coordinates received."
+            },
+            status=400
+        )
+
+    if (
+        not latitude.is_finite()
+        or not longitude.is_finite()
+        or not (-90 <= latitude <= 90 and -180 <= longitude <= 180)
+    ):
+
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Location coordinates are outside the valid range."
+            },
+            status=400
+        )
 
     profile = request.user.customer_profile
-    changed = profile.latitude != latitude or profile.longitude != longitude
+
+    changed = (
+        profile.latitude != latitude
+        or profile.longitude != longitude
+    )
+
     profile.latitude = latitude
     profile.longitude = longitude
-    profile.save(update_fields=["latitude", "longitude"])
-    return JsonResponse({"success": True, "changed": changed, "message": "Your location has been updated."})
+
+    profile.save(
+        update_fields=[
+            "latitude",
+            "longitude"
+        ]
+    )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "changed": changed,
+            "message": "Your location has been updated."
+        }
+    )

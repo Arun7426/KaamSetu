@@ -49,8 +49,9 @@ const heading = document.querySelector(".login-heading");
 const subtitle = document.querySelector(".subtitle");
 
 
+
 // ===============================
-// Customer Role
+// Customer Tab
 // ===============================
 
 if (customerTab) {
@@ -62,9 +63,10 @@ if (customerTab) {
         workerTab.classList.remove("active");
 
 
-        // Send selected role to backend
         if (selectedRole) {
+
             selectedRole.value = "customer";
+
         }
 
 
@@ -81,7 +83,7 @@ if (customerTab) {
 
 
 // ===============================
-// Worker Role
+// Worker Tab
 // ===============================
 
 if (workerTab) {
@@ -93,9 +95,10 @@ if (workerTab) {
         customerTab.classList.remove("active");
 
 
-        // Send selected role to backend
         if (selectedRole) {
+
             selectedRole.value = "worker";
+
         }
 
 

@@ -6,15 +6,21 @@ KaamSetu Login
 {% endblock %}
 
 {% block extra_css %}
+
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+>
 
 {% endblock %}
+
 
 {% block content %}
 
 <div class="login-wrapper">
+
 
     <!-- LEFT PANEL -->
 
@@ -22,27 +28,31 @@ KaamSetu Login
 
         <div class="branding">
 
-            <img src="{% static 'images/logo.png' %}" class="logo" alt="KaamSetu">
+            <img
+                src="{% static 'images/logo.png' %}"
+                class="logo"
+                alt="KaamSetu"
+            >
 
             <h2>
-
                 जहाँ काम मिले,<br>
                 भरोसा मिले।
-
             </h2>
 
             <p>
-
                 भरोसेमंद कारीगर अब आपकी
                 उंगलियों पर।
-
             </p>
 
         </div>
 
+
         <div class="worker-image">
 
-            <img src="{% static 'images/hero-worker.png' %}" alt="Worker">
+            <img
+                src="{% static 'images/hero-worker.png' %}"
+                alt="Worker"
+            >
 
         </div>
 
@@ -56,12 +66,17 @@ KaamSetu Login
 
         <div class="login-card">
 
-            <h1 class="login-heading"><span class="blue">Kaam</span><span class="orange">Setu</span> Login</h1>
+
+            <h1 class="login-heading">
+
+                <span class="blue">Kaam</span><span class="orange">Setu</span>
+                Customer Login
+
+            </h1>
+
 
             <p class="subtitle">
-
-                अपने अकाउंट में लॉगिन करें
-
+                अपने Customer अकाउंट में लॉगिन करें
             </p>
 
 
@@ -70,7 +85,11 @@ KaamSetu Login
 
             <div class="role-tabs">
 
-                <button type="button" class="role-tab active" id="customerTab">
+                <button
+                    type="button"
+                    class="role-tab active"
+                    id="customerTab"
+                >
 
                     <i class="fa-solid fa-user"></i>
 
@@ -79,7 +98,11 @@ KaamSetu Login
                 </button>
 
 
-                <button type="button" class="role-tab" id="workerTab">
+                <button
+                    type="button"
+                    class="role-tab"
+                    id="workerTab"
+                >
 
                     <i class="fa-solid fa-helmet-safety"></i>
 
@@ -90,47 +113,73 @@ KaamSetu Login
             </div>
 
 
-            <input type="hidden" name="role" id="selectedRole" value="customer">
-
-
 
             {% if messages %}
 
-            {% for message in messages %}
+                {% for message in messages %}
 
-            <div class="alert">
+                    <div class="alert">
 
-                {{ message }}
+                        {{ message }}
 
-            </div>
+                    </div>
 
-            {% endfor %}
+                {% endfor %}
 
             {% endif %}
 
 
 
+            <!-- LOGIN FORM -->
+
             <form method="POST">
 
                 {% csrf_token %}
+                <input
+                    type="hidden"
+                    name="role"
+                    id="selectedRole"
+                    value="customer">
+
+
+               
+
+
+                <!-- USERNAME -->
 
                 <div class="input-group">
 
                     <i class="fa-regular fa-user"></i>
 
-                    <input type="text" name="username" placeholder="Username" required>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        required
+                    >
 
                 </div>
 
 
 
+                <!-- PASSWORD -->
+
                 <div class="input-group">
 
                     <i class="fa-solid fa-lock"></i>
 
-                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Password"
+                        required
+                    >
 
-                    <span id="togglePassword" class="eye">
+                    <span
+                        id="togglePassword"
+                        class="eye"
+                    >
 
                         <i class="fa-solid fa-eye"></i>
 
@@ -139,6 +188,8 @@ KaamSetu Login
                 </div>
 
 
+
+                <!-- OPTIONS -->
 
                 <div class="login-options">
 
@@ -150,17 +201,21 @@ KaamSetu Login
 
                     </label>
 
+
                     <a href="#">
-
                         Forgot Password?
-
                     </a>
 
                 </div>
 
 
 
-                <button class="login-btn" type="submit">
+                <!-- LOGIN BUTTON -->
+
+                <button
+                    class="login-btn"
+                    type="submit"
+                >
 
                     <i class="fa-solid fa-right-to-bracket"></i>
 
@@ -172,15 +227,19 @@ KaamSetu Login
 
 
 
+            <!-- REGISTER -->
+
             <div class="register-section">
 
                 <p>
-
                     नया अकाउंट नहीं है?
-
                 </p>
 
-                <a href="{% url 'register' %}" class="register-btn">
+
+                <a
+                    href="{% url 'register' %}"
+                    class="register-btn"
+                >
 
                     <i class="fa-solid fa-user-plus"></i>
 
@@ -190,12 +249,14 @@ KaamSetu Login
 
             </div>
 
+
         </div>
 
     </div>
 
 </div>
 
-<script src="{% static 'js/login.js' %}"></script>
+
+<script src="{% static 'js/login.js' %}?v=2"></script>
 
 {% endblock %}
