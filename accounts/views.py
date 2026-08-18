@@ -66,6 +66,29 @@ def user_login(request):
 
         username = request.POST.get("username")
         password = request.POST.get("password")
+        selected_role = request.POST.get("role")
+
+
+        # ==========================
+        # Validate selected role
+        # ==========================
+
+        if selected_role not in ["customer", "worker"]:
+
+            messages.error(
+                request,
+                "Please select Customer or Worker."
+            )
+
+            return render(
+                request,
+                "login.html"
+            )
+
+
+        # ==========================
+        # Authenticate credentials
+        # ==========================
 
         user = authenticate(
             request,
@@ -73,29 +96,81 @@ def user_login(request):
             password=password
         )
 
-        if user is not None:
 
-            login(request, user)
+        if user is None:
 
-            # Admin
-            if user.is_staff:
-                return redirect("/admin/")
-
-            # Worker
-            elif hasattr(user, "worker_profile"):
-                return redirect("home")
-
-            # Customer
-            else:
-                return redirect("home")
-
-        else:
             messages.error(
                 request,
                 "Invalid Username or Password"
             )
 
-    return render(request, "login.html")
+            return render(
+                request,
+                "login.html"
+            )
+
+
+        # ==========================
+        # Admin
+        # ==========================
+
+        if user.is_staff:
+
+            login(request, user)
+
+            return redirect("/admin/")
+
+
+        # ==========================
+        # Worker Login
+        # ==========================
+
+        if selected_role == "worker":
+
+            if not hasattr(user, "worker_profile"):
+
+                messages.error(
+                    request,
+                    "यह Customer account है। कृपया Customer option select करें।"
+                )
+
+                return render(
+                    request,
+                    "login.html"
+                )
+
+            login(request, user)
+
+            return redirect("home")
+
+
+        # ==========================
+        # Customer Login
+        # ==========================
+
+        if selected_role == "customer":
+
+            if not hasattr(user, "customer_profile"):
+
+                messages.error(
+                    request,
+                    "यह Worker account है। कृपया Worker option select करें।"
+                )
+
+                return render(
+                    request,
+                    "login.html"
+                )
+
+            login(request, user)
+
+            return redirect("home")
+
+
+    return render(
+        request,
+        "login.html"
+    )
 
 
 # ==========================

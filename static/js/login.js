@@ -42,38 +42,69 @@ const customerTab = document.getElementById("customerTab");
 
 const workerTab = document.getElementById("workerTab");
 
+const selectedRole = document.getElementById("selectedRole");
+
 const heading = document.querySelector(".login-heading");
 
 const subtitle = document.querySelector(".subtitle");
 
 
+// ===============================
+// Customer Role
+// ===============================
 
-customerTab.addEventListener("click", function () {
+if (customerTab) {
 
-    customerTab.classList.add("active");
+    customerTab.addEventListener("click", function () {
 
-    workerTab.classList.remove("active");
+        customerTab.classList.add("active");
 
-    heading.innerHTML =
-        '<span class="blue">Kaam</span><span class="orange">Setu</span> Customer Login';
-
-    subtitle.innerHTML =
-        "अपने Customer अकाउंट में लॉगिन करें";
-
-});
+        workerTab.classList.remove("active");
 
 
+        // Send selected role to backend
+        if (selectedRole) {
+            selectedRole.value = "customer";
+        }
 
-workerTab.addEventListener("click", function () {
 
-    workerTab.classList.add("active");
+        heading.innerHTML =
+            '<span class="blue">Kaam</span><span class="orange">Setu</span> Customer Login';
 
-    customerTab.classList.remove("active");
+        subtitle.innerHTML =
+            "अपने Customer अकाउंट में लॉगिन करें";
 
-    heading.innerHTML =
-        '<span class="blue">Kaam</span><span class="orange">Setu</span> Worker Login';
+    });
 
-    subtitle.innerHTML =
-        "अपने Worker अकाउंट में लॉगिन करें";
+}
 
-});
+
+
+// ===============================
+// Worker Role
+// ===============================
+
+if (workerTab) {
+
+    workerTab.addEventListener("click", function () {
+
+        workerTab.classList.add("active");
+
+        customerTab.classList.remove("active");
+
+
+        // Send selected role to backend
+        if (selectedRole) {
+            selectedRole.value = "worker";
+        }
+
+
+        heading.innerHTML =
+            '<span class="blue">Kaam</span><span class="orange">Setu</span> Worker Login';
+
+        subtitle.innerHTML =
+            "अपने Worker अकाउंट में लॉगिन करें";
+
+    });
+
+}
