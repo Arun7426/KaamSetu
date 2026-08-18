@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+
+{% block title %}
+Payments Management
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .admin-page {
+        max-width: 1250px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #1f2937;
+    }
+
+    .back-btn {
+        text-decoration: none;
+        color: #2563eb;
+        font-weight: 600;
+    }
+
+
+    /* ==========================
+       FILTERS
+    ========================== */
+
+    .filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+    .filter-btn {
+        padding: 9px 16px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .filter-btn:hover {
+        background: #f3f4f6;
+    }
+
+    .filter-active {
+        background: #1e3a5f;
+        color: white;
+        border-color: #1e3a5f;
+    }
+
+
+    /* ==========================
+       TABLE
+    ========================== */
+
+    .payments-card {
+        background: white;
+        border-radius: 14px;
+        overflow-x: auto;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+    }
+
+    .payments-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1050px;
+    }
+
+    .payments-table th {
+        background: #1e3a5f;
+        color: white;
+        padding: 14px;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .payments-table td {
+        padding: 14px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+        vertical-align: top;
+    }
+
+    .payments-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .payments-table tr:hover {
+        background: #f8fafc;
+    }
+
+
+    /* ==========================
+       STATUS
+    ========================== */
+
+    .status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .status-paid {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+
+    /* ==========================
+       TRANSACTION
+    ========================== */
+
+    .transaction {
+        font-weight: 600;
+    }
+
+    .booking-id {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 3px;
+    }
+
+    .amount {
+        font-weight: 700;
+    }
+
+</style>
+
+
+<div class="admin-page">
+
+
+    <!-- HEADER -->
+
+    <div class="page-header">
+
+        <h1>
+            Payments Management
+        </h1>
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="back-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <!-- FILTERS -->
+
+    <div class="filters">
+
+        <a
+            href="{% url 'admin_payments' %}"
+            class="filter-btn
+            {% if not status_filter and not transaction_filter %}
+                filter-active
+            {% endif %}"
+        >
+            All
+        </a>
+
+
+        <a
+            href="?status=Pending"
+            class="filter-btn
+            {% if status_filter == 'Pending' %}
+                filter-active
+            {% endif %}"
+        >
+            Pending
+        </a>
+
+
+        <a
+            href="?status=Paid"
+            class="filter-btn
+            {% if status_filter == 'Paid' %}
+                filter-active
+            {% endif %}"
+        >
+            Paid
+        </a>
+
+
+        <a
+            href="?transaction=Booking%20Fee"
+            class="filter-btn
+            {% if transaction_filter == 'Booking Fee' %}
+                filter-active
+            {% endif %}"
+        >
+            Booking Fees
+        </a>
+
+
+        <a
+            href="?transaction=Payment"
+            class="filter-btn
+            {% if transaction_filter == 'Payment' %}
+                filter-active
+            {% endif %}"
+        >
+            Payments
+        </a>
+
+    </div>
+
+
+    <!-- PAYMENT TABLE -->
+
+    <div class="payments-card">
+
+        <table class="payments-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Worker
+                    </th>
+
+                    <th>
+                        Booking
+                    </th>
+
+                    <th>
+                        Transaction
+                    </th>
+
+                    <th>
+                        Amount
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Created
+                    </th>
+
+                    <th>
+                        Paid At
+                    </th>
+
+                    <th>
+                        Description
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for entry in ledger_entries %}
+
+                <tr>
+
+                    <td>
+
+                        <strong>
+                            {{ entry.worker.name }}
+                        </strong>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if entry.booking %}
+
+                            <strong>
+                                #{{ entry.booking.id }}
+                            </strong>
+
+                            <div class="booking-id">
+                                {{ entry.booking.work_description|truncatechars:30 }}
+                            </div>
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="transaction">
+                            {{ entry.transaction_type }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="amount">
+                            ₹{{ entry.amount }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if entry.status == "Paid" %}
+
+                            <span class="status status-paid">
+                                Paid
+                            </span>
+
+                        {% else %}
+
+                            <span class="status status-pending">
+                                Pending
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ entry.created_at|date:"d M Y, h:i A" }}
+                    </td>
+
+
+                    <td>
+
+                        {% if entry.paid_at %}
+
+                            {{ entry.paid_at|date:"d M Y, h:i A" }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ entry.description|default:"—" }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        style="
+                            text-align:center;
+                            padding:35px;
+                            color:#6b7280;
+                        "
+                    >
+                        No payment records found.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <p style="
+        margin-top:15px;
+        color:#6b7280;
+        font-size:14px;
+    ">
+
+        Showing
+        <strong>{{ ledger_entries|length }}</strong>
+        payment record{{ ledger_entries|length|pluralize }}
+
+    </p>
+
+
+</div>
+
+{% endblock %}

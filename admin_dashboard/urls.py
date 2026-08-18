@@ -27,4 +27,10 @@ urlpatterns = [
         name="admin_bookings"
     ),
 
+    path(
+        "payments/",
+        views.admin_payments,
+        name="admin_payments"
+    ),
+
 ]

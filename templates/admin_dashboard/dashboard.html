@@ -112,6 +112,54 @@ Admin Control Dashboard
         color: #111827;
     }
 
+    /* ==========================
+       RECENT ACTIVITY
+    ========================== */
+
+    .recent-activity-grid {
+        gap: 30px !important;
+    }
+
+    .recent-activity-card {
+        padding: 30px !important;
+        min-height: 330px;
+    }
+
+    .recent-activity-card > div:first-child {
+        margin-bottom: 25px !important;
+    }
+
+    .recent-activity-item {
+        padding: 20px 0 !important;
+        min-height: 72px;
+        box-sizing: border-box;
+    }
+
+    .recent-activity-item:first-of-type {
+        padding-top: 8px !important;
+    }
+
+    .recent-activity-item:last-of-type {
+        padding-bottom: 8px !important;
+        border-bottom: none !important;
+    }
+
+    .recent-activity-item strong {
+        line-height: 1.5;
+    }
+
+    .recent-activity-item div {
+        line-height: 1.5;
+    }
+
+
+    @media (max-width: 700px) {
+
+        .dashboard-section>div {
+            grid-template-columns: 1fr !important;
+        }
+
+    }
 
     /* ==========================
        RESPONSIVE
@@ -382,35 +430,206 @@ Admin Control Dashboard
         <div class="stats-grid">
 
 
-            <div class="payment-card">
+            <a href="{% url 'admin_payments' %}?status=Pending" style="text-decoration:none;
+                color:inherit;
+            ">
 
-                <div class="stat-icon">
-                    💰
+                <div class="payment-card">
+
+                    <div class="stat-icon">
+                        💰
+                    </div>
+
+                    <div class="stat-title">
+                        Total Outstanding Fees
+                    </div>
+
+                    <div class="payment-value">
+                        ₹{{ total_outstanding }}
+                    </div>
+
                 </div>
 
-                <div class="stat-title">
-                    Total Outstanding Fees
+            </a>
+
+
+            <a href="{% url 'admin_payments' %}?status=Paid" style="text-decoration:none;
+                color:inherit;
+            ">
+
+                <div class="payment-card">
+
+                    <div class="stat-icon">
+                        ✅
+                    </div>
+
+                    <div class="stat-title">
+                        Total Paid Fees
+                    </div>
+
+                    <div class="payment-value">
+                        ₹{{ total_paid }}
+                    </div>
+
                 </div>
 
-                <div class="payment-value">
-                    ₹{{ total_outstanding }}
-                </div>
+            </a>
 
-            </div>
+            <!-- ==========================
+     WORKER OUTSTANDING
+========================== -->
+
+            <div style="margin-top:25px;">
+
+                <h3 style="
+        margin-bottom:15px;
+        color:#1f2937;
+    ">
+                    Worker-wise Outstanding Fees
+                </h3>
 
 
-            <div class="payment-card">
+                <div style="
+        background:white;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        overflow-x:auto;
+        box-shadow:0 4px 15px rgba(0,0,0,0.05);
+    ">
 
-                <div class="stat-icon">
-                    ✅
-                </div>
+                    <table style="
+            width:100%;
+            border-collapse:collapse;
+            min-width:650px;
+        ">
 
-                <div class="stat-title">
-                    Total Paid Fees
-                </div>
+                        <thead>
 
-                <div class="payment-value">
-                    ₹{{ total_paid }}
+                            <tr>
+
+                                <th style="
+                        background:#1e3a5f;
+                        color:white;
+                        padding:14px;
+                        text-align:left;
+                    ">
+                                    Worker
+                                </th>
+
+                                <th style="
+                        background:#1e3a5f;
+                        color:white;
+                        padding:14px;
+                        text-align:left;
+                    ">
+                                    Profession
+                                </th>
+
+                                <th style="
+                        background:#1e3a5f;
+                        color:white;
+                        padding:14px;
+                        text-align:left;
+                    ">
+                                    Outstanding
+                                </th>
+
+                                <th style="
+                        background:#1e3a5f;
+                        color:white;
+                        padding:14px;
+                        text-align:left;
+                    ">
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for worker in workers_with_outstanding %}
+
+                            <tr>
+
+                                <td style="
+                        padding:14px;
+                        border-bottom:1px solid #e5e7eb;
+                    ">
+                                    <strong>
+                                        {{ worker.name }}
+                                    </strong>
+                                </td>
+
+
+                                <td style="
+                        padding:14px;
+                        border-bottom:1px solid #e5e7eb;
+                    ">
+                                    {{ worker.profession }}
+                                </td>
+
+
+                                <td style="
+                        padding:14px;
+                        border-bottom:1px solid #e5e7eb;
+                        font-weight:700;
+                    ">
+                                    ₹{{ worker.outstanding }}
+                                </td>
+
+
+                                <td style="
+                        padding:14px;
+                        border-bottom:1px solid #e5e7eb;
+                    ">
+
+                                    {% if worker.outstanding >= 200 %}
+
+                                    <span style="
+                                color:#dc2626;
+                                font-weight:700;
+                            ">
+                                        ⚠️ Limit Reached
+                                    </span>
+
+                                    {% else %}
+
+                                    <span style="
+                                color:#d97706;
+                                font-weight:600;
+                            ">
+                                        ⚠️ Outstanding
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+
+                                <td colspan="4" style="
+                            text-align:center;
+                            padding:30px;
+                            color:#6b7280;
+                        ">
+                                    🎉 No worker has any outstanding fee.
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
                 </div>
 
             </div>
@@ -421,6 +640,440 @@ Admin Control Dashboard
     </div>
 
 
+
+
+<!-- ==========================
+     RECENT ACTIVITY
+========================== -->
+
+<div class="dashboard-section">
+
+    <h2>
+        Recent Activity
+    </h2>
+
+
+    <div
+        class="recent-activity-grid"
+        style="
+            display:grid;
+            grid-template-columns:repeat(2, 1fr);
+        "
+    >
+
+    
+        <!-- ==========================
+             RECENT BOOKINGS
+        ========================== -->
+
+        <div
+            class="recent-activity-card"
+            style="
+                background:white;
+                border:1px solid #e5e7eb;
+                border-radius:14px;
+                box-shadow:0 4px 15px rgba(0,0,0,0.05);
+            "
+        >
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:18px;
+            ">
+
+                <h3 style="
+                    margin:0;
+                    color:#1f2937;
+                ">
+                    📋 Recent Bookings
+                </h3>
+
+                <a href="{% url 'admin_bookings' %}" style="
+                        color:#2563eb;
+                        text-decoration:none;
+                        font-size:14px;
+                        font-weight:600;
+                    ">
+                    View All
+                </a>
+
+            </div>
+
+
+            {% for booking in recent_bookings %}
+
+            <div class="recent-activity-item" style="
+                border-bottom:1px solid #e5e7eb;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:15px;
+                ">
+
+                    <div>
+
+                        <strong>
+                            #{{ booking.id }}
+                        </strong>
+
+                        <div style="
+                            margin-top:4px;
+                            color:#6b7280;
+                            font-size:14px;
+                        ">
+                            {{ booking.customer_name }}
+                            → {{ booking.worker.name }}
+                        </div>
+
+                    </div>
+
+
+                    <div style="
+                        text-align:right;
+                        font-size:13px;
+                    ">
+
+                        <div style="
+                            font-weight:600;
+                        ">
+                            {{ booking.status }}
+                        </div>
+
+                        <div style="
+                            color:#9ca3af;
+                            margin-top:3px;
+                        ">
+                            {{ booking.created_at|date:"d M Y" }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <p style="
+                color:#6b7280;
+            ">
+                No recent bookings.
+            </p>
+
+            {% endfor %}
+
+        </div>
+
+        
+
+
+        <!-- ==========================
+             RECENT PAYMENTS
+        ========================== -->
+
+        <div
+            class="recent-activity-card"
+            style="
+                background:white;
+                border:1px solid #e5e7eb;
+                border-radius:14px;
+                box-shadow:0 4px 15px rgba(0,0,0,0.05);
+            "
+        >
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:18px;
+            ">
+
+                <h3 style="
+                    margin:0;
+                    color:#1f2937;
+                ">
+                    💰 Recent Payments
+                </h3>
+
+                <a href="{% url 'admin_payments' %}" style="
+                        color:#2563eb;
+                        text-decoration:none;
+                        font-size:14px;
+                        font-weight:600;
+                    ">
+                    View All
+                </a>
+
+            </div>
+
+
+            {% for entry in recent_payments %}
+
+            <div class="recent-activity-item" style="
+                border-bottom:1px solid #e5e7eb;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:15px;
+                ">
+
+                    <div>
+
+                        <strong>
+                            {{ entry.worker.name }}
+                        </strong>
+
+                        <div style="
+                            margin-top:4px;
+                            color:#6b7280;
+                            font-size:14px;
+                        ">
+
+                            {{ entry.transaction_type }}
+
+                            {% if entry.booking %}
+                            · Booking #{{ entry.booking.id }}
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div style="
+                        text-align:right;
+                    ">
+
+                        <div style="
+                            font-weight:700;
+                        ">
+                            ₹{{ entry.amount }}
+                        </div>
+
+                        <div style="
+                            color:#6b7280;
+                            font-size:13px;
+                            margin-top:3px;
+                        ">
+                            {{ entry.status }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <p style="
+                color:#6b7280;
+            ">
+                No recent payment activity.
+            </p>
+
+            {% endfor %}
+
+        </div>
+
+
+
+        <!-- ==========================
+             RECENT WORKERS
+        ========================== -->
+
+        <div
+            class="recent-activity-card"
+            style="
+                background:white;
+                border:1px solid #e5e7eb;
+                border-radius:14px;
+                box-shadow:0 4px 15px rgba(0,0,0,0.05);
+            "
+        >
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:18px;
+            ">
+
+                <h3 style="
+                    margin:0;
+                    color:#1f2937;
+                ">
+                    👷 Recent Workers
+                </h3>
+
+                <a href="{% url 'admin_workers' %}" style="
+                        color:#2563eb;
+                        text-decoration:none;
+                        font-size:14px;
+                        font-weight:600;
+                    ">
+                    View All
+                </a>
+
+            </div>
+
+
+            {% for worker in recent_workers %}
+
+            <div class="recent-activity-item" style="
+                border-bottom:1px solid #e5e7eb;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:15px;
+                ">
+
+                    <div>
+
+                        <strong>
+                            {{ worker.name }}
+                        </strong>
+
+                        <div style="
+                            margin-top:4px;
+                            color:#6b7280;
+                            font-size:14px;
+                        ">
+                            {{ worker.profession }}
+                        </div>
+
+                    </div>
+
+
+                    <div style="
+                        color:#9ca3af;
+                        font-size:13px;
+                    ">
+                        {{ worker.user.date_joined|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <p style="
+                color:#6b7280;
+            ">
+                No workers found.
+            </p>
+
+            {% endfor %}
+
+        </div>
+
+
+
+        <!-- ==========================
+             RECENT CUSTOMERS
+        ========================== -->
+
+        <div
+            class="recent-activity-card"
+            style="
+                background:white;
+                border:1px solid #e5e7eb;
+                border-radius:14px;
+                box-shadow:0 4px 15px rgba(0,0,0,0.05);
+            "
+        >
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:18px;
+            ">
+
+                <h3 style="
+                    margin:0;
+                    color:#1f2937;
+                ">
+                    👤 Recent Customers
+                </h3>
+
+                <a href="{% url 'admin_customers' %}" style="
+                        color:#2563eb;
+                        text-decoration:none;
+                        font-size:14px;
+                        font-weight:600;
+                    ">
+                    View All
+                </a>
+
+            </div>
+
+
+            {% for customer in recent_customers %}
+
+            <div class="recent-activity-item" style="
+                border-bottom:1px solid #e5e7eb;
+            ">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:15px;
+                ">
+
+                    <div>
+
+                        <strong>
+                            {{ customer.get_full_name|default:customer.username }}
+                        </strong>
+
+                        <div style="
+                            margin-top:4px;
+                            color:#6b7280;
+                            font-size:14px;
+                        ">
+                            {{ customer.username }}
+                        </div>
+
+                    </div>
+
+
+                    <div style="
+                        color:#9ca3af;
+                        font-size:13px;
+                    ">
+                        {{ customer.date_joined|date:"d M Y" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% empty %}
+
+            <p style="
+                color:#6b7280;
+            ">
+                No customers found.
+            </p>
+
+            {% endfor %}
+
+        </div>
+
+
+    </div>
+
+</div>
 </div>
 
 {% endblock %}

@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from django.db.models import Sum, Q
 
 from workers.models import Worker
 from bookings.models import Booking
@@ -71,6 +72,24 @@ def admin_dashboard(request):
         )
     )
 
+        # -----------------------------------------
+    # WORKER-WISE OUTSTANDING
+    # -----------------------------------------
+
+    workers_with_outstanding = Worker.objects.annotate(
+        outstanding=Sum(
+            "ledger_entries__amount",
+            filter=Q(
+                ledger_entries__transaction_type="Booking Fee",
+                ledger_entries__status="Pending"
+            )
+        )
+    ).filter(
+        outstanding__gt=0
+    ).order_by(
+        "-outstanding"
+    )
+
 
     # -----------------------------------------
     # RECENT BOOKINGS
@@ -82,6 +101,32 @@ def admin_dashboard(request):
     ).order_by(
         "-created_at"
     )[:10]
+
+ # -----------------------------------------
+    # RECENT ACTIVITY
+    # -----------------------------------------
+
+    recent_customers = User.objects.filter(
+        is_staff=False,
+        worker_profile__isnull=True
+    ).order_by(
+        "-date_joined"
+    )[:5]
+
+
+    recent_workers = Worker.objects.select_related(
+        "user"
+    ).order_by(
+        "-user__date_joined"
+    )[:5]
+
+
+    recent_payments = WorkerLedger.objects.select_related(
+        "worker",
+        "booking"
+    ).order_by(
+        "-created_at"
+    )[:5]
 
 
     return render(
@@ -101,9 +146,16 @@ def admin_dashboard(request):
             "total_outstanding": total_outstanding,
             "total_paid": total_paid,
 
+            "workers_with_outstanding": workers_with_outstanding,
+
             "recent_bookings": recent_bookings,
+                        "recent_customers": recent_customers,
+            "recent_workers": recent_workers,
+            "recent_payments": recent_payments,
         }
     )
+   
+
 
 @user_passes_test(staff_required, login_url="login")
 def admin_workers(request):
@@ -168,5 +220,38 @@ def admin_bookings(request):
         {
             "bookings": bookings,
             "status_filter": status_filter,
+        }
+    )
+
+@user_passes_test(staff_required, login_url="login")
+def admin_payments(request):
+
+    ledger_entries = WorkerLedger.objects.select_related(
+        "worker",
+        "booking"
+    ).order_by(
+        "-created_at"
+    )
+
+    status_filter = request.GET.get("status")
+    transaction_filter = request.GET.get("transaction")
+
+    if status_filter in ["Pending", "Paid"]:
+        ledger_entries = ledger_entries.filter(
+            status=status_filter
+        )
+
+    if transaction_filter in ["Booking Fee", "Payment"]:
+        ledger_entries = ledger_entries.filter(
+            transaction_type=transaction_filter
+        )
+
+    return render(
+        request,
+        "admin_dashboard/payments.html",
+        {
+            "ledger_entries": ledger_entries,
+            "status_filter": status_filter,
+            "transaction_filter": transaction_filter,
         }
     )
