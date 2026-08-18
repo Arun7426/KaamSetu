@@ -149,7 +149,7 @@ def admin_dashboard(request):
             "workers_with_outstanding": workers_with_outstanding,
 
             "recent_bookings": recent_bookings,
-                        "recent_customers": recent_customers,
+            "recent_customers": recent_customers,
             "recent_workers": recent_workers,
             "recent_payments": recent_payments,
         }

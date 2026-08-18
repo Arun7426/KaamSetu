@@ -8,8 +8,7 @@ KaamSetu Login
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 {% endblock %}
 
@@ -23,10 +22,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
         <div class="branding">
 
-            <img
-                src="{% static 'images/logo.png' %}"
-                class="logo"
-                alt="KaamSetu">
+            <img src="{% static 'images/logo.png' %}" class="logo" alt="KaamSetu">
 
             <h2>
 
@@ -46,9 +42,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
         <div class="worker-image">
 
-            <img
-                src="{% static 'images/hero-worker.png' %}"
-                alt="Worker">
+            <img src="{% static 'images/hero-worker.png' %}" alt="Worker">
 
         </div>
 
@@ -76,10 +70,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
             <div class="role-tabs">
 
-                <button
-                    type="button"
-                    class="role-tab active"
-                    id="customerTab">
+                <button type="button" class="role-tab active" id="customerTab">
 
                     <i class="fa-solid fa-user"></i>
 
@@ -88,10 +79,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
                 </button>
 
 
-                <button
-                    type="button"
-                    class="role-tab"
-                    id="workerTab">
+                <button type="button" class="role-tab" id="workerTab">
 
                     <i class="fa-solid fa-helmet-safety"></i>
 
@@ -100,6 +88,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
                 </button>
 
             </div>
+
+
+            <input type="hidden" name="role" id="selectedRole" value="customer">
 
 
 
@@ -127,11 +118,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
                     <i class="fa-regular fa-user"></i>
 
-                    <input
-                        type="text"
-                        name="username"
-                        placeholder="Username"
-                        required>
+                    <input type="text" name="username" placeholder="Username" required>
 
                 </div>
 
@@ -141,16 +128,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
                     <i class="fa-solid fa-lock"></i>
 
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Password"
-                        required>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
 
-                    <span
-                        id="togglePassword"
-                        class="eye">
+                    <span id="togglePassword" class="eye">
 
                         <i class="fa-solid fa-eye"></i>
 
@@ -180,9 +160,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
 
 
-                <button
-                    class="login-btn"
-                    type="submit">
+                <button class="login-btn" type="submit">
 
                     <i class="fa-solid fa-right-to-bracket"></i>
 
@@ -202,9 +180,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
                 </p>
 
-                <a
-                    href="{% url 'register' %}"
-                    class="register-btn">
+                <a href="{% url 'register' %}" class="register-btn">
 
                     <i class="fa-solid fa-user-plus"></i>
 

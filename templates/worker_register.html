@@ -33,9 +33,7 @@
 
             </ul>
 
-            <img src="{% static 'images/worker-register.png' %}"
-                 alt="Worker"
-                 class="worker-image">
+            <img src="{% static 'images/worker-register.png' %}" alt="Worker" class="worker-image">
             <div class="login-box">
 
                 <p>Already have an account?</p>
@@ -58,6 +56,25 @@
             <h2>Worker Registration</h2>
 
             <form method="POST" enctype="multipart/form-data">
+                {% if form.errors %}
+
+                <div style="
+    background:#fee2e2;
+    color:#991b1b;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
+">
+
+                    <strong>
+                        Please correct the following errors:
+                    </strong>
+
+                    {{ form.errors }}
+
+                </div>
+
+                {% endif %}
 
                 {% csrf_token %}
 
