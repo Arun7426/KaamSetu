@@ -43,7 +43,7 @@ Customer Dashboard
             </li>
 
             <li>
-                <a href="#">
+                <a href="{% url 'edit_customer_profile' %}">
                     👤 Edit Profile
                 </a>
             </li>
@@ -105,6 +105,16 @@ Customer Dashboard
                 <p>
                     You can manage all your bookings from here.
                 </p>
+                {% if request.user.customer_profile.address %}
+                    <p style="margin-top:12px;">
+                        📍 <strong>Address:</strong>
+                        {{ request.user.customer_profile.address }}
+                    </p>
+                {% else %}
+                    <p style="margin-top:12px;color:#888;">
+                        📍 Address not added yet.
+                    </p>
+                {% endif %}
 
             </div>
 

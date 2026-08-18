@@ -50,9 +50,13 @@ class ReviewForm(forms.ModelForm):
 
         fields = [
             "rating",
-            "title",
             "comment",
         ]
+
+        labels = {
+            "rating": "Rating",
+            "comment": "Review",
+        }
 
         widgets = {
 
@@ -69,18 +73,11 @@ class ReviewForm(forms.ModelForm):
                 }
             ),
 
-            "title": forms.TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Review Title"
-                }
-            ),
-
             "comment": forms.Textarea(
                 attrs={
                     "class": "form-control",
                     "rows": 4,
-                    "placeholder": "Share your experience with this worker..."
+                    "placeholder": "अपना Review लिखें..."
                 }
             ),
         }

@@ -114,7 +114,15 @@ def book_worker(request, worker_id):
 
     else:
 
-        form = BookingForm()
+        form = BookingForm(
+            initial={
+                "customer_address": (
+                    request.user.customer_profile.address
+                    if hasattr(request.user, "customer_profile")
+                    else ""
+                )
+            }
+        )
 
     return render(
         request,

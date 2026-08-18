@@ -6,7 +6,10 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from decimal import Decimal, InvalidOperation
 
-from .forms import CustomerRegistrationForm
+from .forms import (
+    CustomerRegistrationForm,
+    CustomerProfileEditForm,
+)
 from .models import CustomerProfile
 from bookings.models import Booking, Review
 
@@ -191,17 +194,28 @@ def customer_dashboard(request):
     reviewed_booking_ids = set(
         Review.objects.filter(
             customer=request.user
-        ).values_list("booking_id", flat=True)
+        ).values_list(
+            "booking_id",
+            flat=True
+        )
     )
 
     review_ratings = {
         review.booking_id: review.rating
-        for review in Review.objects.filter(customer=request.user)
+        for review in Review.objects.filter(
+            customer=request.user
+        )
     }
 
     for booking in bookings:
-        booking.has_review = booking.id in reviewed_booking_ids
-        booking.review_rating = review_ratings.get(booking.id)
+
+        booking.has_review = (
+            booking.id in reviewed_booking_ids
+        )
+
+        booking.review_rating = (
+            review_ratings.get(booking.id)
+        )
 
     total_bookings = bookings.count()
 
@@ -235,6 +249,122 @@ def customer_dashboard(request):
     )
 
 
+# ==========================
+# Customer Profile Edit
+# ==========================
+@login_required
+def edit_customer_profile(request):
+
+    # Only customers can access this page
+    if hasattr(request.user, "worker_profile"):
+
+        messages.error(
+            request,
+            "Only customers can edit this profile."
+        )
+
+        return redirect("home")
+
+    profile = request.user.customer_profile
+
+    if request.method == "POST":
+
+        form = CustomerProfileEditForm(
+            request.POST,
+            instance=profile
+        )
+
+        if form.is_valid():
+
+            # --------------------------
+            # Update User information
+            # --------------------------
+
+            request.user.first_name = (
+                form.cleaned_data["first_name"]
+            )
+
+            request.user.email = (
+                form.cleaned_data["email"]
+            )
+
+            request.user.save(
+                update_fields=[
+                    "first_name",
+                    "email"
+                ]
+            )
+
+            # --------------------------
+            # Update Customer Profile
+            # --------------------------
+
+            profile.address = (
+                form.cleaned_data.get("address", "")
+            )
+
+            profile.save(
+                update_fields=[
+                    "address"
+                ]
+            )
+
+            # --------------------------
+            # IMPORTANT
+            # --------------------------
+            # Mobile is NOT changed here.
+            #
+            # Future flow:
+            #
+            # Change Mobile
+            #       ↓
+            # New Mobile Number
+            #       ↓
+            # OTP Verification
+            #       ↓
+            # Mobile Updated
+            #
+            # Aadhaar will have a separate
+            # controlled verification flow.
+            # --------------------------
+
+            messages.success(
+                request,
+                "Profile updated successfully."
+            )
+
+            return redirect(
+                "customer_dashboard"
+            )
+
+    else:
+
+        form = CustomerProfileEditForm(
+            instance=profile
+        )
+
+        # Populate User model fields
+        form.fields["first_name"].initial = (
+            request.user.first_name
+        )
+
+        form.fields["email"].initial = (
+            request.user.email
+        )
+
+    return render(
+        request,
+        "edit_customer_profile.html",
+        {
+            "form": form,
+            "profile": profile,
+        }
+    )
+
+
+# ==========================
+# Customer Location Update
+# ==========================
 @login_required
 @require_POST
 def update_customer_location(request):
@@ -273,7 +403,10 @@ def update_customer_location(request):
     if (
         not latitude.is_finite()
         or not longitude.is_finite()
-        or not (-90 <= latitude <= 90 and -180 <= longitude <= 180)
+        or not (
+            -90 <= latitude <= 90
+            and -180 <= longitude <= 180
+        )
     ):
 
         return JsonResponse(

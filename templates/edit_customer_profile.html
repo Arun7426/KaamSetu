@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Edit Profile
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<style>
+    .edit-profile-container {
+        max-width: 700px;
+        margin: 40px auto;
+    }
+
+    .edit-profile-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .edit-profile-card h2 {
+        color: #17375E;
+        margin-bottom: 8px;
+    }
+
+    .profile-subtitle {
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+
+    .readonly-field {
+        background: #f3f4f6;
+        cursor: not-allowed;
+    }
+
+    .verified-badge {
+        display: inline-block;
+        margin-top: 6px;
+        color: #198754;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-left: 4px solid #2563eb;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        color: #555;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .error-list {
+        color: #dc2626;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .button-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    .save-btn {
+        background: #16a34a;
+        color: white;
+        border: none;
+        padding: 11px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .cancel-btn {
+        background: #6b7280;
+        color: white;
+        padding: 11px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="edit-profile-container">
+
+    <div class="edit-profile-card">
+
+        <h2>👤 Edit Profile</h2>
+
+        <p class="profile-subtitle">
+            Update your KaamSetu customer profile.
+        </p>
+
+        <div class="info-box">
+
+            📱 Your verified mobile number cannot be
+            changed directly from this page.
+
+            <br>
+
+            If you need to change your mobile number,
+            OTP verification will be required.
+
+            <br><br>
+
+            🪪 Aadhaar verification will be available
+            separately in the future.
+
+        </div>
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <!-- Full Name -->
+
+            <div class="form-group">
+
+                <label for="{{ form.first_name.id_for_label }}">
+                    Full Name
+                </label>
+
+                {{ form.first_name }}
+
+                {% if form.first_name.errors %}
+                <div class="error-list">
+                    {{ form.first_name.errors }}
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div class="form-group">
+
+                <label for="{{ form.email.id_for_label }}">
+                    Email Address
+                </label>
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+                <div class="error-list">
+                    {{ form.email.errors }}
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- Username -->
+
+            <div class="form-group">
+
+                <label>
+                    Username
+                </label>
+
+                <input type="text" value="{{ request.user.username }}" class="form-control readonly-field" readonly>
+
+                <small style="color:#666;">
+                    Username cannot be changed.
+                </small>
+
+            </div>
+
+
+            <!-- Mobile -->
+
+            <div class="form-group">
+
+                <label for="{{ form.mobile.id_for_label }}">
+                    Mobile Number
+                </label>
+
+                <input type="text" name="mobile" value="{{ profile.mobile }}" class="form-control readonly-field"
+                    readonly>
+
+                <span class="verified-badge">
+                    📱 Mobile verification will be OTP based
+                </span>
+
+            </div>
+
+            <!-- Address -->
+
+            <div class="form-group">
+
+                <label for="{{ form.address.id_for_label }}">
+                    Address (Optional)
+                </label>
+
+                {{ form.address }}
+
+                {% if form.address.errors %}
+                <div class="error-list">
+                    {{ form.address.errors }}
+                </div>
+                {% endif %}
+
+                <small style="color:#666;">
+                    You can add your address now or leave it blank.
+                </small>
+
+            </div>
+
+            <!-- Identity Verification -->
+
+            <div class="form-group" style="margin-top:25px;">
+
+                <label>
+                    🪪 Identity Verification
+                </label>
+
+                <div style="
+            background:#f8fafc;
+            border:1px solid #e5e7eb;
+            border-radius:10px;
+            padding:15px;
+            margin-top:8px;
+        ">
+
+                    <div style="font-weight:600; color:#333;">
+                        Aadhaar Verification
+                    </div>
+
+                    <div style="
+                color:#666;
+                font-size:14px;
+                margin-top:6px;
+                line-height:1.5;
+            ">
+                        Aadhaar verification will be introduced
+                        in a future phase of KaamSetu.
+                    </div>
+
+                    <div style="
+                margin-top:10px;
+                color:#856404;
+                font-size:13px;
+                font-weight:600;
+            ">
+                        🟡 Currently Optional
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="button-row">
+
+                <button type="submit" class="save-btn">
+                    💾 Save Profile
+                </button>
+
+                <a href="{% url 'customer_dashboard' %}" class="cancel-btn">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

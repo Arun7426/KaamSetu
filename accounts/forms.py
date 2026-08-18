@@ -104,3 +104,100 @@ class CustomerRegistrationForm(UserCreationForm):
             )
 
         return mobile
+
+# ==========================
+# Customer Profile Edit Form
+# ==========================
+
+class CustomerProfileEditForm(forms.ModelForm):
+
+    first_name = forms.CharField(
+        max_length=100,
+        required=True,
+        label="Full Name",
+    )
+
+    email = forms.EmailField(
+        required=True,
+        label="Email Address",
+    )
+
+    class Meta:
+        model = CustomerProfile
+        fields = [
+            "mobile",
+            "address",
+        ]
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.fields["first_name"].widget = forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Full Name",
+            }
+        )
+
+        self.fields["email"].widget = forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Email Address",
+            }
+        )
+
+        self.fields["mobile"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "Mobile Number",
+            "maxlength": "10",
+            "minlength": "10",
+            "inputmode": "numeric",
+        })
+
+        self.fields["address"].widget = forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Enter your address (Optional)",
+                "rows": 3,
+            }
+        )
+
+        self.fields["mobile"].label = "Mobile Number"
+        self.fields["address"].label = "Address (Optional)"
+
+        # Address optional
+        self.fields["address"].required = False
+
+        # Mobile अभी direct edit नहीं होगा
+        self.fields["mobile"].required = True
+
+    def clean_mobile(self):
+
+        mobile = self.cleaned_data.get("mobile", "").strip()
+
+        if not mobile.isdigit():
+
+            raise forms.ValidationError(
+                "Mobile number must contain only digits."
+            )
+
+        if len(mobile) != 10:
+
+            raise forms.ValidationError(
+                "Enter a valid 10-digit mobile number."
+            )
+
+        existing = CustomerProfile.objects.filter(
+            mobile=mobile
+        ).exclude(
+            pk=self.instance.pk
+        ).exists()
+
+        if existing:
+
+            raise forms.ValidationError(
+                "This mobile number is already registered."
+            )
+
+        return mobile
