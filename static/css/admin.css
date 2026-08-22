@@ -1,0 +1,1344 @@
+/* =====================================================
+   KAAMSETU ADVANCED ADMIN CONTROL CENTER
+   Phase A — Step 1 + Step 2 + Step 3
+===================================================== */
+
+
+/* =====================================================
+   ADMIN SHELL
+===================================================== */
+
+.admin-shell {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    background: #f5f7fb;
+
+}
+
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.admin-sidebar {
+
+    width: 270px;
+
+    min-width: 270px;
+
+    min-height: 100vh;
+
+    position: fixed;
+
+    left: 0;
+
+    top: 0;
+
+    bottom: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    background:
+        linear-gradient(
+            180deg,
+            #0f2744 0%,
+            #17375e 55%,
+            #102a48 100%
+        );
+
+    color: #ffffff;
+
+    z-index: 1000;
+
+    overflow-y: auto;
+
+    transition:
+        transform 0.3s ease;
+
+}
+
+
+
+/* =====================================================
+   SIDEBAR BRAND
+===================================================== */
+
+.admin-brand {
+
+    padding: 20px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.10);
+
+}
+
+
+.admin-brand-link {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+}
+
+
+.admin-brand-logo {
+
+    width: 46px;
+
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+}
+
+
+.admin-brand-logo img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: contain;
+
+    display: block;
+
+}
+
+
+.admin-brand-text h2 {
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+}
+
+
+.admin-brand-text span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: #b9c7d8;
+
+    font-size: 11px;
+
+}
+
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+.admin-navigation {
+
+    flex: 1;
+
+    padding: 22px 14px;
+
+    overflow-y: auto;
+
+}
+
+
+.admin-nav-section {
+
+    margin-bottom: 24px;
+
+}
+
+
+.admin-nav-section-title {
+
+    padding: 0 14px;
+
+    margin-bottom: 8px;
+
+    color: #8fa4ba;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+}
+
+
+.admin-nav-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px 14px;
+
+    margin-bottom: 6px;
+
+    border-radius: 10px;
+
+    color: #dbe5f0;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+.admin-nav-item:hover {
+
+    background:
+        rgba(255,255,255,0.09);
+
+    color: #ffffff;
+
+    transform:
+        translateX(2px);
+
+}
+
+
+.admin-nav-item.active {
+
+    background: #f4a940;
+
+    color: #17375e;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,0.15);
+
+}
+
+
+.admin-nav-icon {
+
+    width: 24px;
+
+    min-width: 24px;
+
+    text-align: center;
+
+    font-size: 17px;
+
+}
+
+
+.admin-nav-label {
+
+    min-width: 0;
+
+}
+
+
+.admin-nav-disabled {
+
+    cursor: default;
+
+    opacity: 0.75;
+
+}
+
+
+.admin-nav-disabled:hover {
+
+    transform: none;
+
+    background:
+        rgba(255,255,255,0.04);
+
+    color: #dbe5f0;
+
+}
+
+
+
+/* =====================================================
+   COMING SOON BADGE
+===================================================== */
+
+.coming-soon-badge {
+
+    margin-left: auto;
+
+    padding: 3px 6px;
+
+    border-radius: 5px;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    color: #9fb0c3;
+
+    font-size: 8px;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+}
+
+
+
+/* =====================================================
+   SIDEBAR SCROLLBAR
+===================================================== */
+
+.admin-navigation::-webkit-scrollbar,
+.admin-sidebar::-webkit-scrollbar {
+
+    width: 5px;
+
+}
+
+
+.admin-navigation::-webkit-scrollbar-track,
+.admin-sidebar::-webkit-scrollbar-track {
+
+    background: transparent;
+
+}
+
+
+.admin-navigation::-webkit-scrollbar-thumb,
+.admin-sidebar::-webkit-scrollbar-thumb {
+
+    background:
+        rgba(255,255,255,0.15);
+
+    border-radius: 10px;
+
+}
+
+
+
+/* =====================================================
+   SIDEBAR FOOTER
+===================================================== */
+
+.admin-sidebar-footer {
+
+    padding: 16px 14px;
+
+    border-top:
+        1px solid rgba(255,255,255,0.10);
+
+}
+
+
+.admin-sidebar-footer a {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 14px;
+
+    margin-bottom: 4px;
+
+    border-radius: 9px;
+
+    color: #cbd5e1;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.admin-sidebar-footer a:hover {
+
+    background:
+        rgba(255,255,255,0.08);
+
+    color: #ffffff;
+
+}
+
+
+
+/* =====================================================
+   MAIN AREA
+===================================================== */
+
+.admin-main {
+
+    width: calc(100% - 270px);
+
+    margin-left: 270px;
+
+    min-height: 100vh;
+
+}
+
+
+
+/* =====================================================
+   ADVANCED HEADER
+===================================================== */
+
+.admin-header {
+
+    height: 82px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 30px;
+
+    background: #ffffff;
+
+    border-bottom:
+        1px solid #e5e7eb;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 900;
+
+}
+
+
+
+/* =====================================================
+   HEADER LEFT
+===================================================== */
+
+.admin-header-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    min-width: 0;
+
+}
+
+
+.admin-page-heading {
+
+    min-width: 0;
+
+}
+
+
+.admin-header h1 {
+
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 23px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+}
+
+
+.admin-header p {
+
+    margin: 4px 0 0;
+
+    color: #6b7280;
+
+    font-size: 13px;
+
+}
+
+
+
+/* =====================================================
+   HEADER LOGO
+===================================================== */
+
+.admin-header-logo {
+
+    width: 46px;
+
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    text-decoration: none;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+}
+
+
+.admin-header-logo img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: contain;
+
+    display: block;
+
+}
+
+
+
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+.admin-menu-toggle {
+
+    display: none;
+
+    border: none;
+
+    background: #f3f4f6;
+
+    color: #17375e;
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    font-size: 20px;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+.admin-menu-toggle:hover {
+
+    background: #e5e7eb;
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+
+/* =====================================================
+   HEADER RIGHT
+===================================================== */
+
+.admin-header-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-left: 20px;
+
+}
+
+
+
+/* =====================================================
+   GLOBAL SEARCH
+===================================================== */
+
+.admin-global-search {
+
+    width: 280px;
+
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    box-sizing: border-box;
+
+    background: #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    padding: 0 13px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+}
+
+
+.admin-global-search:focus-within {
+
+    background: #ffffff;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37,99,235,0.08);
+
+}
+
+
+.admin-search-icon {
+
+    font-size: 15px;
+
+    flex-shrink: 0;
+
+}
+
+
+.admin-global-search input {
+
+    width: 100%;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #111827;
+
+    font-size: 13px;
+
+}
+
+
+.admin-global-search input::placeholder {
+
+    color: #9ca3af;
+
+}
+
+
+
+/* =====================================================
+   HEADER ICON BUTTON
+===================================================== */
+
+.admin-header-icon-btn {
+
+    position: relative;
+
+    width: 42px;
+
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border:
+        1px solid #e5e7eb;
+
+    background: #ffffff;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-size: 17px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+.admin-header-icon-btn:hover {
+
+    background: #f8fafc;
+
+    border-color: #d1d5db;
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+
+/* =====================================================
+   NOTIFICATION BADGE
+===================================================== */
+
+.admin-notification-badge {
+
+    position: absolute;
+
+    top: 5px;
+
+    right: 5px;
+
+    min-width: 15px;
+
+    height: 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0 3px;
+
+    box-sizing: border-box;
+
+    border-radius: 20px;
+
+    background: #dc2626;
+
+    color: #ffffff;
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+}
+
+
+
+/* =====================================================
+   ADMIN PROFILE
+===================================================== */
+
+.admin-profile-wrapper {
+
+    position: relative;
+
+}
+
+
+.admin-profile-btn {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    border: none;
+
+    background: transparent;
+
+    padding: 4px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease;
+
+}
+
+
+.admin-profile-btn:hover {
+
+    background: #f8fafc;
+
+}
+
+
+.admin-user-avatar {
+
+    width: 40px;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #17375e;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+}
+
+
+.admin-user-avatar.large {
+
+    width: 44px;
+
+    height: 44px;
+
+}
+
+
+.admin-user-info {
+
+    text-align: left;
+
+}
+
+
+.admin-user-info strong {
+
+    display: block;
+
+    color: #111827;
+
+    font-size: 13px;
+
+    line-height: 1.2;
+
+}
+
+
+.admin-user-info span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: #6b7280;
+
+    font-size: 11px;
+
+}
+
+
+.admin-profile-arrow {
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    margin-left: 2px;
+
+    transition:
+        transform 0.2s ease;
+
+}
+
+
+.admin-profile-btn.open
+.admin-profile-arrow {
+
+    transform:
+        rotate(180deg);
+
+}
+
+
+
+/* =====================================================
+   PROFILE DROPDOWN
+===================================================== */
+
+.admin-profile-dropdown {
+
+    position: absolute;
+
+    right: 0;
+
+    top: calc(100% + 10px);
+
+    width: 245px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(15,23,42,0.14);
+
+    padding: 10px;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform:
+        translateY(-6px);
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        visibility 0.2s ease;
+
+}
+
+
+.admin-profile-dropdown.open {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        translateY(0);
+
+}
+
+
+.admin-dropdown-user {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 8px;
+
+}
+
+
+.admin-dropdown-user strong {
+
+    display: block;
+
+    color: #111827;
+
+    font-size: 13px;
+
+}
+
+
+.admin-dropdown-user span {
+
+    display: block;
+
+    color: #6b7280;
+
+    font-size: 11px;
+
+    margin-top: 3px;
+
+}
+
+
+.admin-dropdown-divider {
+
+    height: 1px;
+
+    background: #e5e7eb;
+
+    margin: 7px 0;
+
+}
+
+
+.admin-dropdown-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    color: #374151;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.admin-dropdown-item:hover {
+
+    background: #f3f4f6;
+
+    color: #111827;
+
+}
+
+
+.admin-dropdown-item.logout {
+
+    color: #dc2626;
+
+}
+
+
+.admin-dropdown-item.logout:hover {
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+}
+
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.admin-content {
+
+    padding: 30px;
+
+}
+
+
+
+/* =====================================================
+   DJANGO MESSAGES
+===================================================== */
+
+.admin-messages {
+
+    margin-bottom: 20px;
+
+}
+
+
+.admin-message {
+
+    padding: 12px 15px;
+
+    border-radius: 9px;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+
+}
+
+
+.admin-message.success {
+
+    background: #dcfce7;
+
+    color: #166534;
+
+}
+
+
+.admin-message.error {
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+}
+
+
+.admin-message.warning {
+
+    background: #fef3c7;
+
+    color: #92400e;
+
+}
+
+
+.admin-message.info {
+
+    background: #dbeafe;
+
+    color: #1e40af;
+
+}
+
+
+
+/* =====================================================
+   RESPONSIVE — TABLET
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .admin-global-search {
+
+        width: 220px;
+
+    }
+
+}
+
+
+
+/* =====================================================
+   RESPONSIVE — MOBILE
+===================================================== */
+
+@media (max-width: 900px) {
+
+
+    .admin-sidebar {
+
+        transform:
+            translateX(-100%);
+
+    }
+
+
+    .admin-sidebar.open {
+
+        transform:
+            translateX(0);
+
+    }
+
+
+    .admin-main {
+
+        width: 100%;
+
+        margin-left: 0;
+
+    }
+
+
+    .admin-menu-toggle {
+
+        display: flex;
+
+    }
+
+
+    .admin-header {
+
+        padding: 0 18px;
+
+    }
+
+
+    .admin-content {
+
+        padding: 20px;
+
+    }
+
+}
+
+
+
+/* =====================================================
+   RESPONSIVE — SMALL TABLET
+===================================================== */
+
+@media (max-width: 700px) {
+
+
+    .admin-global-search {
+
+        display: none;
+
+    }
+
+
+    .admin-header-right {
+
+        gap: 8px;
+
+    }
+
+
+    .admin-user-info {
+
+        display: none;
+
+    }
+
+
+    .admin-profile-arrow {
+
+        display: none;
+
+    }
+
+
+    .admin-header-logo {
+
+        width: 40px;
+
+        height: 40px;
+
+    }
+
+}
+
+
+
+/* =====================================================
+   RESPONSIVE — PHONE
+===================================================== */
+
+@media (max-width: 600px) {
+
+
+    .admin-header {
+
+        height: 72px;
+
+    }
+
+
+    .admin-header h1 {
+
+        font-size: 18px;
+
+    }
+
+
+    .admin-header p {
+
+        font-size: 11px;
+
+    }
+
+
+    .admin-header-left {
+
+        gap: 9px;
+
+    }
+
+
+    .admin-header-logo {
+
+        width: 38px;
+
+        height: 38px;
+
+    }
+
+
+    .admin-user-avatar {
+
+        width: 36px;
+
+        height: 36px;
+
+    }
+
+
+    .admin-header-icon-btn {
+
+        width: 38px;
+
+        height: 38px;
+
+    }
+
+
+    .admin-content {
+
+        padding: 15px;
+
+    }
+
+}

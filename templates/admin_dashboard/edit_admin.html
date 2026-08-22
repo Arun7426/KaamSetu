@@ -1,0 +1,374 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block admin_title %}
+Edit Admin — KaamSetu
+{% endblock %}
+
+{% block admin_heading %}
+Edit Admin
+{% endblock %}
+
+{% block admin_subheading %}
+Update administrator details, permission groups and account status
+{% endblock %}
+
+{% block admin_content %}
+
+<style>
+    .ea-page {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .ea-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(15, 39, 68, 0.06);
+        overflow: hidden;
+    }
+
+    .ea-card-header {
+        padding: 24px 26px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .ea-card-header h2 {
+        margin: 0;
+        color: #17375e;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .ea-card-header p {
+        margin: 7px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .ea-form {
+        padding: 26px;
+    }
+
+    .ea-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .ea-field {
+        margin-bottom: 20px;
+    }
+
+    .ea-field-full {
+        grid-column: 1 / -1;
+    }
+
+    .ea-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #17375e;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .ea-input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 11px 13px;
+        border: 1px solid #dbe2ea;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #374151;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .ea-input:focus {
+        border-color: #17375e;
+        box-shadow: 0 0 0 3px rgba(23, 55, 94, 0.08);
+    }
+
+    .ea-input-readonly {
+        background: #f8fafc;
+        color: #64748b;
+    }
+
+    .ea-help {
+        display: block;
+        margin-top: 6px;
+        color: #94a3b8;
+        font-size: 11px;
+    }
+
+    .ea-groups {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .ea-group-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 13px;
+        border: 1px solid #e5e7eb;
+        border-radius: 9px;
+        background: #f8fafc;
+    }
+
+    .ea-group-option input {
+        width: 16px;
+        height: 16px;
+    }
+
+    .ea-group-option label {
+        color: #17375e;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .ea-status-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px;
+        border: 1px solid #e5e7eb;
+        border-radius: 9px;
+        background: #f8fafc;
+    }
+
+    .ea-status-box input {
+        width: 17px;
+        height: 17px;
+    }
+
+    .ea-status-box label {
+        color: #17375e;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .ea-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 8px;
+        padding-top: 22px;
+        border-top: 1px solid #edf0f4;
+    }
+
+    .ea-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 17px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .ea-btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .ea-btn-primary {
+        background: #17375e;
+        color: #ffffff;
+        border: 1px solid #17375e;
+    }
+
+    .ea-btn-primary:hover {
+        background: #0f2f54;
+    }
+
+    @media (max-width: 700px) {
+        .ea-grid,
+        .ea-groups {
+            grid-template-columns: 1fr;
+        }
+
+        .ea-field-full {
+            grid-column: auto;
+        }
+
+        .ea-form,
+        .ea-card-header {
+            padding: 20px;
+        }
+
+        .ea-actions {
+            flex-direction: column-reverse;
+        }
+
+        .ea-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="ea-page">
+
+    <div class="ea-card">
+
+        <div class="ea-card-header">
+            <h2>
+                Edit Administrator
+            </h2>
+
+            <p>
+                Update the selected normal Admin account.
+            </p>
+        </div>
+
+        <form method="post" class="ea-form">
+
+            {% csrf_token %}
+
+            <div class="ea-grid">
+
+                <div class="ea-field">
+                    <label for="full_name" class="ea-label">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="full_name"
+                        name="full_name"
+                        class="ea-input"
+                        value="{{ admin_user.first_name }}"
+                        required
+                    >
+                </div>
+
+                <div class="ea-field">
+                    <label for="username" class="ea-label">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        class="ea-input ea-input-readonly"
+                        value="{{ admin_user.username }}"
+                        readonly
+                    >
+
+                    <span class="ea-help">
+                        Username cannot be changed from Admin Management.
+                    </span>
+                </div>
+
+                <div class="ea-field ea-field-full">
+                    <label for="email" class="ea-label">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="ea-input"
+                        value="{{ admin_user.email }}"
+                    >
+                </div>
+
+                <div class="ea-field ea-field-full">
+                    <label class="ea-label">
+                        Permission Groups
+                    </label>
+
+                    <div class="ea-groups">
+
+                        {% for group in groups %}
+
+                        <div class="ea-group-option">
+
+                            <input
+                                type="checkbox"
+                                id="group_{{ group.id }}"
+                                name="groups"
+                                value="{{ group.id }}"
+                                {% if group in admin_user.groups.all %}checked{% endif %}
+                            >
+
+                            <label for="group_{{ group.id }}">
+                                {{ group.name }}
+                            </label>
+
+                        </div>
+
+                        {% empty %}
+
+                        <span class="ea-help">
+                            No permission groups available.
+                        </span>
+
+                        {% endfor %}
+
+                    </div>
+                </div>
+
+                <div class="ea-field ea-field-full">
+
+                    <label class="ea-label">
+                        Account Status
+                    </label>
+
+                    <div class="ea-status-box">
+
+                        <input
+                            type="checkbox"
+                            id="is_active"
+                            name="is_active"
+                            {% if admin_user.is_active %}checked{% endif %}
+                        >
+
+                        <label for="is_active">
+                            Active Admin Account
+                        </label>
+
+                    </div>
+
+                    <span class="ea-help">
+                        Turn this off to prevent the Admin from logging in.
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="ea-actions">
+
+                <a
+                    href="{% url 'admin_management' %}"
+                    class="ea-btn ea-btn-secondary"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="ea-btn ea-btn-primary"
+                >
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

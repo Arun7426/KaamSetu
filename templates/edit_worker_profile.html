@@ -1,0 +1,431 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Edit Worker Profile
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<style>
+    .edit-profile-container {
+        max-width: 700px;
+        margin: 40px auto;
+    }
+
+    .edit-profile-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .edit-profile-card h2 {
+        color: #17375E;
+        margin-bottom: 8px;
+    }
+
+    .profile-subtitle {
+        color: #666;
+        margin-bottom: 25px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+
+    .readonly-field {
+        background: #f3f4f6;
+        cursor: not-allowed;
+    }
+
+    .verified-badge {
+        display: inline-block;
+        margin-top: 6px;
+        color: #198754;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-left: 4px solid #2563eb;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        color: #555;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .error-list {
+        color: #dc2626;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .button-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 25px;
+    }
+
+    .save-btn {
+        background: #16a34a;
+        color: white;
+        border: none;
+        padding: 11px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .cancel-btn {
+        background: #6b7280;
+        color: white;
+        padding: 11px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .current-photo {
+        margin-top: 10px;
+    }
+
+    .current-photo img {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="edit-profile-container">
+
+    <div class="edit-profile-card">
+
+        <h2>👷 Edit Worker Profile</h2>
+
+        <p class="profile-subtitle">
+            Update your KaamSetu worker profile.
+        </p>
+
+        <div class="info-box">
+
+            📱 Your registered mobile number cannot be
+            changed directly from this page.
+
+            <br>
+
+            Username is also locked and cannot be changed.
+
+            <br><br>
+
+            ⭐ Rating, Reviews and Verification status
+            are managed by the KaamSetu system.
+
+        </div>
+
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="error-list">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+
+            <!-- Full Name -->
+
+            <div class="form-group">
+
+                <label for="{{ form.first_name.id_for_label }}">
+                    Full Name
+                </label>
+
+                {{ form.first_name }}
+
+                {% if form.first_name.errors %}
+                <div class="error-list">
+                    {{ form.first_name.errors }}
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div class="form-group">
+
+                <label for="{{ form.email.id_for_label }}">
+                    Email Address
+                </label>
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+                <div class="error-list">
+                    {{ form.email.errors }}
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Username -->
+
+            <div class="form-group">
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    value="{{ request.user.username }}"
+                    class="form-control readonly-field"
+                    readonly
+                >
+
+                <small style="color:#666;">
+                    Username cannot be changed.
+                </small>
+
+            </div>
+
+
+            <!-- Mobile -->
+
+            <div class="form-group">
+
+                <label>
+                    Mobile Number
+                </label>
+
+                <input
+                    type="text"
+                    value="{{ worker.mobile }}"
+                    class="form-control readonly-field"
+                    readonly
+                >
+
+                <span class="verified-badge">
+                    📱 Mobile verification will be OTP based
+                </span>
+
+            </div>
+
+
+            <!-- Profession -->
+
+            <div class="form-group">
+
+                <label for="{{ form.profession.id_for_label }}">
+                    Profession
+                </label>
+
+                {{ form.profession }}
+
+                {% if form.profession.errors %}
+                <div class="error-list">
+                    {{ form.profession.errors }}
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Experience -->
+
+            <div class="form-group">
+
+                <label for="{{ form.experience.id_for_label }}">
+                    Experience (Years)
+                </label>
+
+                {{ form.experience }}
+
+                {% if form.experience.errors %}
+                <div class="error-list">
+                    {{ form.experience.errors }}
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- City -->
+
+            <div class="form-group">
+
+                <label for="{{ form.city.id_for_label }}">
+                    City
+                </label>
+
+                {{ form.city }}
+
+                {% if form.city.errors %}
+                <div class="error-list">
+                    {{ form.city.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Area -->
+
+            <div class="form-group">
+
+                <label for="{{ form.area.id_for_label }}">
+                    Area
+                </label>
+
+                {{ form.area }}
+
+                {% if form.area.errors %}
+                <div class="error-list">
+                    {{ form.area.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Daily Wage -->
+
+            <div class="form-group">
+
+                <label for="{{ form.daily_wage.id_for_label }}">
+                    Daily Wage (₹)
+                </label>
+
+                {{ form.daily_wage }}
+
+                {% if form.daily_wage.errors %}
+                <div class="error-list">
+                    {{ form.daily_wage.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- About -->
+
+            <div class="form-group">
+
+                <label for="{{ form.about.id_for_label }}">
+                    About Yourself
+                </label>
+
+                {{ form.about }}
+
+                {% if form.about.errors %}
+                <div class="error-list">
+                    {{ form.about.errors }}
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Profile Photo -->
+
+            <div class="form-group">
+
+                <label for="{{ form.profile_photo.id_for_label }}">
+                    Profile Photo
+                </label>
+
+                {{ form.profile_photo }}
+
+                {% if worker.profile_photo %}
+                <div class="current-photo">
+
+                    <small style="color:#666;">
+                        Current Profile Photo:
+                    </small>
+
+                    <br>
+
+                    <img
+                        src="{{ worker.profile_photo.url }}"
+                        alt="{{ worker.name }}"
+                    >
+
+                </div>
+                {% endif %}
+
+                {% if form.profile_photo.errors %}
+                <div class="error-list">
+                    {{ form.profile_photo.errors }}
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Buttons -->
+
+            <div class="button-row">
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    💾 Save Profile
+                </button>
+
+                <a
+                    href="{% url 'worker_dashboard' %}"
+                    class="cancel-btn"
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

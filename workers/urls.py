@@ -35,6 +35,12 @@ urlpatterns = [
         views.worker_dashboard,
         name="worker_dashboard",
     ),
+    
+    path(
+        "worker/edit-profile/",
+        views.edit_worker_profile,
+        name="edit_worker_profile",
+    ),
 
     path(
         "worker/toggle-availability/",

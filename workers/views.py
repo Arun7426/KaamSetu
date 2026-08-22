@@ -12,7 +12,10 @@ from django.views.decorators.http import require_POST
 from bookings.models import Booking
 from bookings.notifications import create_notification
 
-from .forms import WorkerRegistrationForm
+from .forms import (
+    WorkerRegistrationForm,
+    WorkerProfileEditForm,
+)
 from .location import nearby_workers
 from .models import Worker
 from payments.services import get_worker_outstanding
@@ -59,7 +62,90 @@ def worker_dashboard(request):
             "worker_outstanding": worker_outstanding,
         }
     )
+# =========================================================
+# WORKER PROFILE EDIT
+# =========================================================
 
+@login_required
+def edit_worker_profile(request):
+
+    # Only workers can access this page
+    if not hasattr(request.user, "worker_profile"):
+        messages.error(
+            request,
+            "Only workers can edit this profile."
+        )
+        return redirect("home")
+
+    worker = request.user.worker_profile
+
+    if request.method == "POST":
+
+        form = WorkerProfileEditForm(
+            request.POST,
+            request.FILES,
+            instance=worker,
+        )
+
+        if form.is_valid():
+
+            # --------------------------
+            # Update User information
+            # --------------------------
+
+            request.user.first_name = (
+                form.cleaned_data["first_name"]
+            )
+
+            request.user.email = (
+                form.cleaned_data["email"]
+            )
+
+            request.user.save(
+                update_fields=[
+                    "first_name",
+                    "email",
+                ]
+            )
+
+            # --------------------------
+            # Update Worker Profile
+            # --------------------------
+
+            form.save()
+
+            messages.success(
+                request,
+                "Worker profile updated successfully."
+            )
+
+            return redirect(
+                "worker_dashboard"
+            )
+
+    else:
+
+        form = WorkerProfileEditForm(
+            instance=worker
+        )
+
+        # Populate User model fields
+        form.fields["first_name"].initial = (
+            request.user.first_name
+        )
+
+        form.fields["email"].initial = (
+            request.user.email
+        )
+
+    return render(
+        request,
+        "edit_worker_profile.html",
+        {
+            "form": form,
+            "worker": worker,
+        }
+    )
 
 @login_required
 def toggle_availability(request):

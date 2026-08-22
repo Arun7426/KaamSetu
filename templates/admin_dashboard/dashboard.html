@@ -1,10 +1,10 @@
-{% extends "base.html" %}
+{% extends "admin_dashboard/admin_base.html" %}
 
-{% block title %}
-Admin Control Dashboard
+{% block admin_title %}
+Admin Dashboard | KaamSetu
 {% endblock %}
 
-{% block content %}
+{% block admin_content %}
 
 <style>
     .admin-dashboard {
@@ -118,11 +118,14 @@ Admin Control Dashboard
 
     .recent-activity-grid {
         gap: 30px !important;
+        
+        
     }
 
     .recent-activity-card {
         padding: 30px !important;
         min-height: 330px;
+        margin-top: 28px !important;
     }
 
     .recent-activity-card > div:first-child {
@@ -420,6 +423,7 @@ Admin Control Dashboard
     <!-- ==========================
          PAYMENT OVERVIEW
     ========================== -->
+    {% if request.user.is_superuser %}
 
     <div class="dashboard-section">
 
@@ -476,8 +480,8 @@ Admin Control Dashboard
             </a>
 
             <!-- ==========================
-     WORKER OUTSTANDING
-========================== -->
+                    WORKER OUTSTANDING
+            ========================== -->
 
             <div style="margin-top:25px;">
 
@@ -881,7 +885,7 @@ Admin Control Dashboard
             {% endfor %}
 
         </div>
-
+        {% endif %}
 
 
         <!-- ==========================

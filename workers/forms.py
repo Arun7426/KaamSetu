@@ -70,3 +70,96 @@ class WorkerRegistrationForm(forms.ModelForm):
             ("POP Worker", "POP Worker"),
             ("Other", "Other"),
         ]
+
+# ==========================
+# Worker Profile Edit Form
+# ==========================
+
+class WorkerProfileEditForm(forms.ModelForm):
+
+    first_name = forms.CharField(
+        max_length=100,
+        required=True,
+        label="Full Name",
+    )
+
+    email = forms.EmailField(
+        required=False,
+        label="Email Address",
+    )
+
+    class Meta:
+        model = Worker
+
+        fields = [
+            "profession",
+            "experience",
+            "city",
+            "area",
+            "daily_wage",
+            "about",
+            "profile_photo",
+        ]
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        # Full Name
+        self.fields["first_name"].widget = forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Full Name",
+            }
+        )
+
+        # Email
+        self.fields["email"].widget = forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Email Address",
+            }
+        )
+
+        # Profession
+        self.fields["profession"].widget.attrs.update({
+            "class": "form-control",
+        })
+
+        # Experience
+        self.fields["experience"].widget.attrs.update({
+            "class": "form-control",
+            "min": "0",
+        })
+
+        # City
+        self.fields["city"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "City",
+        })
+
+        # Area
+        self.fields["area"].widget.attrs.update({
+            "class": "form-control",
+            "placeholder": "Area",
+        })
+
+        # Daily Wage
+        self.fields["daily_wage"].widget.attrs.update({
+            "class": "form-control",
+            "min": "0",
+        })
+
+        # About
+        self.fields["about"].widget = forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Apne baare mein likhiye...",
+                "rows": 5,
+            }
+        )
+
+        # Profile Photo
+        self.fields["profile_photo"].widget.attrs.update({
+            "class": "form-control-file",
+        })

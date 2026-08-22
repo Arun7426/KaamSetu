@@ -1,0 +1,573 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block admin_title %}
+Create Admin — KaamSetu
+{% endblock %}
+
+{% block admin_heading %}
+Create Admin
+{% endblock %}
+
+{% block admin_subheading %}
+Create a new KaamSetu administrator and assign permission groups
+{% endblock %}
+
+{% block admin_content %}
+
+<style>
+
+    .ca-page {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+
+    .ca-card {
+        background: #ffffff;
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 16px;
+
+        box-shadow:
+            0 8px 25px rgba(15,39,68,0.06);
+
+        overflow: hidden;
+    }
+
+
+    .ca-card-header {
+        padding: 26px;
+
+        border-bottom: 1px solid #edf0f4;
+    }
+
+
+    .ca-card-header h2 {
+        margin: 0;
+
+        color: #17375e;
+
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+
+    .ca-card-header p {
+        margin: 7px 0 0;
+
+        color: #6b7280;
+
+        font-size: 13px;
+    }
+
+
+    .ca-form {
+        padding: 28px;
+    }
+
+
+    .ca-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 20px;
+    }
+
+
+    .ca-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .ca-field.full {
+        grid-column: 1 / -1;
+    }
+
+
+    .ca-field label {
+        margin-bottom: 7px;
+
+        color: #17375e;
+
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+
+    .ca-field input,
+    .ca-field select {
+        width: 100%;
+
+        padding: 12px 13px;
+
+        border: 1px solid #dbe2ea;
+
+        border-radius: 9px;
+
+        background: #ffffff;
+
+        color: #111827;
+
+        font-size: 13px;
+
+        outline: none;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+
+    .ca-field input:focus,
+    .ca-field select:focus {
+        border-color: #17375e;
+
+        box-shadow:
+            0 0 0 3px rgba(23,55,94,0.10);
+    }
+
+
+    .ca-help {
+        margin-top: 5px;
+
+        color: #94a3b8;
+
+        font-size: 11px;
+    }
+
+
+    .ca-groups {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 10px;
+
+        margin-top: 5px;
+    }
+
+
+    .ca-group-option {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        padding: 12px;
+
+        background: #f8fafc;
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 9px;
+
+        cursor: pointer;
+
+        transition:
+            background 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+
+    .ca-group-option:hover {
+        background: #eef4fb;
+
+        border-color: #cbd9e8;
+    }
+
+
+    .ca-group-option input {
+        width: auto;
+
+        margin: 0;
+    }
+
+
+    .ca-group-name {
+        color: #17375e;
+
+        font-size: 12px;
+
+        font-weight: 700;
+    }
+
+
+    .ca-active {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        margin-top: 5px;
+
+        padding: 12px;
+
+        background: #f8fafc;
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 9px;
+    }
+
+
+    .ca-active input {
+        width: auto;
+        margin: 0;
+    }
+
+
+    .ca-active label {
+        margin: 0;
+
+        cursor: pointer;
+    }
+
+
+    .ca-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 15px;
+
+        margin-top: 30px;
+
+        padding-top: 22px;
+
+        border-top: 1px solid #edf0f4;
+    }
+
+
+    .ca-back {
+        display: inline-flex;
+        align-items: center;
+
+        padding: 11px 17px;
+
+        border: 1px solid #dbe2ea;
+
+        border-radius: 9px;
+
+        background: #ffffff;
+
+        color: #17375e;
+
+        text-decoration: none;
+
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+
+    .ca-submit {
+        border: none;
+
+        padding: 12px 20px;
+
+        border-radius: 9px;
+
+        background: #f4a940;
+
+        color: #17375e;
+
+        font-size: 13px;
+        font-weight: 800;
+
+        cursor: pointer;
+
+        transition:
+            background 0.2s ease,
+            transform 0.2s ease;
+    }
+
+
+    .ca-submit:hover {
+        background: #f0a02f;
+
+        transform: translateY(-1px);
+    }
+
+
+    @media (max-width: 700px) {
+
+        .ca-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .ca-field.full {
+            grid-column: auto;
+        }
+
+        .ca-groups {
+            grid-template-columns: 1fr;
+        }
+
+        .ca-form {
+            padding: 20px;
+        }
+
+        .ca-card-header {
+            padding: 20px;
+        }
+
+        .ca-actions {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .ca-back,
+        .ca-submit {
+            justify-content: center;
+            text-align: center;
+        }
+
+    }
+
+</style>
+
+
+<div class="ca-page">
+
+
+    <div class="ca-card">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="ca-card-header">
+
+            <h2>
+                Create New Admin
+            </h2>
+
+            <p>
+                Only Super Admin can create and manage administrator accounts.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM
+        ================================================== -->
+
+        <form
+            method="post"
+            class="ca-form"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="ca-grid">
+
+
+                <!-- FULL NAME -->
+
+                <div class="ca-field">
+
+                    <label for="full_name">
+                        Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="full_name"
+                        name="full_name"
+                        placeholder="Enter admin name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- USERNAME -->
+
+                <div class="ca-field">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter username"
+                        required
+                    >
+
+                    <span class="ca-help">
+                        Username must be unique.
+                    </span>
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="ca-field">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="admin@example.com"
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="ca-field">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CONFIRM PASSWORD -->
+
+                <div class="ca-field">
+
+                    <label for="confirm_password">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        placeholder="Confirm password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- ACTIVE STATUS -->
+
+                <div class="ca-field">
+
+                    <label>
+                        Account Status
+                    </label>
+
+                    <div class="ca-active">
+
+                        <input
+                            type="checkbox"
+                            id="is_active"
+                            name="is_active"
+                            checked
+                        >
+
+                        <label for="is_active">
+                            Active Admin Account
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- GROUPS -->
+
+                <div class="ca-field full">
+
+                    <label>
+                        Permission Groups
+                    </label>
+
+                    <div class="ca-groups">
+
+                        {% for group in groups %}
+
+                        <label class="ca-group-option">
+
+                            <input
+                                type="checkbox"
+                                name="groups"
+                                value="{{ group.id }}"
+                            >
+
+                            <span class="ca-group-name">
+                                {{ group.name }}
+                            </span>
+
+                        </label>
+
+                        {% empty %}
+
+                        <span class="ca-help">
+                            No permission groups available.
+                        </span>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <span class="ca-help">
+                        You can assign one or multiple permission groups.
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
+
+            <div class="ca-actions">
+
+                <a
+                    href="{% url 'admin_management' %}"
+                    class="ca-back"
+                >
+                    ← Back to Admin Management
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="ca-submit"
+                >
+                    ➕ Create Admin
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

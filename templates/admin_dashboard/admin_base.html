@@ -1,0 +1,809 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% block admin_title %}
+KaamSetu Admin
+{% endblock %}
+{% endblock %}
+
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="admin-shell">
+
+
+    <!-- =================================================
+         ADMIN SIDEBAR
+    ================================================== -->
+
+    <aside class="admin-sidebar">
+
+
+        <!-- BRAND -->
+
+        <div class="admin-brand">
+
+            <a href="{% url 'admin_dashboard' %}" class="admin-brand-link">
+
+                <div class="admin-brand-logo">
+
+                    <img src="{% static 'images/logo.png' %}" alt="KaamSetu Logo">
+
+                </div>
+
+
+                <div class="admin-brand-text">
+
+                    <h2>
+                        KaamSetu
+                    </h2>
+
+                    <span>
+                        Admin Control Center
+                    </span>
+
+                </div>
+
+            </a>
+
+        </div>
+
+
+        <!-- =================================================
+             NAVIGATION
+        ================================================== -->
+
+        <nav class="admin-navigation">
+
+
+            <!-- =========================
+                 OVERVIEW
+            ========================== -->
+
+            <div class="admin-nav-section">
+
+                <div class="admin-nav-section-title">
+                    OVERVIEW
+                </div>
+
+
+                <a href="{% url 'admin_dashboard' %}" class="admin-nav-item
+                    {% if request.resolver_match.url_name == 'admin_dashboard' %}
+                        active
+                    {% endif %}">
+
+                    <span class="admin-nav-icon">
+                        📊
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Dashboard
+                    </span>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- =========================
+                 MANAGEMENT
+            ========================== -->
+
+            <div class="admin-nav-section">
+
+                <div class="admin-nav-section-title">
+                    MANAGEMENT
+                </div>
+
+
+                <!-- Workers -->
+
+                {% if request.user.is_superuser or perms.workers.view_worker %}
+
+                <a href="{% url 'admin_workers' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_workers' %}active{% endif %}">
+                    <span>👷</span>
+                    <span>Workers</span>
+                </a>
+
+                {% endif %}
+
+
+                <!-- Customers -->
+
+                {% if request.user.is_superuser or perms.auth.view_user %}
+
+                <a href="{% url 'admin_customers' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_customers' %}active{% endif %}">
+                    <span>👤</span>
+                    <span>Customers</span>
+                </a>
+
+                {% endif %}
+
+
+                <!-- Bookings -->
+
+                {% if request.user.is_superuser or perms.bookings.view_booking %}
+
+                <a href="{% url 'admin_bookings' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_bookings' %}active{% endif %}">
+                    <span>📋</span>
+                    <span>Bookings</span>
+                </a>
+
+                {% endif %}
+
+
+                <!-- Reviews -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="Reviews Management — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        ⭐
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Reviews
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+
+                <!-- Notifications -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="Notifications Center — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        🔔
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Notifications
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- =========================
+                 FINANCE
+            ========================== -->
+
+            <div class="admin-nav-section">
+
+                <div class="admin-nav-section-title">
+                    FINANCE
+                </div>
+
+
+                <!-- Payments -->
+
+                {% if request.user.is_superuser or perms.payments.view_workerledger %}
+
+                <a href="{% url 'admin_payments' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}">
+                    <span>💰</span>
+                    <span>Payments</span>
+                </a>
+
+                {% endif %}
+
+
+                <!-- Worker Ledgers -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="Worker Ledger Management — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        📒
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Worker Ledgers
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+
+                <!-- Fee Settings -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="Fee Settings — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        ⚙️
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Fee Settings
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+
+                <!-- Promotions -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="Promotion Management — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        🎁
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Promotions
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- =========================
+                 ANALYTICS
+            ========================== -->
+
+            <div class="admin-nav-section">
+
+                <div class="admin-nav-section-title">
+                    ANALYTICS
+                </div>
+
+
+                <!-- Insights -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="Advanced Insights — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        📈
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Insights
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+
+                <!-- Reports -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="Reports — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        📑
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Reports
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- =========================
+                 SYSTEM
+            ========================== -->
+
+            <div class="admin-nav-section">
+
+                <div class="admin-nav-section-title">
+                    SYSTEM
+                </div>
+
+
+                <!-- Admin & Roles -->
+
+               
+
+                {% if request.user.is_superuser %}
+
+                <a
+                    href="{% url 'admin_management' %}"
+                    class="admin-nav-item"
+                    title="Admin & Roles"
+                >
+
+                    <span class="admin-nav-icon">
+                        🛡️
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Admin & Roles
+                    </span>
+
+                </a>
+
+                {% endif %}
+
+
+                <!-- Audit Logs -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="Audit Logs — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        🧾
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Audit Logs
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+
+                <!-- System Settings -->
+
+                <a href="#" class="admin-nav-item admin-nav-disabled" title="System Settings — Coming Soon">
+
+                    <span class="admin-nav-icon">
+                        ⚙️
+                    </span>
+
+                    <span class="admin-nav-label">
+                        System Settings
+                    </span>
+
+                    <small class="coming-soon-badge">
+                        Soon
+                    </small>
+
+                </a>
+
+            </div>
+
+
+        </nav>
+
+
+
+        <!-- =================================================
+             SIDEBAR FOOTER
+        ================================================== -->
+
+        <div class="admin-sidebar-footer">
+
+            <a href="{% url 'home' %}">
+                <span>🌐</span>
+                <span>View Website</span>
+            </a>
+
+
+            <a href="{% url 'logout' %}">
+                <span>🚪</span>
+                <span>Logout</span>
+            </a>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =================================================
+         ADMIN MAIN AREA
+    ================================================== -->
+
+    <div class="admin-main">
+
+
+        <!-- =================================================
+             ADVANCED HEADER
+        ================================================== -->
+
+        <header class="admin-header">
+
+
+            <!-- LEFT -->
+
+            <div class="admin-header-left">
+
+
+                <!-- Mobile Menu -->
+
+                <button type="button" class="admin-menu-toggle" id="admin-menu-toggle" aria-label="Toggle admin menu">
+                    ☰
+                </button>
+
+
+                <!-- KaamSetu Logo -->
+
+                <a href="{% url 'admin_dashboard' %}" class="admin-header-logo" aria-label="KaamSetu Admin Dashboard">
+
+                    <img src="{% static 'images/logo.png' %}" alt="KaamSetu">
+
+                </a>
+
+
+                <!-- Page Heading -->
+
+                <div class="admin-page-heading">
+
+                    <h1>
+
+                        {% block admin_heading %}
+                        Admin Control Center
+                        {% endblock %}
+
+                    </h1>
+
+
+                    <p>
+
+                        {% block admin_subheading %}
+                        Manage and monitor KaamSetu
+                        {% endblock %}
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- RIGHT -->
+
+            <div class="admin-header-right">
+
+
+                <!-- GLOBAL SEARCH -->
+
+                <div class="admin-global-search">
+
+                    <span class="admin-search-icon">
+                        🔎
+                    </span>
+
+
+                    <input type="search" id="admin-global-search" placeholder="Search KaamSetu..." autocomplete="off">
+
+                </div>
+
+
+
+                <!-- NOTIFICATIONS -->
+
+                <button type="button" class="admin-header-icon-btn" title="Notifications" aria-label="Notifications">
+
+                    🔔
+
+                    <span class="admin-notification-badge">
+                        0
+                    </span>
+
+                </button>
+
+
+
+                <!-- ADMIN PROFILE -->
+
+                <div class="admin-profile-wrapper">
+
+
+                    <button type="button" class="admin-profile-btn" id="admin-profile-btn" aria-expanded="false">
+
+
+                        <div class="admin-user-avatar">
+
+                            {{ request.user.first_name|default:request.user.username|first|upper }}
+
+                        </div>
+
+
+                        <div class="admin-user-info">
+
+                            <strong>
+
+                                {{ request.user.first_name|default:request.user.username }}
+
+                            </strong>
+
+
+                            <span>
+
+                                {% if request.user.is_superuser %}
+
+                                Super Admin
+
+                                {% else %}
+
+                                Admin
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <span class="admin-profile-arrow">
+                            ▾
+                        </span>
+
+
+                    </button>
+
+
+
+                    <!-- PROFILE DROPDOWN -->
+
+                    <div class="admin-profile-dropdown" id="admin-profile-dropdown">
+
+
+                        <div class="admin-dropdown-user">
+
+
+                            <div class="admin-user-avatar large">
+
+                                {{ request.user.first_name|default:request.user.username|first|upper }}
+
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+
+                                    {{ request.user.first_name|default:request.user.username }}
+
+                                </strong>
+
+
+                                <span>
+
+                                    {% if request.user.is_superuser %}
+
+                                    Super Admin
+
+                                    {% else %}
+
+                                    Admin
+
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <div class="admin-dropdown-divider"></div>
+
+
+
+                        <a href="{% url 'home' %}" class="admin-dropdown-item">
+
+                            <span>
+                                🌐
+                            </span>
+
+                            <span>
+                                View Website
+                            </span>
+
+                        </a>
+
+
+
+                        <a href="{% url 'logout' %}" class="admin-dropdown-item logout">
+
+                            <span>
+                                🚪
+                            </span>
+
+                            <span>
+                                Logout
+                            </span>
+
+                        </a>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+        <main class="admin-content">
+
+
+            <!-- Django Messages -->
+
+            {% if messages %}
+
+            <div class="admin-messages">
+
+                {% for message in messages %}
+
+                <div class="admin-message {{ message.tags }}">
+
+                    {{ message }}
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- Child Page Content -->
+
+            {% block admin_content %}
+            {% endblock %}
+
+
+        </main>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =================================================
+     ADMIN JAVASCRIPT
+================================================== -->
+
+<script>
+
+    (function () {
+
+
+        /* =================================================
+           SIDEBAR TOGGLE
+        ================================================== */
+
+        const toggle =
+            document.getElementById("admin-menu-toggle");
+
+        const sidebar =
+            document.querySelector(".admin-sidebar");
+
+
+        if (toggle && sidebar) {
+
+            toggle.addEventListener(
+                "click",
+                function () {
+
+                    sidebar.classList.toggle("open");
+
+                }
+            );
+
+        }
+
+
+
+        /* =================================================
+           PROFILE DROPDOWN
+        ================================================== */
+
+        const profileButton =
+            document.getElementById("admin-profile-btn");
+
+        const profileDropdown =
+            document.getElementById("admin-profile-dropdown");
+
+
+        if (profileButton && profileDropdown) {
+
+
+            profileButton.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+
+                    const isOpen =
+                        profileDropdown.classList.toggle("open");
+
+
+                    profileButton.classList.toggle(
+                        "open",
+                        isOpen
+                    );
+
+
+                    profileButton.setAttribute(
+                        "aria-expanded",
+                        isOpen ? "true" : "false"
+                    );
+
+                }
+            );
+
+
+
+            document.addEventListener(
+                "click",
+                function () {
+
+                    profileDropdown.classList.remove("open");
+
+                    profileButton.classList.remove("open");
+
+                    profileButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+
+                }
+            );
+
+        }
+
+
+    })();
+
+</script>
+
+
+{% endblock %}
