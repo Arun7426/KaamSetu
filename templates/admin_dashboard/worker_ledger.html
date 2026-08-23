@@ -1,0 +1,955 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block title %}
+Worker Ledger
+{% endblock %}
+
+{% block admin_heading %}
+Worker Ledger
+{% endblock %}
+
+{% block admin_subheading %}
+Super Admin financial ledger for worker transactions
+{% endblock %}
+
+{% block extra_css %}
+
+{{ block.super }}
+
+<style>
+
+/* =========================================================
+   WORKER LEDGER PAGE
+========================================================= */
+
+.worker-ledger-page {
+    width: 100%;
+}
+
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.ledger-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 20px;
+
+    margin-bottom: 24px;
+}
+
+
+.ledger-stat-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    padding: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 20px rgba(15, 39, 68, 0.06);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.ledger-stat-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 26px rgba(15, 39, 68, 0.10);
+}
+
+
+.ledger-stat-icon {
+    width: 52px;
+
+    height: 52px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    background: #eef4fb;
+
+    font-size: 24px;
+}
+
+
+.ledger-stat-info {
+    min-width: 0;
+}
+
+
+.ledger-stat-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+.ledger-stat-value {
+    display: block;
+
+    color: #17375e;
+
+    font-size: 25px;
+
+    font-weight: 800;
+
+    line-height: 1.1;
+}
+
+
+/* =========================================================
+   FILTER CARD
+========================================================= */
+
+.ledger-filter-card {
+    margin-bottom: 24px;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 20px rgba(15, 39, 68, 0.05);
+}
+
+
+.ledger-filters {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+
+.ledger-filter-label {
+    margin-right: 5px;
+
+    color: #475569;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.ledger-filter-group {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+}
+
+
+.ledger-filter-title {
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+.ledger-filter-link {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 36px;
+
+    padding: 0 12px;
+
+    border: 1px solid #dbe2ea;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #475569;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+}
+
+
+.ledger-filter-link:hover {
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+}
+
+
+.ledger-filter-link.active {
+    background: #17375e;
+
+    border-color: #17375e;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   TABLE CARD
+========================================================= */
+
+.ledger-table-card {
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 8px 25px rgba(15, 39, 68, 0.06);
+}
+
+
+.ledger-table-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+
+.ledger-table-header h2 {
+    margin: 0;
+
+    color: #17375e;
+
+    font-size: 19px;
+
+    font-weight: 800;
+}
+
+
+.ledger-table-header span {
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.ledger-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+.ledger-table {
+    width: 100%;
+
+    min-width: 1050px;
+
+    border-collapse: collapse;
+}
+
+
+.ledger-table thead {
+    background: #f8fafc;
+}
+
+
+.ledger-table th {
+    padding: 14px 18px;
+
+    color: #64748b;
+
+    text-align: left;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.03em;
+
+    white-space: nowrap;
+}
+
+
+.ledger-table td {
+    padding: 17px 18px;
+
+    border-top: 1px solid #edf0f4;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    vertical-align: middle;
+}
+
+
+.ledger-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+
+.ledger-table tbody tr:hover {
+    background: #fafcff;
+}
+
+
+/* =========================================================
+   WORKER
+========================================================= */
+
+.ledger-worker-name {
+    color: #17375e;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   BOOKING
+========================================================= */
+
+.ledger-booking {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 7px;
+
+    background: #eef4fb;
+
+    color: #17375e;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   TRANSACTION
+========================================================= */
+
+.ledger-transaction {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 7px;
+
+    background: #f1f5f9;
+
+    color: #475569;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   AMOUNT
+========================================================= */
+
+.ledger-amount {
+    color: #17375e;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.ledger-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.ledger-status.pending {
+    background: #fff7ed;
+
+    color: #c2410c;
+}
+
+
+.ledger-status.paid {
+    background: #ecfdf5;
+
+    color: #047857;
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.ledger-date {
+    color: #64748b;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.ledger-empty {
+    padding: 65px 20px;
+
+    text-align: center;
+}
+
+
+.ledger-empty-icon {
+    margin-bottom: 12px;
+
+    font-size: 42px;
+}
+
+
+.ledger-empty h3 {
+    margin: 0 0 6px;
+
+    color: #17375e;
+
+    font-size: 18px;
+}
+
+
+.ledger-empty p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1150px) {
+
+    .ledger-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .ledger-stats {
+        grid-template-columns: 1fr;
+    }
+
+
+    .ledger-table-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .ledger-filters {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .ledger-filter-group {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block admin_content %}
+
+<div class="worker-ledger-page">
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="ledger-stats">
+
+
+        <!-- TOTAL AMOUNT -->
+
+        <div class="ledger-stat-card">
+
+            <div class="ledger-stat-icon">
+                💰
+            </div>
+
+            <div class="ledger-stat-info">
+
+                <span class="ledger-stat-label">
+                    Total Ledger Amount
+                </span>
+
+                <span class="ledger-stat-value">
+                    ₹{{ total_ledger_amount|default:"0.00" }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- PENDING -->
+
+        <div class="ledger-stat-card">
+
+            <div class="ledger-stat-icon">
+                ⏳
+            </div>
+
+            <div class="ledger-stat-info">
+
+                <span class="ledger-stat-label">
+                    Pending Amount
+                </span>
+
+                <span class="ledger-stat-value">
+                    ₹{{ pending_amount|default:"0.00" }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAID -->
+
+        <div class="ledger-stat-card">
+
+            <div class="ledger-stat-icon">
+                ✅
+            </div>
+
+            <div class="ledger-stat-info">
+
+                <span class="ledger-stat-label">
+                    Paid Amount
+                </span>
+
+                <span class="ledger-stat-value">
+                    ₹{{ paid_amount|default:"0.00" }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ENTRIES -->
+
+        <div class="ledger-stat-card">
+
+            <div class="ledger-stat-icon">
+                📒
+            </div>
+
+            <div class="ledger-stat-info">
+
+                <span class="ledger-stat-label">
+                    Ledger Entries
+                </span>
+
+                <span class="ledger-stat-value">
+                    {{ ledger_entries|length }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         FILTERS
+    ====================================================== -->
+
+    <div class="ledger-filter-card">
+
+        <div class="ledger-filters">
+
+            <span class="ledger-filter-label">
+                Filters:
+            </span>
+
+
+            <!-- STATUS -->
+
+            <div class="ledger-filter-group">
+
+                <span class="ledger-filter-title">
+                    Status
+                </span>
+
+
+                <a
+                    href="{% url 'admin_worker_ledger' %}{% if transaction_filter %}?transaction={{ transaction_filter|urlencode }}{% endif %}"
+                    class="ledger-filter-link {% if not status_filter %}active{% endif %}"
+                >
+                    All
+                </a>
+
+
+                <a
+                    href="{% url 'admin_worker_ledger' %}?status=Pending{% if transaction_filter %}&transaction={{ transaction_filter|urlencode }}{% endif %}"
+                    class="ledger-filter-link {% if status_filter == 'Pending' %}active{% endif %}"
+                >
+                    Pending
+                </a>
+
+
+                <a
+                    href="{% url 'admin_worker_ledger' %}?status=Paid{% if transaction_filter %}&transaction={{ transaction_filter|urlencode }}{% endif %}"
+                    class="ledger-filter-link {% if status_filter == 'Paid' %}active{% endif %}"
+                >
+                    Paid
+                </a>
+
+            </div>
+
+
+            <!-- TRANSACTION -->
+
+            <div class="ledger-filter-group">
+
+                <span class="ledger-filter-title">
+                    Type
+                </span>
+
+
+                <a
+                    href="{% url 'admin_worker_ledger' %}{% if status_filter %}?status={{ status_filter }}{% endif %}"
+                    class="ledger-filter-link {% if not transaction_filter %}active{% endif %}"
+                >
+                    All
+                </a>
+
+
+                <a
+                    href="{% url 'admin_worker_ledger' %}?transaction=Booking%20Fee{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                    class="ledger-filter-link {% if transaction_filter == 'Booking Fee' %}active{% endif %}"
+                >
+                    Booking Fee
+                </a>
+
+
+                <a
+                    href="{% url 'admin_worker_ledger' %}?transaction=Payment{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                    class="ledger-filter-link {% if transaction_filter == 'Payment' %}active{% endif %}"
+                >
+                    Payment
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         LEDGER TABLE
+    ====================================================== -->
+
+    <div class="ledger-table-card">
+
+
+        <div class="ledger-table-header">
+
+            <h2>
+                Worker Ledger Entries
+            </h2>
+
+            <span>
+                {{ ledger_entries|length }} entr{{ ledger_entries|length|pluralize:"y,ies" }}
+            </span>
+
+        </div>
+
+
+        {% if ledger_entries %}
+
+        <div class="ledger-table-wrapper">
+
+            <table class="ledger-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Worker
+                        </th>
+
+                        <th>
+                            Booking
+                        </th>
+
+                        <th>
+                            Transaction
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for entry in ledger_entries %}
+
+                    <tr>
+
+
+                        <!-- WORKER -->
+
+                        <td>
+
+                            <div class="ledger-worker-name">
+
+                                {{ entry.worker.name }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- BOOKING -->
+
+                        <td>
+
+                            {% if entry.booking %}
+
+                                <span class="ledger-booking">
+
+                                    #{{ entry.booking.id }}
+
+                                </span>
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- TRANSACTION -->
+
+                        <td>
+
+                            <span class="ledger-transaction">
+
+                                {{ entry.transaction_type }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- AMOUNT -->
+
+                        <td>
+
+                            <span class="ledger-amount">
+
+                                ₹{{ entry.amount }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% if entry.status == "Paid" %}
+
+                                <span class="ledger-status paid">
+
+                                    ✓ Paid
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="ledger-status pending">
+
+                                    ● {{ entry.status }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            <span class="ledger-date">
+
+                                {{ entry.created_at|date:"d M Y, h:i A" }}
+
+                            </span>
+
+                        </td>
+
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+        <div class="ledger-empty">
+
+            <div class="ledger-empty-icon">
+                📒
+            </div>
+
+            <h3>
+                No Ledger Entries Found
+            </h3>
+
+            <p>
+                There are currently no worker ledger transactions.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,620 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block title %}
+Payment Alerts | KaamSetu Admin
+{% endblock %}
+
+{% block admin_title %}
+Payment Alerts
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .payment-alert-page {
+        padding: 10px 0 40px;
+    }
+
+    /* =========================================
+       HEADER
+    ========================================= */
+
+    .payment-alert-header {
+        margin-bottom: 28px;
+    }
+
+    .payment-alert-header h1 {
+        margin: 0;
+        font-size: 28px;
+        color: #111827;
+    }
+
+    .payment-alert-header p {
+        margin: 8px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+
+    /* =========================================
+       STAT CARDS
+    ========================================= */
+
+    .payment-alert-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .payment-alert-stat {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .payment-alert-stat-icon {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .payment-alert-stat-title {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .payment-alert-stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+
+    /* =========================================
+       ALERT TABLE CARD
+    ========================================= */
+
+    .payment-alert-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .payment-alert-card-header {
+        padding: 22px 24px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .payment-alert-card-header h2 {
+        margin: 0;
+        font-size: 20px;
+        color: #111827;
+    }
+
+    .payment-alert-card-header p {
+        margin: 6px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+
+    /* =========================================
+       TABLE
+    ========================================= */
+
+    .payment-alert-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .payment-alert-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+    .payment-alert-table th {
+        text-align: left;
+        padding: 15px 20px;
+        background: #f9fafb;
+        color: #6b7280;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+    }
+
+    .payment-alert-table td {
+        padding: 17px 20px;
+        border-top: 1px solid #f0f0f0;
+        color: #374151;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+    .payment-alert-table tbody tr:hover {
+        background: #fafafa;
+    }
+
+
+    /* =========================================
+       WORKER
+    ========================================= */
+
+    .alert-worker-name {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .alert-worker-mobile {
+        margin-top: 4px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+
+    /* =========================================
+       AMOUNTS
+    ========================================= */
+
+    .alert-amount {
+        font-weight: 700;
+        color: #dc2626;
+    }
+
+    .alert-threshold {
+        color: #374151;
+        font-weight: 600;
+    }
+
+
+    /* =========================================
+       STATUS BADGES
+    ========================================= */
+
+    .alert-status,
+    .sms-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .alert-status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .alert-status-followup {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .alert-status-resolved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .sms-status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .sms-status-sent {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .sms-status-failed {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+
+    /* =========================================
+       ACTION
+    ========================================= */
+
+    .alert-action-btn {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 8px;
+        background: #f3f4f6;
+        color: #374151;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .alert-action-btn:hover {
+        background: #e5e7eb;
+    }
+
+
+    /* =========================================
+       EMPTY STATE
+    ========================================= */
+
+    .payment-alert-empty {
+        text-align: center;
+        padding: 55px 20px;
+        color: #6b7280;
+    }
+
+    .payment-alert-empty-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+    }
+
+    .payment-alert-empty h3 {
+        margin: 0 0 7px;
+        color: #374151;
+    }
+
+    .payment-alert-empty p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @media (max-width: 1000px) {
+
+        .payment-alert-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .payment-alert-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .payment-alert-header h1 {
+            font-size: 24px;
+        }
+
+    }
+
+</style>
+
+
+<div class="payment-alert-page">
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <div class="payment-alert-header">
+
+        <h1>
+            🚨 Payment Alerts
+        </h1>
+
+        <p>
+            Monitor workers who have reached the outstanding payment limit.
+        </p>
+
+    </div>
+
+
+    <!-- =========================================
+         STATISTICS
+    ========================================== -->
+
+    <div class="payment-alert-stats">
+
+
+        <!-- TOTAL -->
+
+        <div class="payment-alert-stat">
+
+            <div class="payment-alert-stat-icon">
+                🚨
+            </div>
+
+            <div class="payment-alert-stat-title">
+                Total Payment Alerts
+            </div>
+
+            <div class="payment-alert-stat-value">
+                {{ total_alerts }}
+            </div>
+
+        </div>
+
+
+        <!-- FOLLOW UPS -->
+
+        <div class="payment-alert-stat">
+
+            <div class="payment-alert-stat-icon">
+                ⏳
+            </div>
+
+            <div class="payment-alert-stat-title">
+                Pending Follow-ups
+            </div>
+
+            <div class="payment-alert-stat-value">
+                {{ pending_followups }}
+            </div>
+
+        </div>
+
+
+        <!-- SMS -->
+
+        <div class="payment-alert-stat">
+
+            <div class="payment-alert-stat-icon">
+                📱
+            </div>
+
+            <div class="payment-alert-stat-title">
+                SMS Pending
+            </div>
+
+            <div class="payment-alert-stat-value">
+                {{ sms_pending }}
+            </div>
+
+        </div>
+
+
+        <!-- RESOLVED -->
+
+        <div class="payment-alert-stat">
+
+            <div class="payment-alert-stat-icon">
+                ✅
+            </div>
+
+            <div class="payment-alert-stat-title">
+                Resolved
+            </div>
+
+            <div class="payment-alert-stat-value">
+                {{ resolved_alerts }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         ALERT TABLE
+    ========================================== -->
+
+    <div class="payment-alert-card">
+
+
+        <div class="payment-alert-card-header">
+
+            <h2>
+                Worker Payment Alerts
+            </h2>
+
+            <p>
+                Workers currently requiring payment follow-up.
+            </p>
+
+        </div>
+
+
+        <div class="payment-alert-table-wrapper">
+
+            <table class="payment-alert-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Worker
+                        </th>
+
+                        <th>
+                            Outstanding
+                        </th>
+
+                        <th>
+                            Threshold
+                        </th>
+
+                        <th>
+                            Alert Status
+                        </th>
+
+                        <th>
+                            SMS Status
+                        </th>
+
+                        <th>
+                            Created
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for alert in alerts %}
+
+                    <tr>
+
+
+                        <!-- WORKER -->
+
+                        <td>
+
+                            <div class="alert-worker-name">
+                                {{ alert.worker.name }}
+                            </div>
+
+                            <div class="alert-worker-mobile">
+                                {{ alert.worker.mobile }}
+                            </div>
+
+                        </td>
+
+
+                        <!-- OUTSTANDING -->
+
+                        <td>
+
+                            <span class="alert-amount">
+                                ₹{{ alert.outstanding_amount }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- THRESHOLD -->
+
+                        <td>
+
+                            <span class="alert-threshold">
+                                ₹{{ alert.threshold_amount }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- ALERT STATUS -->
+
+                        <td>
+
+                            {% if alert.status == "Pending" %}
+
+                                <span class="alert-status alert-status-pending">
+                                    Pending
+                                </span>
+
+                            {% elif alert.status == "Follow-up" %}
+
+                                <span class="alert-status alert-status-followup">
+                                    Follow-up
+                                </span>
+
+                            {% else %}
+
+                                <span class="alert-status alert-status-resolved">
+                                    Resolved
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- SMS -->
+
+                        <td>
+
+                            {% if alert.sms_status == "Sent" %}
+
+                                <span class="sms-status sms-status-sent">
+                                    Sent
+                                </span>
+
+                            {% elif alert.sms_status == "Failed" %}
+
+                                <span class="sms-status sms-status-failed">
+                                    Failed
+                                </span>
+
+                            {% else %}
+
+                                <span class="sms-status sms-status-pending">
+                                    Pending
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- CREATED -->
+
+                        <td>
+
+                            {{ alert.created_at|date:"d M Y, h:i A" }}
+
+                        </td>
+
+
+                        <!-- ACTION -->
+
+                        <td>
+
+                            <a href="{% url 'admin_payment_alert_detail' alert.id %}"
+                                class="alert-action-btn">
+                                View
+                            </a>
+
+                        </td>
+
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="7">
+
+                            <div class="payment-alert-empty">
+
+                                <div class="payment-alert-empty-icon">
+                                    🎉
+                                </div>
+
+                                <h3>
+                                    No Payment Alerts
+                                </h3>
+
+                                <p>
+                                    No worker has reached the outstanding payment limit.
+                                </p>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -146,7 +146,10 @@ KaamSetu Admin
 
                 <!-- Reviews -->
 
-                <a href="#" class="admin-nav-item admin-nav-disabled" title="Reviews Management — Coming Soon">
+                {% if request.user.is_superuser or perms.bookings.view_review %}
+
+                <a href="{% url 'admin_reviews' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_reviews' %}active{% endif %}">
 
                     <span class="admin-nav-icon">
                         ⭐
@@ -156,16 +159,17 @@ KaamSetu Admin
                         Reviews
                     </span>
 
-                    <small class="coming-soon-badge">
-                        Soon
-                    </small>
-
                 </a>
+
+                {% endif %}
 
 
                 <!-- Notifications -->
 
-                <a href="#" class="admin-nav-item admin-nav-disabled" title="Notifications Center — Coming Soon">
+                {% if request.user.is_superuser or perms.bookings.view_notification %}
+
+                <a href="{% url 'admin_notifications' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_notifications' %}active{% endif %}">
 
                     <span class="admin-nav-icon">
                         🔔
@@ -175,11 +179,9 @@ KaamSetu Admin
                         Notifications
                     </span>
 
-                    <small class="coming-soon-badge">
-                        Soon
-                    </small>
-
                 </a>
+
+                {% endif %}
 
             </div>
 
@@ -211,21 +213,22 @@ KaamSetu Admin
 
                 <!-- Worker Ledgers -->
 
-                <a href="#" class="admin-nav-item admin-nav-disabled" title="Worker Ledger Management — Coming Soon">
+                {% if request.user.is_superuser %}
+
+                <a href="{% url 'admin_worker_ledger' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_worker_ledger' %}active{% endif %}">
 
                     <span class="admin-nav-icon">
                         📒
                     </span>
 
                     <span class="admin-nav-label">
-                        Worker Ledgers
+                        Worker Ledger
                     </span>
 
-                    <small class="coming-soon-badge">
-                        Soon
-                    </small>
-
                 </a>
+
+                {% endif %}
 
 
                 <!-- Fee Settings -->
@@ -267,7 +270,38 @@ KaamSetu Admin
 
             </div>
 
+            <!-- =========================
+                FINANCE
+            ========================== -->
 
+            {% if request.user.is_superuser %}
+
+            <div class="admin-nav-section">
+
+                <div class="admin-nav-section-title">
+                    FINANCE
+                </div>
+
+                <!-- Payment Alerts -->
+
+                <a href="{% url 'admin_payment_alerts' %}" class="admin-nav-item
+                    {% if request.resolver_match.url_name == 'admin_payment_alerts' %}
+                        active
+                    {% endif %}">
+
+                    <span class="admin-nav-icon">
+                        🚨
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Payment Alerts
+                    </span>
+
+                </a>
+
+            </div>
+
+            {% endif %}
 
             <!-- =========================
                  ANALYTICS
@@ -334,15 +368,11 @@ KaamSetu Admin
 
                 <!-- Admin & Roles -->
 
-               
+
 
                 {% if request.user.is_superuser %}
 
-                <a
-                    href="{% url 'admin_management' %}"
-                    class="admin-nav-item"
-                    title="Admin & Roles"
-                >
+                <a href="{% url 'admin_management' %}" class="admin-nav-item" title="Admin & Roles">
 
                     <span class="admin-nav-icon">
                         🛡️

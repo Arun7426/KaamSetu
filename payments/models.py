@@ -129,3 +129,98 @@ class WorkerLedger(models.Model):
             f"₹{self.amount} - "
             f"{self.transaction_type}"
         )
+        
+class WorkerPaymentAlert(models.Model):
+
+    ALERT_TYPE_CHOICES = [
+        ("Outstanding Limit", "Outstanding Limit"),
+    ]
+
+    ALERT_STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Follow-up", "Follow-up"),
+        ("Resolved", "Resolved"),
+    ]
+
+    SMS_STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Sent", "Sent"),
+        ("Failed", "Failed"),
+    ]
+
+    worker = models.ForeignKey(
+        "workers.Worker",
+        on_delete=models.CASCADE,
+        related_name="payment_alerts"
+    )
+
+    alert_type = models.CharField(
+        max_length=50,
+        choices=ALERT_TYPE_CHOICES,
+        default="Outstanding Limit"
+    )
+
+    outstanding_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    threshold_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=200
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=ALERT_STATUS_CHOICES,
+        default="Pending"
+    )
+
+    sms_status = models.CharField(
+        max_length=20,
+        choices=SMS_STATUS_CHOICES,
+        default="Pending"
+    )
+
+    sms_sent_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    sms_error = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    last_follow_up_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    resolved_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    notes = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return (
+            f"{self.worker.name} - "
+            f"₹{self.outstanding_amount} - "
+            f"{self.status}"
+        )

@@ -39,7 +39,18 @@ urlpatterns = [
         name="admin_bookings"
     ),
 
-
+    path(
+        "reviews/",
+        views.admin_reviews,
+        name="admin_reviews"
+    ),
+    
+    path(
+        "notifications/",
+        views.admin_notifications,
+        name="admin_notifications"
+    ),
+    
     # =====================================================
     # FINANCE
     # =====================================================
@@ -49,7 +60,36 @@ urlpatterns = [
         views.admin_payments,
         name="admin_payments"
     ),
+    
+    path(
+        "payment-alerts/",
+        views.admin_payment_alerts,
+        name="admin_payment_alerts"
+    ),
+    
+    path(
+        "payment-alerts/<int:alert_id>/",
+        views.admin_payment_alert_detail,
+        name="admin_payment_alert_detail"
+    ),
+    
+    path(
+        "payment-alerts/<int:alert_id>/follow-up/",
+        views.admin_payment_alert_follow_up,
+        name="admin_payment_alert_follow_up"
+    ),
 
+    path(
+        "payment-alerts/<int:alert_id>/send-sms/",
+        views.admin_payment_alert_send_sms,
+        name="admin_payment_alert_send_sms"
+    ),
+    
+    path(
+        "worker-ledger/",
+        views.admin_worker_ledger,
+        name="admin_worker_ledger"
+    ),
 
     # =====================================================
     # ADMIN MANAGEMENT

@@ -1,0 +1,863 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block title %}
+Reviews Management
+{% endblock %}
+
+{% block admin_title %}
+Reviews Management
+{% endblock %}
+
+{% block admin_heading %}
+Reviews Management
+{% endblock %}
+
+{% block admin_subheading %}
+View and monitor customer reviews and worker ratings
+{% endblock %}
+
+{% block extra_css %}
+
+{{ block.super }}
+
+<style>
+
+/* =========================================================
+   REVIEWS PAGE
+========================================================= */
+
+.reviews-page {
+    width: 100%;
+}
+
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.reviews-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.review-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    padding: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    box-shadow: 0 6px 20px rgba(15, 39, 68, 0.06);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.review-stat-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 10px 26px rgba(15, 39, 68, 0.10);
+}
+
+.review-stat-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    background: #eef4fb;
+
+    font-size: 24px;
+}
+
+.review-stat-info {
+    min-width: 0;
+}
+
+.review-stat-label {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.review-stat-value {
+    display: block;
+
+    color: #17375e;
+
+    font-size: 27px;
+
+    font-weight: 800;
+
+    line-height: 1.1;
+}
+
+
+/* =========================================================
+   FILTER CARD
+========================================================= */
+
+.reviews-filter-card {
+    margin-bottom: 24px;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    box-shadow: 0 6px 20px rgba(15, 39, 68, 0.05);
+}
+
+.reviews-filter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+.reviews-filter-label {
+    margin-right: 4px;
+
+    color: #475569;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.reviews-filter a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+
+    padding: 0 14px;
+
+    border: 1px solid #dbe2ea;
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #475569;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+}
+
+.reviews-filter a:hover {
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+}
+
+.reviews-filter a.active {
+    background: #17375e;
+
+    border-color: #17375e;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   TABLE CARD
+========================================================= */
+
+.reviews-table-card {
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    box-shadow: 0 8px 25px rgba(15, 39, 68, 0.06);
+}
+
+.reviews-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid #edf0f4;
+}
+
+.reviews-table-header h2 {
+    margin: 0;
+
+    color: #17375e;
+
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.reviews-table-header span {
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.reviews-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.reviews-table {
+    width: 100%;
+
+    min-width: 1050px;
+
+    border-collapse: collapse;
+}
+
+.reviews-table thead {
+    background: #f8fafc;
+}
+
+.reviews-table th {
+    padding: 14px 18px;
+
+    color: #64748b;
+
+    text-align: left;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.03em;
+
+    white-space: nowrap;
+}
+
+.reviews-table td {
+    padding: 17px 18px;
+
+    border-top: 1px solid #edf0f4;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    vertical-align: middle;
+}
+
+.reviews-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.reviews-table tbody tr:hover {
+    background: #fafcff;
+}
+
+
+/* =========================================================
+   CUSTOMER / WORKER
+========================================================= */
+
+.person-name {
+    color: #17375e;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.person-username {
+    margin-top: 3px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RATING
+========================================================= */
+
+.review-rating {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 7px;
+
+    white-space: nowrap;
+}
+
+.review-stars {
+    color: #f59e0b;
+
+    font-size: 15px;
+
+    letter-spacing: 1px;
+}
+
+.review-rating-number {
+    color: #475569;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   REVIEW CONTENT
+========================================================= */
+
+.review-content {
+    max-width: 330px;
+}
+
+.review-title {
+    margin-bottom: 4px;
+
+    color: #17375e;
+
+    font-weight: 700;
+}
+
+.review-comment {
+    overflow: hidden;
+
+    color: #64748b;
+
+    line-height: 1.5;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.review-empty {
+    color: #94a3b8;
+
+    font-style: italic;
+}
+
+
+/* =========================================================
+   BOOKING
+========================================================= */
+
+.booking-id {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 7px;
+
+    background: #eef4fb;
+
+    color: #17375e;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.review-date {
+    color: #64748b;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.reviews-empty {
+    padding: 65px 20px;
+
+    text-align: center;
+}
+
+.reviews-empty-icon {
+    margin-bottom: 12px;
+
+    font-size: 42px;
+}
+
+.reviews-empty h3 {
+    margin: 0 0 6px;
+
+    color: #17375e;
+
+    font-size: 18px;
+}
+
+.reviews-empty p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .reviews-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .reviews-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .reviews-table-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .reviews-filter {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .reviews-filter a {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block admin_content %}
+
+<div class="reviews-page">
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div class="reviews-stats">
+
+
+        <div class="review-stat-card">
+
+            <div class="review-stat-icon">
+                ⭐
+            </div>
+
+            <div class="review-stat-info">
+
+                <span class="review-stat-label">
+                    Total Reviews
+                </span>
+
+                <span class="review-stat-value">
+                    {{ total_reviews }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="review-stat-card">
+
+            <div class="review-stat-icon">
+                🌟
+            </div>
+
+            <div class="review-stat-info">
+
+                <span class="review-stat-label">
+                    Average Rating
+                </span>
+
+                <span class="review-stat-value">
+                    {{ average_rating }}/5
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="review-stat-card">
+
+            <div class="review-stat-icon">
+                🏆
+            </div>
+
+            <div class="review-stat-info">
+
+                <span class="review-stat-label">
+                    5 Star Reviews
+                </span>
+
+                <span class="review-stat-value">
+                    {{ five_star_reviews }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="review-stat-card">
+
+            <div class="review-stat-icon">
+                ⚠️
+            </div>
+
+            <div class="review-stat-info">
+
+                <span class="review-stat-label">
+                    Low Ratings
+                </span>
+
+                <span class="review-stat-value">
+                    {{ low_rating_reviews }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         FILTER
+    ====================================================== -->
+
+    <div class="reviews-filter-card">
+
+        <div class="reviews-filter">
+
+            <span class="reviews-filter-label">
+                Filter by rating:
+            </span>
+
+
+            <a
+                href="{% url 'admin_reviews' %}"
+                class="{% if not rating_filter %}active{% endif %}"
+            >
+                All
+            </a>
+
+
+            <a
+                href="{% url 'admin_reviews' %}?rating=5"
+                class="{% if rating_filter == '5' %}active{% endif %}"
+            >
+                ⭐ 5
+            </a>
+
+
+            <a
+                href="{% url 'admin_reviews' %}?rating=4"
+                class="{% if rating_filter == '4' %}active{% endif %}"
+            >
+                ⭐ 4
+            </a>
+
+
+            <a
+                href="{% url 'admin_reviews' %}?rating=3"
+                class="{% if rating_filter == '3' %}active{% endif %}"
+            >
+                ⭐ 3
+            </a>
+
+
+            <a
+                href="{% url 'admin_reviews' %}?rating=2"
+                class="{% if rating_filter == '2' %}active{% endif %}"
+            >
+                ⭐ 2
+            </a>
+
+
+            <a
+                href="{% url 'admin_reviews' %}?rating=1"
+                class="{% if rating_filter == '1' %}active{% endif %}"
+            >
+                ⭐ 1
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REVIEWS
+    ====================================================== -->
+
+    <div class="reviews-table-card">
+
+
+        <div class="reviews-table-header">
+
+            <h2>
+                Customer Reviews
+            </h2>
+
+            <span>
+                {{ reviews|length }} review(s) shown
+            </span>
+
+        </div>
+
+
+        {% if reviews %}
+
+        <div class="reviews-table-wrapper">
+
+            <table class="reviews-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Customer</th>
+
+                        <th>Worker</th>
+
+                        <th>Rating</th>
+
+                        <th>Review</th>
+
+                        <th>Booking</th>
+
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for review in reviews %}
+
+                    <tr>
+
+
+                        <!-- CUSTOMER -->
+
+                        <td>
+
+                            <div class="person-name">
+
+                                {% if review.customer.get_full_name %}
+
+                                    {{ review.customer.get_full_name }}
+
+                                {% else %}
+
+                                    {{ review.customer.username }}
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="person-username">
+
+                                @{{ review.customer.username }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- WORKER -->
+
+                        <td>
+
+                            <div class="person-name">
+
+                                {{ review.worker.name }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- RATING -->
+
+                        <td>
+
+                            <div class="review-rating">
+
+                                <span class="review-stars">
+
+                                    {% if review.rating >= 1 %}★{% endif %}
+                                    {% if review.rating >= 2 %}★{% endif %}
+                                    {% if review.rating >= 3 %}★{% endif %}
+                                    {% if review.rating >= 4 %}★{% endif %}
+                                    {% if review.rating >= 5 %}★{% endif %}
+
+                                </span>
+
+                                <span class="review-rating-number">
+
+                                    {{ review.rating }}/5
+
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- REVIEW -->
+
+                        <td>
+
+                            <div class="review-content">
+
+                                {% if review.title %}
+
+                                    <div class="review-title">
+                                        {{ review.title }}
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if review.comment %}
+
+                                    <div class="review-comment">
+                                        {{ review.comment }}
+                                    </div>
+
+                                {% else %}
+
+                                    <span class="review-empty">
+                                        No comment
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- BOOKING -->
+
+                        <td>
+
+                            <span class="booking-id">
+                                #{{ review.booking.id }}
+                            </span>
+
+                        </td>
+
+
+                        <!-- DATE -->
+
+                        <td>
+
+                            <span class="review-date">
+                                {{ review.created_at|date:"d M Y, h:i A" }}
+                            </span>
+
+                        </td>
+
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+        <div class="reviews-empty">
+
+            <div class="reviews-empty-icon">
+                ⭐
+            </div>
+
+            <h3>
+                No Reviews Found
+            </h3>
+
+            <p>
+                There are no reviews matching the selected filter.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+{% endblock %}

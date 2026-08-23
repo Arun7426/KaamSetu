@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import timezone
 
 from .models import WorkerLedger, FeeSetting, Promotion
-
+from .alert_service import check_worker_payment_alert
 
 
 
@@ -137,6 +137,14 @@ def create_booking_fee(booking):
         description="KaamSetu platform booking fee"
     )
 
+    # -----------------------------------------
+    # PAYMENT ALERT CHECK
+    # -----------------------------------------
+
+    check_worker_payment_alert(
+        booking.worker
+    )
+
     return ledger_entry
 
 
@@ -212,5 +220,12 @@ def settle_worker_payment(worker, amount):
         else:
             # Partial payment will be handled later
             break
+        # -----------------------------------------
+    # PAYMENT ALERT CHECK
+    # -----------------------------------------
+
+    check_worker_payment_alert(
+        worker
+    )
 
     return True

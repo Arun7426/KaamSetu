@@ -23,6 +23,7 @@ class Command(BaseCommand):
                 # Bookings
                 "view_booking",
                 "change_booking",
+                "view_notification",
 
             ],
 
@@ -34,11 +35,15 @@ class Command(BaseCommand):
 
             ],
 
-            "Content Manager": [
+           "Content Manager": [
 
                 # Workers
                 "view_worker",
                 "change_worker",
+
+                # Reviews
+                "view_review",
+                "change_review",
 
             ],
 
@@ -50,6 +55,7 @@ class Command(BaseCommand):
                 # Bookings
                 "view_booking",
                 "change_booking",
+                "view_notification",
 
             ],
 
@@ -60,6 +66,8 @@ class Command(BaseCommand):
                 "view_booking",
                 "view_workerledger",
                 "view_user",
+                "view_review",
+                "view_notification",
 
             ],
         }
