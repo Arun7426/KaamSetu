@@ -51,6 +51,16 @@ urlpatterns = [
         name="admin_notifications"
     ),
     
+        # =====================================================
+    # ANALYTICS
+    # =====================================================
+
+    path(
+        "insights/",
+        views.admin_insights,
+        name="admin_insights"
+    ),
+    
     # =====================================================
     # FINANCE
     # =====================================================
@@ -89,6 +99,42 @@ urlpatterns = [
         "worker-ledger/",
         views.admin_worker_ledger,
         name="admin_worker_ledger"
+    ),
+
+    path(
+        "fee-settings/",
+        views.admin_fee_settings,
+        name="admin_fee_settings"
+    ),
+
+    path(
+        "promotions/",
+        views.admin_promotions,
+        name="admin_promotions"
+    ),
+
+    path(
+        "promotions/create/",
+        views.admin_promotion_create,
+        name="admin_promotion_create"
+    ),
+
+    path(
+        "promotions/<int:promotion_id>/edit/",
+        views.admin_promotion_edit,
+        name="admin_promotion_edit"
+    ),
+
+    path(
+        "promotions/<int:promotion_id>/toggle/",
+        views.admin_promotion_toggle,
+        name="admin_promotion_toggle"
+    ),
+
+    path(
+        "promotions/<int:promotion_id>/delete/",
+        views.admin_promotion_delete,
+        name="admin_promotion_delete"
     ),
 
     # =====================================================

@@ -1,0 +1,382 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block title %}
+Fee Settings | KaamSetu Admin
+{% endblock %}
+
+{% block admin_title %}
+Fee Settings
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .fee-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 34px 28px 50px;
+    }
+
+    .fee-header {
+        margin-bottom: 24px;
+    }
+
+    .fee-header h1 {
+        margin: 0 0 8px;
+        color: #172b4d;
+        font-size: 32px;
+    }
+
+    .fee-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 15px;
+    }
+
+    .message {
+        padding: 13px 16px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        font-weight: 600;
+    }
+
+    .message.success {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #047857;
+    }
+
+    .message.error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+    }
+
+    .fee-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+        padding: 28px;
+    }
+
+    .fee-section-title {
+        margin: 0 0 6px;
+        color: #1f2937;
+        font-size: 20px;
+    }
+
+    .fee-section-subtitle {
+        margin: 0 0 25px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .fee-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+    }
+
+    .field {
+        margin-bottom: 22px;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 8px;
+        color: #374151;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .field select,
+    .field input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        background: #fff;
+        color: #111827;
+        font-size: 15px;
+        outline: none;
+    }
+
+    .field select:focus,
+    .field input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .field-help {
+        margin-top: 7px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: #f8fafc;
+        margin-bottom: 25px;
+    }
+
+    .status-text strong {
+        display: block;
+        color: #1f2937;
+        margin-bottom: 3px;
+    }
+
+    .status-text span {
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+    .switch {
+        position: relative;
+        width: 52px;
+        height: 28px;
+        flex: 0 0 auto;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        background: #cbd5e1;
+        border-radius: 28px;
+        transition: 0.2s;
+    }
+
+    .slider:before {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        left: 3px;
+        top: 3px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0,0,0,.2);
+        transition: 0.2s;
+    }
+
+    .switch input:checked + .slider {
+        background: #2563eb;
+    }
+
+    .switch input:checked + .slider:before {
+        transform: translateX(24px);
+    }
+
+    .current-setting {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+
+    .current-item {
+        padding: 14px;
+        border-radius: 10px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+    }
+
+    .current-item small {
+        display: block;
+        color: #64748b;
+        margin-bottom: 5px;
+    }
+
+    .current-item strong {
+        color: #172b4d;
+        font-size: 18px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 5px;
+    }
+
+    .save-btn {
+        border: 0;
+        border-radius: 9px;
+        padding: 12px 24px;
+        background: #1e3a5f;
+        color: white;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+    .save-btn:hover {
+        opacity: .92;
+    }
+
+    .admin-note {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1e40af;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 700px) {
+        .fee-page {
+            padding: 25px 15px 40px;
+        }
+
+        .fee-card {
+            padding: 20px;
+        }
+
+        .fee-grid,
+        .current-setting {
+            grid-template-columns: 1fr;
+        }
+
+        .status-box {
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="fee-page">
+
+    <div class="fee-header">
+        <h1>Fee Settings</h1>
+        <p>Manage the KaamSetu platform booking fee.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="fee-card">
+
+        <h2 class="fee-section-title">Platform Fee Configuration</h2>
+        <p class="fee-section-subtitle">Only Super Admin can change these settings.</p>
+
+        <div class="current-setting">
+            <div class="current-item">
+                <small>Current Type</small>
+                <strong>
+                    {% if fee_setting.fee_type == "fixed" %}
+                        Fixed Amount
+                    {% else %}
+                        Percentage
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="current-item">
+                <small>Current Value</small>
+                <strong>
+                    {% if fee_setting.fee_type == "fixed" %}
+                        ₹{{ fee_setting.fee_value }}
+                    {% else %}
+                        {{ fee_setting.fee_value }}%
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="current-item">
+                <small>Status</small>
+                <strong>
+                    {% if fee_setting.is_active %}
+                        Active
+                    {% else %}
+                        Inactive
+                    {% endif %}
+                </strong>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="fee-grid">
+                <div class="field">
+                    <label for="fee_type">Fee Type</label>
+                    <select name="fee_type" id="fee_type" required>
+                        <option value="fixed" {% if fee_setting.fee_type == "fixed" %}selected{% endif %}>Fixed Amount</option>
+                        <option value="percentage" {% if fee_setting.fee_type == "percentage" %}selected{% endif %}>Percentage</option>
+                    </select>
+                    <div class="field-help">Choose whether the platform fee is a fixed amount or a percentage of the final booking amount.</div>
+                </div>
+
+                <div class="field">
+                    <label for="fee_value">Fee Value</label>
+                    <input
+                        type="number"
+                        name="fee_value"
+                        id="fee_value"
+                        value="{{ fee_setting.fee_value }}"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+                    <div class="field-help" id="fee-value-help">Enter the amount in rupees.</div>
+                </div>
+            </div>
+
+            <div class="status-box">
+                <div class="status-text">
+                    <strong>Platform Fee Status</strong>
+                    <span>Turn this off to temporarily stop charging the platform fee.</span>
+                </div>
+
+                <label class="switch" aria-label="Active or inactive">
+                    <input type="checkbox" name="is_active" {% if fee_setting.is_active %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="save-btn">Save Fee Settings</button>
+            </div>
+        </form>
+
+        <div class="admin-note">
+            <strong>Important:</strong> The worker promotion/free-booking system remains separate. The first configured free bookings continue to be handled by the existing Promotion logic.
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const feeType = document.getElementById("fee_type");
+    const feeHelp = document.getElementById("fee-value-help");
+
+    function updateFeeHelp() {
+        feeHelp.textContent = feeType.value === "percentage"
+            ? "Enter a percentage from 0 to 100."
+            : "Enter the amount in rupees.";
+    }
+
+    feeType.addEventListener("change", updateFeeHelp);
+    updateFeeHelp();
+</script>
+
+{% endblock %}

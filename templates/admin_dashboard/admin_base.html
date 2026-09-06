@@ -233,7 +233,11 @@ KaamSetu Admin
 
                 <!-- Fee Settings -->
 
-                <a href="#" class="admin-nav-item admin-nav-disabled" title="Fee Settings — Coming Soon">
+                {% if request.user.is_superuser %}
+
+                <a href="{% url 'admin_fee_settings' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_fee_settings' %}active{% endif %}"
+                    title="Fee Settings">
 
                     <span class="admin-nav-icon">
                         ⚙️
@@ -243,16 +247,18 @@ KaamSetu Admin
                         Fee Settings
                     </span>
 
-                    <small class="coming-soon-badge">
-                        Soon
-                    </small>
-
                 </a>
+
+                {% endif %}
 
 
                 <!-- Promotions -->
 
-                <a href="#" class="admin-nav-item admin-nav-disabled" title="Promotion Management — Coming Soon">
+                {% if request.user.is_superuser %}
+
+                <a href="{% url 'admin_promotions' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_promotions' or request.resolver_match.url_name == 'admin_promotion_create' or request.resolver_match.url_name == 'admin_promotion_edit' or request.resolver_match.url_name == 'admin_promotion_delete' %}active{% endif %}"
+                    title="Promotion Management">
 
                     <span class="admin-nav-icon">
                         🎁
@@ -262,11 +268,9 @@ KaamSetu Admin
                         Promotions
                     </span>
 
-                    <small class="coming-soon-badge">
-                        Soon
-                    </small>
-
                 </a>
+
+                {% endif %}
 
             </div>
 
@@ -316,7 +320,9 @@ KaamSetu Admin
 
                 <!-- Insights -->
 
-                <a href="#" class="admin-nav-item admin-nav-disabled" title="Advanced Insights — Coming Soon">
+                <a href="{% url 'admin_insights' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_insights' %}active{% endif %}"
+                    title="Insights & Analytics">
 
                     <span class="admin-nav-icon">
                         📈
@@ -325,10 +331,6 @@ KaamSetu Admin
                     <span class="admin-nav-label">
                         Insights
                     </span>
-
-                    <small class="coming-soon-badge">
-                        Soon
-                    </small>
 
                 </a>
 

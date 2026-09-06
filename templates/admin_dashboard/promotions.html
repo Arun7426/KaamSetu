@@ -1,0 +1,101 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block title %}
+Promotions | KaamSetu Admin
+{% endblock %}
+
+{% block admin_title %}
+Promotions
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .promo-page { max-width: 1100px; margin: 0 auto; padding: 34px 28px 50px; }
+    .promo-header { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; margin-bottom:24px; }
+    .promo-header h1 { margin:0 0 8px; color:#172b4d; font-size:32px; }
+    .promo-header p { margin:0; color:#64748b; font-size:15px; }
+    .primary-btn { display:inline-flex; align-items:center; gap:8px; background:#1e3a5f; color:#fff; text-decoration:none; border:0; border-radius:9px; padding:11px 17px; font-weight:700; }
+    .primary-btn:hover { background:#17304f; }
+    .message { padding:13px 16px; border-radius:10px; margin-bottom:18px; font-weight:600; }
+    .message.success { background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; }
+    .message.error { background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; }
+    .info-box { background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; border-radius:12px; padding:14px 16px; margin-bottom:22px; line-height:1.5; }
+    .promo-card { background:#fff; border:1px solid #e5e7eb; border-radius:16px; box-shadow:0 6px 22px rgba(15,23,42,.06); overflow:hidden; }
+    .promo-table { width:100%; border-collapse:collapse; }
+    .promo-table th { background:#1e3a5f; color:#fff; padding:14px 16px; text-align:left; font-size:13px; }
+    .promo-table td { padding:15px 16px; border-bottom:1px solid #e5e7eb; color:#374151; vertical-align:middle; }
+    .promo-table tr:last-child td { border-bottom:0; }
+    .promo-name { font-weight:700; color:#172b4d; }
+    .status { display:inline-block; padding:5px 10px; border-radius:20px; font-size:12px; font-weight:700; }
+    .status-active { background:#dcfce7; color:#166534; }
+    .status-inactive { background:#f3f4f6; color:#6b7280; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .action-btn { display:inline-flex; align-items:center; padding:8px 11px; border-radius:8px; border:1px solid #d1d5db; background:#fff; color:#374151; text-decoration:none; font-size:12px; font-weight:700; cursor:pointer; }
+    .action-btn:hover { background:#f8fafc; }
+    .action-btn.danger { color:#b91c1c; border-color:#fecaca; }
+    .empty { padding:40px 20px; text-align:center; color:#64748b; }
+    @media (max-width: 800px) { .promo-header { flex-direction:column; } .promo-card { overflow-x:auto; } .promo-table { min-width:850px; } }
+</style>
+
+<div class="promo-page">
+    <div class="promo-header">
+        <div>
+            <h1>Promotions</h1>
+            <p>Manage worker fee-waiver offers from the Super Admin panel.</p>
+        </div>
+        <a href="{% url 'admin_promotion_create' %}" class="primary-btn">＋ Create Promotion</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {% if message.tags == 'success' %}success{% else %}error{% endif %}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="info-box">
+        <strong>Current rule:</strong> the active promotion controls how many qualifying final-accepted bookings receive a platform-fee waiver. The existing payment logic uses the newest active promotion, so this panel keeps only one promotion active at a time.
+    </div>
+
+    <div class="promo-card">
+        {% if promotions %}
+            <table class="promo-table">
+                <thead>
+                    <tr>
+                        <th>Promotion</th>
+                        <th>Status</th>
+                        <th>Free Bookings</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for promotion in promotions %}
+                    <tr>
+                        <td><div class="promo-name">{{ promotion.name }}</div></td>
+                        <td>
+                            {% if promotion.is_active %}<span class="status status-active">Active</span>{% else %}<span class="status status-inactive">Inactive</span>{% endif %}
+                        </td>
+                        <td>{{ promotion.free_bookings_limit }}</td>
+                        <td>{{ promotion.updated_at|date:"d M Y, h:i A" }}</td>
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'admin_promotion_edit' promotion.id %}" class="action-btn">Edit</a>
+                                <form method="post" action="{% url 'admin_promotion_toggle' promotion.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="action-btn">{% if promotion.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+                                </form>
+                                <a href="{% url 'admin_promotion_delete' promotion.id %}" class="action-btn danger">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty">No promotions found. Create the first promotion to configure the worker fee-waiver offer.</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

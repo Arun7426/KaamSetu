@@ -1,0 +1,79 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block title %}
+{{ page_title }} | KaamSetu Admin
+{% endblock %}
+
+{% block admin_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block content %}
+<style>
+    .form-page { max-width:760px; margin:0 auto; padding:34px 28px 50px; }
+    .form-header h1 { margin:0 0 8px; color:#172b4d; font-size:32px; }
+    .form-header p { margin:0 0 24px; color:#64748b; }
+    .form-card { background:#fff; border:1px solid #e5e7eb; border-radius:16px; box-shadow:0 6px 22px rgba(15,23,42,.06); padding:28px; }
+    .field { margin-bottom:22px; }
+    .field label { display:block; margin-bottom:8px; color:#374151; font-weight:700; font-size:14px; }
+    .field input { width:100%; box-sizing:border-box; padding:12px 13px; border:1px solid #d1d5db; border-radius:9px; font-size:15px; outline:none; }
+    .field input:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.10); }
+    .help { margin-top:7px; color:#6b7280; font-size:12px; }
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:16px; border:1px solid #e5e7eb; border-radius:12px; background:#f8fafc; margin-bottom:25px; }
+    .toggle-title { font-weight:700; color:#1f2937; margin-bottom:4px; }
+    .toggle-help { color:#64748b; font-size:13px; }
+    .toggle-row input { width:20px; height:20px; }
+    .actions { display:flex; justify-content:flex-end; gap:10px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; padding:11px 18px; border-radius:9px; text-decoration:none; font-weight:700; border:0; cursor:pointer; }
+    .btn-primary { background:#1e3a5f; color:#fff; }
+    .btn-secondary { background:#f3f4f6; color:#374151; }
+</style>
+
+<div class="form-page">
+    <div class="form-header">
+        <h1>{{ page_title }}</h1>
+        <p>Only Super Admin can change promotion settings.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding:13px 16px;border-radius:10px;margin-bottom:18px;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-weight:600;">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="form-card">
+        {% if form_action == 'admin_promotion_create' %}
+            <form method="post" action="{% url 'admin_promotion_create' %}">
+        {% else %}
+            <form method="post" action="{% url 'admin_promotion_edit' promotion.id %}">
+        {% endif %}
+            {% csrf_token %}
+
+            <div class="field">
+                <label for="id_name">Promotion Name</label>
+                <input id="id_name" type="text" name="name" maxlength="100" required value="{% if promotion %}{{ promotion.name }}{% endif %}" placeholder="e.g. Launch Offer">
+                <div class="help">Use a clear name so Super Admin can identify the offer later.</div>
+            </div>
+
+            <div class="field">
+                <label for="id_limit">Free Bookings Limit</label>
+                <input id="id_limit" type="number" name="free_bookings_limit" min="0" required value="{% if promotion %}{{ promotion.free_bookings_limit }}{% else %}10{% endif %}">
+                <div class="help">Number of qualifying final-accepted bookings for which the platform fee is waived.</div>
+            </div>
+
+            <div class="toggle-row">
+                <div>
+                    <div class="toggle-title">Promotion Status</div>
+                    <div class="toggle-help">Only one promotion can be active at a time with the current payment logic.</div>
+                </div>
+                <input type="checkbox" name="is_active" {% if not promotion or promotion.is_active %}checked{% endif %}>
+            </div>
+
+            <div class="actions">
+                <a href="{% url 'admin_promotions' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Promotion</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

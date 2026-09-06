@@ -1,0 +1,36 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block title %}
+Delete Promotion | KaamSetu Admin
+{% endblock %}
+
+{% block admin_title %}
+Delete Promotion
+{% endblock %}
+
+{% block content %}
+<style>
+    .delete-page { max-width:650px; margin:0 auto; padding:50px 28px; }
+    .delete-card { background:#fff; border:1px solid #fecaca; border-radius:16px; box-shadow:0 6px 22px rgba(15,23,42,.06); padding:30px; }
+    .delete-card h1 { margin:0 0 10px; color:#991b1b; }
+    .delete-card p { color:#4b5563; line-height:1.6; }
+    .actions { display:flex; justify-content:flex-end; gap:10px; margin-top:25px; }
+    .btn { padding:11px 18px; border-radius:9px; text-decoration:none; font-weight:700; border:0; cursor:pointer; }
+    .cancel { background:#f3f4f6; color:#374151; }
+    .danger { background:#b91c1c; color:#fff; }
+</style>
+<div class="delete-page">
+    <div class="delete-card">
+        <h1>Delete Promotion?</h1>
+        <p>You are about to delete <strong>{{ promotion.name }}</strong>. This cannot be undone.</p>
+        <p>Deleting a promotion does not alter historical bookings or ledger entries.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="actions">
+                <a href="{% url 'admin_promotions' %}" class="btn cancel">Cancel</a>
+                <button type="submit" class="btn danger">Delete Promotion</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -15,11 +15,12 @@ def get_fee_setting():
     If no setting exists, create the default ₹20 fixed fee.
     """
 
-    setting = FeeSetting.objects.filter(
-        is_active=True
-    ).first()
+    setting = FeeSetting.objects.first()
 
-    if not setting:
+    # Create the default only when no FeeSetting exists at all.
+    # If Super Admin intentionally sets the existing setting inactive,
+    # keep it inactive so the platform fee is not recreated as active.
+    if setting is None:
         setting = FeeSetting.objects.create(
             fee_type="fixed",
             fee_value=Decimal("20.00"),
@@ -47,6 +48,9 @@ def calculate_platform_fee(booking):
     """
 
     setting = get_fee_setting()
+
+    if not setting.is_active:
+        return Decimal("0.00")
 
     if setting.fee_type == "fixed":
         return setting.fee_value
