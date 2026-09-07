@@ -61,6 +61,25 @@ urlpatterns = [
         name="admin_insights"
     ),
     
+    path(
+        "reports/",
+        views.admin_reports,
+        name="admin_reports"
+    ),
+    
+    
+    path(
+        "reports/export/excel/",
+        views.export_report_excel,
+        name="export_report_excel",
+    ),
+
+    path(
+        "reports/export/pdf/",
+        views.export_report_pdf,
+        name="export_report_pdf",
+    ),
+        
     # =====================================================
     # FINANCE
     # =====================================================

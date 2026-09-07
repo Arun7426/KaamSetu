@@ -7,14 +7,34 @@ from django.contrib import messages
 from django.db.models import Sum, Q, Avg, Count
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
-
+from datetime import datetime
 from functools import wraps
+
 
 from workers.models import Worker
 from bookings.models import Booking, Review, Notification
 from payments.models import WorkerLedger, WorkerPaymentAlert, FeeSetting, Promotion
 
+from io import BytesIO
 
+from django.http import HttpResponse
+
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.utils import get_column_letter
+
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import mm
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Table,
+    TableStyle,
+    Paragraph,
+    Spacer,
+)
 
 # =========================================================
 # EXISTING STAFF CHECK
@@ -1859,6 +1879,1742 @@ def admin_insights(request):
         context,
     )
 
+
+# =========================================================
+# REPORTS
+# =========================================================
+
+@admin_required
+def admin_reports(request):
+    """
+    KaamSetu Report Generator.
+
+    Reports are generated according to:
+        1. Report type
+        2. Selected date range
+
+    Export functionality will use the same filtered data.
+    Financial reports remain Super Admin only.
+    """
+
+    today = timezone.localdate()
+
+    # =====================================================
+    # REPORT TYPE
+    # =====================================================
+
+    report_type = request.GET.get(
+        "report_type",
+        "new_users"
+    )
+
+    allowed_reports = [
+        "new_users",
+        "active_users",
+        "inactive_users",
+        "bookings",
+        "accepted_bookings",
+        "completed_bookings",
+        "cancelled_bookings",
+        "pending_bookings",
+        "new_workers",
+        "active_workers",
+        "worker_performance",
+        "reviews",
+        "low_ratings",
+        "platform_fees",
+        "worker_payments",
+        "outstanding",
+        "ledger",
+        "app_retention",
+    ]
+
+    if report_type not in allowed_reports:
+        report_type = "new_users"
+
+    # =====================================================
+    # DATE FILTER
+    # =====================================================
+
+    period = request.GET.get(
+        "period",
+        "30"
+    )
+
+    start_date = None
+    end_date = today
+
+    custom_start = request.GET.get(
+        "start_date",
+        ""
+    )
+
+    custom_end = request.GET.get(
+        "end_date",
+        ""
+    )
+
+    period_label = "Last 30 Days"
+
+    # -----------------------------------------------------
+    # ALL TIME
+    # -----------------------------------------------------
+
+    if period == "all":
+
+        start_date = None
+        period_label = "All Time"
+
+    # -----------------------------------------------------
+    # TODAY
+    # -----------------------------------------------------
+
+    elif period == "today":
+
+        start_date = today
+        period_label = "Today"
+
+    # -----------------------------------------------------
+    # LAST 7 DAYS
+    # -----------------------------------------------------
+
+    elif period == "7":
+
+        start_date = today - timedelta(days=6)
+        period_label = "Last 7 Days"
+
+    # -----------------------------------------------------
+    # LAST 30 DAYS
+    # -----------------------------------------------------
+
+    elif period == "30":
+
+        start_date = today - timedelta(days=29)
+        period_label = "Last 30 Days"
+
+    # -----------------------------------------------------
+    # THIS MONTH
+    # -----------------------------------------------------
+
+    elif period == "month":
+
+        start_date = today.replace(day=1)
+        period_label = "This Month"
+
+    # -----------------------------------------------------
+    # LAST MONTH
+    # -----------------------------------------------------
+
+    elif period == "last_month":
+
+        first_this_month = today.replace(day=1)
+
+        last_month_end = (
+            first_this_month - timedelta(days=1)
+        )
+
+        start_date = last_month_end.replace(day=1)
+        end_date = last_month_end
+
+        period_label = "Last Month"
+
+    # -----------------------------------------------------
+    # THIS YEAR
+    # -----------------------------------------------------
+
+    elif period == "year":
+
+        start_date = date(
+            today.year,
+            1,
+            1
+        )
+
+        period_label = "This Year"
+
+    # -----------------------------------------------------
+    # CUSTOM
+    # -----------------------------------------------------
+
+    elif period == "custom":
+
+        try:
+
+            parsed_start = date.fromisoformat(
+                custom_start
+            )
+
+            parsed_end = date.fromisoformat(
+                custom_end
+            )
+
+            if parsed_start > parsed_end:
+
+                parsed_start, parsed_end = (
+                    parsed_end,
+                    parsed_start
+                )
+
+            start_date = parsed_start
+            end_date = parsed_end
+
+            period_label = (
+                f"{start_date.strftime('%d %b %Y')}"
+                f" – "
+                f"{end_date.strftime('%d %b %Y')}"
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            period = "30"
+
+            start_date = (
+                today -
+                timedelta(days=29)
+            )
+
+            end_date = today
+
+            period_label = "Last 30 Days"
+
+    # =====================================================
+    # REPORT DEFINITIONS
+    # =====================================================
+
+    report_definitions = {
+
+        # -------------------------------------------------
+        # USERS
+        # -------------------------------------------------
+
+        "new_users": {
+            "label": "New Users",
+            "category": "Users",
+            "description":
+                "Users registered during the selected period.",
+        },
+
+        "active_users": {
+            "label": "Active Users",
+            "category": "Users",
+            "description":
+                "Users who were active during the selected period.",
+        },
+
+        "inactive_users": {
+            "label": "Inactive Users",
+            "category": "Users",
+            "description":
+                "Users with no recent login activity.",
+        },
+
+        # -------------------------------------------------
+        # BOOKINGS
+        # -------------------------------------------------
+
+        "bookings": {
+            "label": "All Bookings",
+            "category": "Bookings",
+            "description":
+                "All bookings created during the selected period.",
+        },
+
+        "accepted_bookings": {
+            "label": "Accepted Bookings",
+            "category": "Bookings",
+            "description":
+                "Bookings accepted during the selected period.",
+        },
+
+        "completed_bookings": {
+            "label": "Completed Bookings",
+            "category": "Bookings",
+            "description":
+                "Bookings completed during the selected period.",
+        },
+
+        "cancelled_bookings": {
+            "label": "Cancelled Bookings",
+            "category": "Bookings",
+            "description":
+                "Bookings cancelled during the selected period.",
+        },
+
+        "pending_bookings": {
+            "label": "Pending Bookings",
+            "category": "Bookings",
+            "description":
+                "Bookings currently pending.",
+        },
+
+        # -------------------------------------------------
+        # WORKERS
+        # -------------------------------------------------
+
+        "new_workers": {
+            "label": "New Workers",
+            "category": "Workers",
+            "description":
+                "Workers registered during the selected period.",
+        },
+
+        "active_workers": {
+            "label": "Active Workers",
+            "category": "Workers",
+            "description":
+                "Workers with recent platform activity.",
+        },
+
+        "worker_performance": {
+            "label": "Worker Performance",
+            "category": "Workers",
+            "description":
+                "Worker-wise booking performance.",
+        },
+
+        # -------------------------------------------------
+        # REVIEWS
+        # -------------------------------------------------
+
+        "reviews": {
+            "label": "Reviews",
+            "category": "Reviews",
+            "description":
+                "Reviews submitted during the selected period.",
+        },
+
+        "low_ratings": {
+            "label": "Low Ratings",
+            "category": "Reviews",
+            "description":
+                "Reviews with ratings of 2 stars or below.",
+        },
+
+        # -------------------------------------------------
+        # FINANCE
+        # -------------------------------------------------
+
+        "platform_fees": {
+            "label": "Platform Fee Report",
+            "category": "Finance",
+            "description":
+                "Platform fees generated during the selected period.",
+        },
+
+        "worker_payments": {
+            "label": "Worker Payment Report",
+            "category": "Finance",
+            "description":
+                "Worker payments recorded during the selected period.",
+        },
+
+        "outstanding": {
+            "label": "Outstanding Report",
+            "category": "Finance",
+            "description":
+                "Current worker outstanding balances.",
+        },
+
+        "ledger": {
+            "label": "Worker Ledger Report",
+            "category": "Finance",
+            "description":
+                "Worker ledger transactions during the selected period.",
+        },
+
+        # -------------------------------------------------
+        # APP RETENTION
+        # -------------------------------------------------
+
+        "app_retention": {
+            "label": "App Retention",
+            "category": "App & Retention",
+            "description":
+                "App installation, activity and retention analytics.",
+        },
+    }
+
+    selected_report = report_definitions[
+        report_type
+    ]
+
+    # =====================================================
+    # INITIAL DATA
+    # =====================================================
+
+    report_rows = []
+
+    report_columns = []
+
+    report_count = 0
+
+    report_total = Decimal("0")
+
+    report_message = None
+
+    # =====================================================
+    # USERS — NEW
+    # =====================================================
+
+    if report_type == "new_users":
+
+        users = User.objects.filter(
+            is_staff=False
+        ).order_by(
+            "-date_joined"
+        )
+
+        if start_date:
+
+            users = users.filter(
+                date_joined__date__gte=start_date,
+                date_joined__date__lte=end_date,
+            )
+
+        report_columns = [
+            "Username",
+            "Name",
+            "Email",
+            "Joined",
+        ]
+
+        for user in users:
+
+            report_rows.append({
+                "username":
+                    user.username,
+
+                "name":
+                    user.get_full_name()
+                    or "-",
+
+                "email":
+                    user.email
+                    or "-",
+
+                "date":
+                    user.date_joined,
+            })
+
+        report_count = len(report_rows)
+
+    # =====================================================
+    # USERS — ACTIVE
+    # =====================================================
+
+    elif report_type == "active_users":
+
+        users = User.objects.filter(
+            is_staff=False,
+            last_login__isnull=False,
+        ).order_by(
+            "-last_login"
+        )
+
+        if start_date:
+
+            users = users.filter(
+                last_login__date__gte=start_date,
+                last_login__date__lte=end_date,
+            )
+
+        report_columns = [
+            "Username",
+            "Name",
+            "Email",
+            "Last Active",
+        ]
+
+        for user in users:
+
+            report_rows.append({
+                "username":
+                    user.username,
+
+                "name":
+                    user.get_full_name()
+                    or "-",
+
+                "email":
+                    user.email
+                    or "-",
+
+                "date":
+                    user.last_login,
+            })
+
+        report_count = len(report_rows)
+
+    # =====================================================
+    # USERS — INACTIVE
+    # =====================================================
+
+    elif report_type == "inactive_users":
+
+        users = User.objects.filter(
+            is_staff=False
+        ).order_by(
+            "last_login"
+        )
+
+        if start_date:
+
+            users = users.filter(
+                Q(last_login__isnull=True)
+                |
+                Q(
+                    last_login__date__lt=
+                    start_date
+                )
+            )
+
+        report_columns = [
+            "Username",
+            "Name",
+            "Email",
+            "Last Active",
+        ]
+
+        for user in users:
+
+            report_rows.append({
+                "username":
+                    user.username,
+
+                "name":
+                    user.get_full_name()
+                    or "-",
+
+                "email":
+                    user.email
+                    or "-",
+
+                "date":
+                    user.last_login,
+            })
+
+        report_count = len(report_rows)
+
+    # =====================================================
+    # BOOKINGS
+    # =====================================================
+
+    elif report_type in [
+        "bookings",
+        "accepted_bookings",
+        "completed_bookings",
+        "cancelled_bookings",
+        "pending_bookings",
+    ]:
+
+        bookings = Booking.objects.select_related(
+            "worker",
+            "customer",
+        ).order_by(
+            "-created_at"
+        )
+
+        if start_date:
+
+            bookings = bookings.filter(
+                created_at__date__gte=start_date,
+                created_at__date__lte=end_date,
+            )
+
+        status_map = {
+
+            "accepted_bookings":
+                "Accepted",
+
+            "completed_bookings":
+                "Completed",
+
+            "cancelled_bookings":
+                "Cancelled",
+
+            "pending_bookings":
+                "Pending",
+        }
+
+        if report_type in status_map:
+
+            bookings = bookings.filter(
+                status=status_map[report_type]
+            )
+
+        report_columns = [
+            "Booking ID",
+            "Date",
+            "Customer",
+            "Worker",
+            "Work",
+            "Status",
+            "Amount",
+        ]
+
+        for booking in bookings:
+
+            amount = (
+                booking.final_amount
+                if booking.final_amount is not None
+                else Decimal("0")
+            )
+
+            report_rows.append({
+                "id":
+                    booking.id,
+
+                "date":
+                    booking.created_at,
+
+                "customer":
+                    booking.customer_name
+                    or (
+                        booking.customer.get_full_name()
+                        if booking.customer
+                        else "-"
+                    ),
+
+                "worker":
+                    booking.worker.name
+                    if booking.worker
+                    else "-",
+
+                "work":
+                    booking.work_description
+                    or "-",
+
+                "status":
+                    booking.status,
+
+                "amount":
+                    amount,
+            })
+
+            report_total += amount
+
+        report_count = len(report_rows)
+
+    # =====================================================
+    # NEW WORKERS
+    # =====================================================
+
+    elif report_type == "new_workers":
+
+        workers = Worker.objects.select_related(
+            "user"
+        ).order_by(
+            "-user__date_joined"
+        )
+
+        if start_date:
+
+            workers = workers.filter(
+                user__date_joined__date__gte=start_date,
+                user__date_joined__date__lte=end_date,
+            )
+
+        report_columns = [
+            "Worker",
+            "Profession",
+            "Mobile",
+            "City",
+            "Experience",
+            "Daily Wage",
+            "Joined",
+        ]
+
+        for worker in workers:
+
+            report_rows.append({
+                "name":
+                    worker.name,
+
+                "profession":
+                    worker.profession
+                    or "-",
+
+                "mobile":
+                    worker.mobile
+                    or "-",
+
+                "city":
+                    worker.city
+                    or "-",
+
+                "experience":
+                    worker.experience
+                    or "-",
+
+                "daily_wage":
+                    worker.daily_wage,
+
+                "date":
+                    worker.user.date_joined
+                    if worker.user
+                    else None,
+            })
+
+        report_count = len(report_rows)
+
+    # =====================================================
+    # REVIEWS
+    # =====================================================
+
+    elif report_type in [
+        "reviews",
+        "low_ratings",
+    ]:
+
+        reviews = Review.objects.select_related(
+            "booking",
+            "worker",
+            "customer",
+        ).order_by(
+            "-created_at"
+        )
+
+        if start_date:
+
+            reviews = reviews.filter(
+                created_at__date__gte=start_date,
+                created_at__date__lte=end_date,
+            )
+
+        if report_type == "low_ratings":
+
+            reviews = reviews.filter(
+                rating__lte=2
+            )
+
+        report_columns = [
+            "Date",
+            "Customer",
+            "Worker",
+            "Rating",
+            "Comment",
+            "Booking ID",
+        ]
+
+        for review in reviews:
+
+            report_rows.append({
+                "date":
+                    review.created_at,
+
+                "customer":
+                    review.customer.get_full_name()
+                    or review.customer.username,
+
+                "worker":
+                    review.worker.name
+                    if review.worker
+                    else "-",
+
+                "rating":
+                    review.rating,
+
+                "comment":
+                    review.comment
+                    or "-",
+
+                "booking":
+                    review.booking.id
+                    if review.booking
+                    else "-",
+            })
+
+        report_count = len(report_rows)
+
+    # =====================================================
+    # FINANCIAL REPORTS
+    # =====================================================
+
+    elif report_type in [
+        "platform_fees",
+        "worker_payments",
+        "outstanding",
+        "ledger",
+    ]:
+
+        # -------------------------------------------------
+        # SUPER ADMIN SECURITY
+        # -------------------------------------------------
+
+        if not request.user.is_superuser:
+
+            raise PermissionDenied
+
+        # -------------------------------------------------
+        # LEDGER
+        # -------------------------------------------------
+
+        ledger = WorkerLedger.objects.select_related(
+            "worker",
+            "booking",
+        ).order_by(
+            "-created_at"
+        )
+
+        if start_date:
+
+            ledger = ledger.filter(
+                created_at__date__gte=start_date,
+                created_at__date__lte=end_date,
+            )
+
+        if report_type == "platform_fees":
+
+            ledger = ledger.filter(
+                transaction_type="Booking Fee"
+            )
+
+        elif report_type == "worker_payments":
+
+            ledger = ledger.filter(
+                transaction_type="Payment"
+            )
+
+        elif report_type == "ledger":
+
+            pass
+
+        elif report_type == "outstanding":
+
+            workers = Worker.objects.annotate(
+                outstanding=Sum(
+                    "ledger_entries__amount",
+                    filter=Q(
+                        ledger_entries__transaction_type=
+                        "Booking Fee"
+                    )
+                    & Q(
+                        ledger_entries__status="Pending"
+                    )
+                )
+            ).order_by(
+                "-outstanding"
+            )
+
+            report_columns = [
+                "Worker",
+                "Mobile",
+                "Outstanding",
+            ]
+
+            for worker in workers:
+
+                outstanding = (
+                    worker.outstanding
+                    or Decimal("0")
+                )
+
+                if outstanding > 0:
+
+                    report_rows.append({
+                        "worker":
+                            worker.name,
+
+                        "mobile":
+                            worker.mobile
+                            or "-",
+
+                        "amount":
+                            outstanding,
+                    })
+
+                    report_total += outstanding
+
+            report_count = len(report_rows)
+
+        if report_type != "outstanding":
+
+            report_columns = [
+                "Date",
+                "Worker",
+                "Transaction",
+                "Amount",
+                "Status",
+                "Booking ID",
+            ]
+
+            for entry in ledger:
+
+                amount = (
+                    entry.amount
+                    or Decimal("0")
+                )
+
+                report_rows.append({
+                    "date":
+                        entry.created_at,
+
+                    "worker":
+                        entry.worker.name
+                        if entry.worker
+                        else "-",
+
+                    "transaction":
+                        entry.transaction_type,
+
+                    "amount":
+                        amount,
+
+                    "status":
+                        entry.status
+                        or "-",
+
+                    "booking":
+                        entry.booking.id
+                        if entry.booking
+                        else "-",
+                })
+
+                report_total += amount
+
+            report_count = len(report_rows)
+
+    # =====================================================
+    # APP RETENTION
+    # =====================================================
+
+    elif report_type == "app_retention":
+
+        report_message = (
+            "Detailed app installation and uninstall "
+            "tracking will become available after the "
+            "Android app installation-tracking system "
+            "is implemented."
+        )
+
+        report_columns = [
+            "Metric",
+            "Status",
+        ]
+
+        report_rows = [
+            {
+                "metric":
+                    "App Installations",
+
+                "status":
+                    "Android tracking required",
+            },
+            {
+                "metric":
+                    "App Uninstalls",
+
+                "status":
+                    "Android tracking required",
+            },
+            {
+                "metric":
+                    "Reinstalls",
+
+                "status":
+                    "Android tracking required",
+            },
+            {
+                "metric":
+                    "Retention Rate",
+
+                "status":
+                    "Android tracking required",
+            },
+        ]
+
+        report_count = 0
+
+    # =====================================================
+    # REPORT CONTEXT
+    # =====================================================
+
+    context = {
+
+        "report_definitions":
+            report_definitions,
+
+        "selected_report":
+            selected_report,
+
+        "report_type":
+            report_type,
+
+        "period":
+            period,
+
+        "period_label":
+            period_label,
+
+        "start_date":
+            start_date,
+
+        "end_date":
+            end_date,
+
+        "custom_start":
+            custom_start,
+
+        "custom_end":
+            custom_end,
+
+        "report_columns":
+            report_columns,
+
+        "report_rows":
+            report_rows,
+
+        "report_count":
+            report_count,
+
+        "report_total":
+            report_total,
+
+        "report_message":
+            report_message,
+
+        "is_super_admin":
+            request.user.is_superuser,
+    }
+
+    response = render(
+        request,
+        "admin_dashboard/reports.html",
+        context,
+    )
+
+    # Keep the generated report data available
+    # for Excel/PDF export views.
+    response.report_context = context
+
+    return response
+
+# =========================================================
+# REPORT EXPORT — EXCEL
+# =========================================================
+
+@admin_required
+def export_report_excel(request):
+    """
+    Export the currently selected report to Excel.
+
+    Uses the same report_type and date filters
+    used by the Reports page.
+    """
+
+    report_response = admin_reports(request)
+
+    context = getattr(
+        report_response,
+        "report_context",
+        None
+    )
+
+    if not context:
+        raise PermissionDenied(
+            "Unable to generate report data."
+        )
+
+    report_type = context["report_type"]
+    selected_report = context["selected_report"]
+
+    report_columns = context["report_columns"]
+    report_rows = context["report_rows"]
+
+    period_label = context["period_label"]
+
+    report_count = context["report_count"]
+    report_total = context["report_total"]
+
+    # -----------------------------------------------------
+    # WORKBOOK
+    # -----------------------------------------------------
+
+    workbook = Workbook()
+
+    worksheet = workbook.active
+
+    worksheet.title = "Report"
+
+    # -----------------------------------------------------
+    # TITLE
+    # -----------------------------------------------------
+
+    worksheet["A1"] = "KaamSetu"
+    worksheet["A1"].font = Font(
+        bold=True,
+        size=18
+    )
+
+    worksheet["A2"] = selected_report["label"]
+    worksheet["A2"].font = Font(
+        bold=True,
+        size=14
+    )
+
+    worksheet["A3"] = (
+        f"Period: {period_label}"
+    )
+
+    worksheet["A4"] = (
+        f"Total Records: {report_count}"
+    )
+
+    # -----------------------------------------------------
+    # HEADERS
+    # -----------------------------------------------------
+
+    header_row = 6
+
+    for column_number, column_name in enumerate(
+        report_columns,
+        start=1
+    ):
+
+        cell = worksheet.cell(
+            row=header_row,
+            column=column_number,
+            value=column_name
+        )
+
+        cell.font = Font(
+            bold=True,
+            color="FFFFFF"
+        )
+
+        cell.fill = PatternFill(
+            fill_type="solid",
+            fgColor="17375E"
+        )
+
+        cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center"
+        )
+
+    # -----------------------------------------------------
+    # DATA
+    # -----------------------------------------------------
+
+    data_start_row = header_row + 1
+
+    # Map report columns to actual row_data keys
+    column_keys = {
+        "bookings": [
+            "id",
+            "date",
+            "customer",
+            "worker",
+            "work",
+            "status",
+            "amount",
+        ],
+
+        "accepted_bookings": [
+            "id",
+            "date",
+            "customer",
+            "worker",
+            "work",
+            "status",
+            "amount",
+        ],
+
+        "completed_bookings": [
+            "id",
+            "date",
+            "customer",
+            "worker",
+            "work",
+            "status",
+            "amount",
+        ],
+
+        "cancelled_bookings": [
+            "id",
+            "date",
+            "customer",
+            "worker",
+            "work",
+            "status",
+            "amount",
+        ],
+
+        "pending_bookings": [
+            "id",
+            "date",
+            "customer",
+            "worker",
+            "work",
+            "status",
+            "amount",
+        ],
+    }
+
+    keys = column_keys.get(
+        report_type,
+        list(report_rows[0].keys())
+        if report_rows
+        else []
+    )
+
+    for row_number, row_data in enumerate(
+        report_rows,
+        start=data_start_row
+    ):
+
+        for column_number, key in enumerate(
+            keys,
+            start=1
+        ):
+
+            value = row_data.get(
+                key,
+                ""
+            )
+
+            # -------------------------------------------------
+            # TIMEZONE-AWARE DATETIME
+            # -------------------------------------------------
+
+            if isinstance(value, datetime):
+
+                if value.tzinfo is not None:
+
+                    value = value.replace(
+                        tzinfo=None
+                    )
+
+            # -------------------------------------------------
+            # CREATE CELL
+            # -------------------------------------------------
+
+            cell = worksheet.cell(
+                row=row_number,
+                column=column_number,
+                value=value
+            )
+
+            # -------------------------------------------------
+            # DECIMAL → FLOAT
+            # -------------------------------------------------
+
+            if isinstance(value, Decimal):
+
+                cell.value = float(value)
+
+                cell.number_format = (
+                    '₹#,##0.00'
+                )
+
+            # -------------------------------------------------
+            # DATETIME FORMATTING
+            # -------------------------------------------------
+
+            elif isinstance(value, datetime):
+
+                cell.number_format = (
+                    "dd-mmm-yyyy hh:mm AM/PM"
+                )
+
+            cell.alignment = Alignment(
+                vertical="top"
+            )
+
+    # -----------------------------------------------------
+    # TOTAL
+    # -----------------------------------------------------
+
+    if report_total:
+
+        total_row = (
+            data_start_row
+            + len(report_rows)
+            + 1
+        )
+
+        worksheet.cell(
+            row=total_row,
+            column=max(
+                1,
+                len(report_columns) - 1
+            ),
+            value="Total"
+        ).font = Font(
+            bold=True
+        )
+
+        total_cell = worksheet.cell(
+            row=total_row,
+            column=len(report_columns),
+            value=float(report_total)
+        )
+
+        total_cell.font = Font(
+            bold=True
+        )
+
+        total_cell.number_format = (
+            '₹#,##0.00'
+        )
+
+    # -----------------------------------------------------
+    # COLUMN WIDTH
+    # -----------------------------------------------------
+
+    for column_cells in worksheet.columns:
+
+        column_letter = get_column_letter(
+            column_cells[0].column
+        )
+
+        max_length = 0
+
+        for cell in column_cells:
+
+            if cell.value is not None:
+
+                value_length = len(
+                    str(cell.value)
+                )
+
+                max_length = max(
+                    max_length,
+                    value_length
+                )
+
+        worksheet.column_dimensions[
+            column_letter
+        ].width = min(
+            max(max_length + 3, 12),
+            45
+        )
+
+    # -----------------------------------------------------
+    # FREEZE HEADER
+    # -----------------------------------------------------
+
+    worksheet.freeze_panes = "A7"
+
+    # -----------------------------------------------------
+    # AUTO FILTER
+    # -----------------------------------------------------
+
+    if report_columns:
+
+        last_column = get_column_letter(
+            len(report_columns)
+        )
+
+        last_row = (
+            data_start_row
+            + len(report_rows)
+            - 1
+        )
+
+        if last_row >= header_row:
+
+            worksheet.auto_filter.ref = (
+                f"A{header_row}:"
+                f"{last_column}{last_row}"
+            )
+
+    # -----------------------------------------------------
+    # RESPONSE
+    # -----------------------------------------------------
+
+    output = BytesIO()
+
+    workbook.save(output)
+
+    output.seek(0)
+
+    filename = (
+        f"KaamSetu_"
+        f"{report_type}_"
+        f"report.xlsx"
+    )
+
+    response = HttpResponse(
+        output.getvalue(),
+        content_type=(
+            "application/vnd.openxmlformats-"
+            "officedocument.spreadsheetml.sheet"
+        )
+    )
+
+    response[
+        "Content-Disposition"
+    ] = (
+        f'attachment; filename="{filename}"'
+    )
+
+    return response
+
+
+
+# =========================================================
+# REPORT EXPORT — PDF
+# =========================================================
+
+@admin_required
+def export_report_pdf(request):
+
+    """
+    Export the currently selected report to PDF.
+    """
+
+    report_response = admin_reports(request)
+
+    context = getattr(
+        report_response,
+        "report_context",
+        None
+    )
+
+    if not context:
+        raise PermissionDenied(
+            "Unable to generate report data."
+        )
+
+    report_type = context["report_type"]
+
+    selected_report = context["selected_report"]
+
+    report_columns = context["report_columns"]
+
+    report_rows = context["report_rows"]
+
+    period_label = context["period_label"]
+
+    report_count = context["report_count"]
+
+    report_total = context["report_total"]
+
+    # -----------------------------------------------------
+    # PDF BUFFER
+    # -----------------------------------------------------
+
+    buffer = BytesIO()
+
+    document = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        rightMargin=12 * mm,
+        leftMargin=12 * mm,
+        topMargin=12 * mm,
+        bottomMargin=12 * mm,
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = ParagraphStyle(
+        "KaamSetuTitle",
+        parent=styles["Title"],
+        fontSize=20,
+        leading=24,
+        alignment=TA_CENTER,
+        textColor=colors.HexColor("#17375E"),
+        spaceAfter=6,
+    )
+
+    report_style = ParagraphStyle(
+        "ReportTitle",
+        parent=styles["Heading2"],
+        fontSize=14,
+        leading=18,
+        textColor=colors.HexColor("#17375E"),
+        spaceAfter=5,
+    )
+
+    info_style = ParagraphStyle(
+        "ReportInfo",
+        parent=styles["Normal"],
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor("#5F6B7A"),
+        spaceAfter=3,
+    )
+
+    cell_style = ParagraphStyle(
+        "Cell",
+        parent=styles["Normal"],
+        fontSize=7,
+        leading=9,
+    )
+
+    header_cell_style = ParagraphStyle(
+        "HeaderCell",
+        parent=styles["Normal"],
+        fontSize=7,
+        leading=9,
+        textColor=colors.white,
+        alignment=TA_CENTER,
+    )
+
+    story = []
+
+    # -----------------------------------------------------
+    # HEADER
+    # -----------------------------------------------------
+
+    story.append(
+        Paragraph(
+            "KaamSetu",
+            title_style
+        )
+    )
+
+    story.append(
+        Paragraph(
+            "Admin Report",
+            report_style
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"<b>Report:</b> "
+            f"{selected_report['label']}",
+            info_style
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"<b>Period:</b> "
+            f"{period_label}",
+            info_style
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"<b>Total Records:</b> "
+            f"{report_count}",
+            info_style
+        )
+    )
+
+    if report_total:
+
+        story.append(
+            Paragraph(
+                f"<b>Total Amount:</b> "
+                f"₹{report_total:,.2f}",
+                info_style
+            )
+        )
+
+    story.append(
+        Spacer(1, 8)
+    )
+
+    # -----------------------------------------------------
+    # TABLE
+    # -----------------------------------------------------
+
+    table_data = []
+
+    table_data.append([
+        Paragraph(
+            str(column),
+            header_cell_style
+        )
+        for column in report_columns
+    ])
+
+    for row_data in report_rows:
+
+        values = list(
+            row_data.values()
+        )
+
+        formatted_values = []
+
+        for value in values:
+
+            if isinstance(value, Decimal):
+
+                display_value = (
+                    f"₹{value:,.2f}"
+                )
+
+            elif hasattr(value, "strftime"):
+
+                display_value = value.strftime(
+                    "%d %b %Y, %I:%M %p"
+                )
+
+            else:
+
+                display_value = (
+                    "-"
+                    if value is None
+                    else str(value)
+                )
+
+            formatted_values.append(
+                Paragraph(
+                    display_value,
+                    cell_style
+                )
+            )
+
+        table_data.append(
+            formatted_values
+        )
+
+    # -----------------------------------------------------
+    # EMPTY REPORT
+    # -----------------------------------------------------
+
+    if len(table_data) == 1:
+
+        table_data.append([
+            Paragraph(
+                "No records found for the selected report and period.",
+                cell_style
+            )
+        ])
+
+        table = Table(
+            table_data,
+            colWidths=[260 * mm]
+        )
+
+    else:
+
+        available_width = 273 * mm
+
+        column_count = len(
+            report_columns
+        )
+
+        column_width = (
+            available_width /
+            max(column_count, 1)
+        )
+
+        table = Table(
+            table_data,
+            repeatRows=1,
+            colWidths=[
+                column_width
+            ] * column_count
+        )
+
+    # -----------------------------------------------------
+    # TABLE STYLE
+    # -----------------------------------------------------
+
+    table.setStyle(
+        TableStyle([
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                colors.HexColor("#17375E")
+            ),
+
+            (
+                "TEXTCOLOR",
+                (0, 0),
+                (-1, 0),
+                colors.white
+            ),
+
+            (
+                "FONTNAME",
+                (0, 0),
+                (-1, 0),
+                "Helvetica-Bold"
+            ),
+
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "TOP"
+            ),
+
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.35,
+                colors.HexColor("#D9DEE5")
+            ),
+
+            (
+                "ROWBACKGROUNDS",
+                (0, 1),
+                (-1, -1),
+                [
+                    colors.white,
+                    colors.HexColor("#F7F9FC"),
+                ]
+            ),
+
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+
+            (
+                "TOPPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+
+            (
+                "BOTTOMPADDING",
+                (0, 0),
+                (-1, -1),
+                5
+            ),
+        ])
+    )
+
+    story.append(table)
+
+    # -----------------------------------------------------
+    # BUILD
+    # -----------------------------------------------------
+
+    document.build(story)
+
+    buffer.seek(0)
+
+    filename = (
+        f"KaamSetu_"
+        f"{report_type}_"
+        f"report.pdf"
+    )
+
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type="application/pdf"
+    )
+
+    response["Content-Disposition"] = (
+        f'attachment; filename="{filename}"'
+    )
+
+    return response
 
 # =========================================================
 # SUPER ADMIN ONLY

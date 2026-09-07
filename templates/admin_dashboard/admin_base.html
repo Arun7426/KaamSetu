@@ -337,7 +337,9 @@ KaamSetu Admin
 
                 <!-- Reports -->
 
-                <a href="#" class="admin-nav-item admin-nav-disabled" title="Reports — Coming Soon">
+                <a href="{% url 'admin_reports' %}"
+                    class="admin-nav-item {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}"
+                    title="Reports">
 
                     <span class="admin-nav-icon">
                         📑
@@ -346,10 +348,6 @@ KaamSetu Admin
                     <span class="admin-nav-label">
                         Reports
                     </span>
-
-                    <small class="coming-soon-badge">
-                        Soon
-                    </small>
 
                 </a>
 

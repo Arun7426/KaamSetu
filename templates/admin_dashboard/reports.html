@@ -1,0 +1,1242 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block admin_title %}
+Reports — KaamSetu
+{% endblock %}
+
+{% block admin_heading %}
+Reports
+{% endblock %}
+
+{% block admin_subheading %}
+Generate, review and export specific platform reports
+{% endblock %}
+
+{% block admin_content %}
+
+<style>
+
+    .reports-page {
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    .reports-intro {
+        margin-bottom: 20px;
+    }
+
+    .reports-intro h2 {
+        margin: 0;
+        color: #17375e;
+        font-size: 27px;
+        font-weight: 800;
+    }
+
+    .reports-intro p {
+        margin: 6px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+
+    /* =====================================================
+       GENERATOR CARD
+    ===================================================== */
+
+    .report-generator {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 17px;
+        padding: 22px;
+        box-shadow: 0 8px 25px rgba(15,39,68,.06);
+        margin-bottom: 22px;
+    }
+
+    .generator-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .generator-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: #eef4fb;
+        font-size: 20px;
+    }
+
+    .generator-title h3 {
+        margin: 0;
+        color: #17375e;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .generator-title p {
+        margin: 3px 0 0;
+        color: #9ca3af;
+        font-size: 11px;
+    }
+
+
+    .generator-grid {
+        display: grid;
+        grid-template-columns: 1.7fr 1fr 1fr auto;
+        gap: 14px;
+        align-items: end;
+    }
+
+    .report-field label {
+        display: block;
+        margin-bottom: 7px;
+        color: #374151;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .report-field select,
+    .report-field input {
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        background: #ffffff;
+        color: #1f2937;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .report-field select:focus,
+    .report-field input:focus {
+        border-color: #17375e;
+        box-shadow: 0 0 0 3px rgba(23,55,94,.08);
+    }
+
+    .generate-button {
+        min-height: 44px;
+        padding: 10px 21px;
+        border: 0;
+        border-radius: 10px;
+        background: #17375e;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .generate-button:hover {
+        background: #0f2f54;
+    }
+
+
+    /* =====================================================
+       REPORT DESCRIPTION
+    ===================================================== */
+
+    .selected-report {
+        margin-top: 15px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: #f7f9fc;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+    }
+
+    .selected-report strong {
+        color: #17375e;
+        font-size: 12px;
+    }
+
+    .selected-report span {
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+
+    /* =====================================================
+       EXPORT BAR
+    ===================================================== */
+
+    .export-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 19px 22px;
+        margin-bottom: 25px;
+        border-radius: 16px;
+        background: linear-gradient(
+            135deg,
+            #17375e,
+            #285681
+        );
+        box-shadow: 0 8px 25px rgba(15,39,68,.12);
+    }
+
+    .export-text h3 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .export-text p {
+        margin: 4px 0 0;
+        color: rgba(255,255,255,.78);
+        font-size: 11px;
+    }
+
+    .export-actions {
+        display: flex;
+        gap: 9px;
+    }
+
+    .export-button {
+        min-height: 40px;
+        padding: 9px 16px;
+        border: 1px solid rgba(255,255,255,.3);
+        border-radius: 9px;
+        background: rgba(255,255,255,.12);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .export-button.disabled {
+        opacity: .6;
+        cursor: not-allowed;
+    }
+
+
+    /* =====================================================
+       PREVIEW HEADER
+    ===================================================== */
+
+    .preview-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(15,39,68,.05);
+    }
+
+    .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 20px;
+        border-bottom: 1px solid #edf0f3;
+    }
+
+    .preview-header h3 {
+        margin: 0;
+        color: #17375e;
+        font-size: 19px;
+        font-weight: 800;
+    }
+
+    .preview-header p {
+        margin: 5px 0 0;
+        color: #8b95a5;
+        font-size: 11px;
+    }
+
+    .record-count {
+        padding: 7px 12px;
+        border-radius: 20px;
+        background: #eef4fb;
+        color: #17375e;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       SUMMARY
+    ===================================================== */
+
+    .report-summary {
+        display: flex;
+        gap: 12px;
+        padding: 17px 20px;
+        border-bottom: 1px solid #edf0f3;
+        flex-wrap: wrap;
+    }
+
+    .summary-item {
+        min-width: 150px;
+        padding: 12px 14px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fafbfc;
+    }
+
+    .summary-label {
+        color: #8b95a5;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .summary-value {
+        margin-top: 5px;
+        color: #17375e;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    .report-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 700px;
+    }
+
+    .report-table th {
+        padding: 12px 15px;
+        background: #f7f9fc;
+        border-bottom: 1px solid #e5e7eb;
+        color: #536173;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .report-table td {
+        padding: 13px 15px;
+        border-bottom: 1px solid #edf0f3;
+        color: #374151;
+        font-size: 12px;
+        vertical-align: top;
+    }
+
+    .report-table tbody tr:hover {
+        background: #fafcff;
+    }
+
+
+    /* =====================================================
+       EMPTY / MESSAGE
+    ===================================================== */
+
+    .report-message {
+        margin: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        background: #fff8e8;
+        border: 1px solid #f1dfae;
+        color: #735d20;
+        font-size: 12px;
+    }
+
+    .empty-report {
+        padding: 50px 20px;
+        text-align: center;
+        color: #9ca3af;
+    }
+
+    .empty-report-icon {
+        font-size: 38px;
+        margin-bottom: 10px;
+    }
+
+    .empty-report h4 {
+        margin: 0;
+        color: #536173;
+        font-size: 15px;
+    }
+
+    .empty-report p {
+        margin: 5px 0 0;
+        font-size: 11px;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 1100px) {
+
+        .generator-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+    }
+
+    @media (max-width: 800px) {
+
+        .export-bar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .export-actions {
+            width: 100%;
+        }
+
+        .export-button {
+            flex: 1;
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .generator-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .generate-button {
+            width: 100%;
+        }
+
+        .preview-header {
+            flex-direction: column;
+        }
+
+    }
+
+</style>
+
+
+<div class="reports-page">
+
+
+    <!-- =====================================================
+         INTRO
+    ====================================================== -->
+
+    <div class="reports-intro">
+
+        <h2>
+            Report Generator
+        </h2>
+
+        <p>
+            Select a specific report, choose a date range and generate
+            the exact data you need.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         GENERATOR
+    ====================================================== -->
+
+    <div class="report-generator">
+
+        <div class="generator-title">
+
+            <div class="generator-icon">
+                📑
+            </div>
+
+            <div>
+
+                <h3>
+                    Generate Report
+                </h3>
+
+                <p>
+                    Choose one report at a time for accurate filtering and export.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <form method="get">
+
+            <div class="generator-grid">
+
+
+                <!-- REPORT TYPE -->
+
+                <div class="report-field">
+
+                    <label for="report_type">
+                        Report Type
+                    </label>
+
+                    <select
+                        name="report_type"
+                        id="report_type"
+                    >
+
+                        <optgroup label="Users">
+
+                            <option
+                                value="new_users"
+                                {% if report_type == "new_users" %}selected{% endif %}
+                            >
+                                👥 New Users
+                            </option>
+
+                            <option
+                                value="active_users"
+                                {% if report_type == "active_users" %}selected{% endif %}
+                            >
+                                🟢 Active Users
+                            </option>
+
+                            <option
+                                value="inactive_users"
+                                {% if report_type == "inactive_users" %}selected{% endif %}
+                            >
+                                ⚪ Inactive Users
+                            </option>
+
+                        </optgroup>
+
+
+                        <optgroup label="Bookings">
+
+                            <option
+                                value="bookings"
+                                {% if report_type == "bookings" %}selected{% endif %}
+                            >
+                                📋 All Bookings
+                            </option>
+
+                            <option
+                                value="accepted_bookings"
+                                {% if report_type == "accepted_bookings" %}selected{% endif %}
+                            >
+                                🔵 Accepted Bookings
+                            </option>
+
+                            <option
+                                value="completed_bookings"
+                                {% if report_type == "completed_bookings" %}selected{% endif %}
+                            >
+                                🟢 Completed Bookings
+                            </option>
+
+                            <option
+                                value="cancelled_bookings"
+                                {% if report_type == "cancelled_bookings" %}selected{% endif %}
+                            >
+                                🔴 Cancelled Bookings
+                            </option>
+
+                            <option
+                                value="pending_bookings"
+                                {% if report_type == "pending_bookings" %}selected{% endif %}
+                            >
+                                🟡 Pending Bookings
+                            </option>
+
+                        </optgroup>
+
+
+                        <optgroup label="Workers">
+
+                            <option
+                                value="new_workers"
+                                {% if report_type == "new_workers" %}selected{% endif %}
+                            >
+                                👷 New Workers
+                            </option>
+
+                            <option
+                                value="active_workers"
+                                {% if report_type == "active_workers" %}selected{% endif %}
+                            >
+                                🟢 Active Workers
+                            </option>
+
+                            <option
+                                value="worker_performance"
+                                {% if report_type == "worker_performance" %}selected{% endif %}
+                            >
+                                📊 Worker Performance
+                            </option>
+
+                        </optgroup>
+
+
+                        <optgroup label="Reviews">
+
+                            <option
+                                value="reviews"
+                                {% if report_type == "reviews" %}selected{% endif %}
+                            >
+                                ⭐ Reviews
+                            </option>
+
+                            <option
+                                value="low_ratings"
+                                {% if report_type == "low_ratings" %}selected{% endif %}
+                            >
+                                ⚠️ Low Ratings
+                            </option>
+
+                        </optgroup>
+
+
+                        {% if is_super_admin %}
+
+                        <optgroup label="Finance — Super Admin">
+
+                            <option
+                                value="platform_fees"
+                                {% if report_type == "platform_fees" %}selected{% endif %}
+                            >
+                                💰 Platform Fees
+                            </option>
+
+                            <option
+                                value="worker_payments"
+                                {% if report_type == "worker_payments" %}selected{% endif %}
+                            >
+                                💳 Worker Payments
+                            </option>
+
+                            <option
+                                value="outstanding"
+                                {% if report_type == "outstanding" %}selected{% endif %}
+                            >
+                                ⚠️ Outstanding
+                            </option>
+
+                            <option
+                                value="ledger"
+                                {% if report_type == "ledger" %}selected{% endif %}
+                            >
+                                📒 Worker Ledger
+                            </option>
+
+                        </optgroup>
+
+                        {% endif %}
+
+
+                        <optgroup label="App & Retention">
+
+                            <option
+                                value="app_retention"
+                                {% if report_type == "app_retention" %}selected{% endif %}
+                            >
+                                📱 App Retention
+                            </option>
+
+                        </optgroup>
+
+                    </select>
+
+                </div>
+
+
+                <!-- PERIOD -->
+
+                <div class="report-field">
+
+                    <label for="period">
+                        Date Range
+                    </label>
+
+                    <select
+                        name="period"
+                        id="period"
+                    >
+
+                        <option
+                            value="today"
+                            {% if period == "today" %}selected{% endif %}
+                        >
+                            Today
+                        </option>
+
+                        <option
+                            value="7"
+                            {% if period == "7" %}selected{% endif %}
+                        >
+                            Last 7 Days
+                        </option>
+
+                        <option
+                            value="30"
+                            {% if period == "30" %}selected{% endif %}
+                        >
+                            Last 30 Days
+                        </option>
+
+                        <option
+                            value="month"
+                            {% if period == "month" %}selected{% endif %}
+                        >
+                            This Month
+                        </option>
+
+                        <option
+                            value="last_month"
+                            {% if period == "last_month" %}selected{% endif %}
+                        >
+                            Last Month
+                        </option>
+
+                        <option
+                            value="year"
+                            {% if period == "year" %}selected{% endif %}
+                        >
+                            This Year
+                        </option>
+
+                        <option
+                            value="all"
+                            {% if period == "all" %}selected{% endif %}
+                        >
+                            All Time
+                        </option>
+
+                        <option
+                            value="custom"
+                            {% if period == "custom" %}selected{% endif %}
+                        >
+                            Custom Range
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- START -->
+
+                <div
+                    class="report-field custom-date-field"
+                >
+
+                    <label for="start_date">
+                        Start Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="start_date"
+                        id="start_date"
+                        value="{{ custom_start }}"
+                    >
+
+                </div>
+
+
+                <!-- END / GENERATE -->
+
+                <div
+                    class="report-field custom-date-field"
+                >
+
+                    <label for="end_date">
+                        End Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="end_date"
+                        id="end_date"
+                        value="{{ custom_end }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div style="margin-top:14px;">
+
+                <button
+                    type="submit"
+                    class="generate-button"
+                >
+                    Generate Report
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <div class="selected-report">
+
+            <strong>
+                Selected Report:
+            </strong>
+
+            <span>
+                {{ selected_report.label }}
+            </span>
+
+            <span>•</span>
+
+            <strong>
+                Period:
+            </strong>
+
+            <span>
+                {{ period_label }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EXPORT
+    ====================================================== -->
+
+    <div class="export-bar">
+
+        <div class="export-text">
+
+            <h3>
+                📥 Export Generated Report
+            </h3>
+
+            <p>
+                Export exactly the report and date range selected above.
+            </p>
+
+        </div>
+
+
+        <div class="export-actions">
+
+            <a
+                href="{% url 'export_report_excel' %}?report_type={{ report_type }}&period={{ period }}&start_date={{ custom_start }}&end_date={{ custom_end }}"
+                class="export-button"
+            >
+                📊 Export Excel
+            </a>
+
+            <a
+                href="{% url 'export_report_pdf' %}?report_type={{ report_type }}&period={{ period }}&start_date={{ custom_start }}&end_date={{ custom_end }}"
+                class="export-button"
+            >
+                📄 Export PDF
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REPORT PREVIEW
+    ====================================================== -->
+
+    <div class="preview-card">
+
+
+        <div class="preview-header">
+
+            <div>
+
+                <h3>
+                    {{ selected_report.label }}
+                </h3>
+
+                <p>
+                    {{ selected_report.description }}
+                </p>
+
+            </div>
+
+            <div class="record-count">
+
+                {{ report_count }} record{{ report_count|pluralize }}
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             MESSAGE
+        ================================================== -->
+
+        {% if report_message %}
+
+            <div class="report-message">
+
+                📱 {{ report_message }}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
+
+        <div class="report-summary">
+
+            <div class="summary-item">
+
+                <div class="summary-label">
+                    Report
+                </div>
+
+                <div class="summary-value">
+                    {{ selected_report.label }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <div class="summary-label">
+                    Records
+                </div>
+
+                <div class="summary-value">
+                    {{ report_count }}
+                </div>
+
+            </div>
+
+
+            {% if report_total %}
+
+            <div class="summary-item">
+
+                <div class="summary-label">
+                    Total Amount
+                </div>
+
+                <div class="summary-value">
+                    ₹{{ report_total|floatformat:2 }}
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
+
+        {% if report_rows %}
+
+        <div class="report-table-wrapper">
+
+            <table class="report-table">
+
+                <thead>
+
+                    <tr>
+
+                        {% for column in report_columns %}
+
+                            <th>
+                                {{ column }}
+                            </th>
+
+                        {% endfor %}
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for row in report_rows %}
+
+                    <tr>
+
+                        {% if report_type == "new_users" %}
+
+                            <td>{{ row.username }}</td>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.email }}</td>
+                            <td>
+                                {{ row.date|date:"d M Y, h:i A" }}
+                            </td>
+
+
+                        {% elif report_type == "active_users" or report_type == "inactive_users" %}
+
+                            <td>{{ row.username }}</td>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.email }}</td>
+
+                            <td>
+                                {% if row.date %}
+                                    {{ row.date|date:"d M Y, h:i A" }}
+                                {% else %}
+                                    Never
+                                {% endif %}
+                            </td>
+
+
+                        {% elif report_type == "bookings" or report_type == "accepted_bookings" or report_type == "completed_bookings" or report_type == "cancelled_bookings" or report_type == "pending_bookings" %}
+
+                            <td>
+                                #{{ row.id }}
+                            </td>
+
+                            <td>
+                                {{ row.date|date:"d M Y, h:i A" }}
+                            </td>
+
+                            <td>
+                                {{ row.customer }}
+                            </td>
+
+                            <td>
+                                {{ row.worker }}
+                            </td>
+
+                            <td>
+                                {{ row.work }}
+                            </td>
+
+                            <td>
+                                {{ row.status }}
+                            </td>
+
+                            <td>
+                                ₹{{ row.amount|floatformat:2 }}
+                            </td>
+
+
+                        {% elif report_type == "new_workers" %}
+
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.profession }}</td>
+                            <td>{{ row.mobile }}</td>
+                            <td>{{ row.city }}</td>
+                            <td>{{ row.experience }}</td>
+                            <td>₹{{ row.daily_wage }}</td>
+
+                            <td>
+                                {{ row.date|date:"d M Y" }}
+                            </td>
+
+
+                        {% elif report_type == "reviews" or report_type == "low_ratings" %}
+
+                            <td>
+                                {{ row.date|date:"d M Y, h:i A" }}
+                            </td>
+
+                            <td>{{ row.customer }}</td>
+
+                            <td>{{ row.worker }}</td>
+
+                            <td>
+                                {{ row.rating }}/5
+                            </td>
+
+                            <td>
+                                {{ row.comment }}
+                            </td>
+
+                            <td>
+                                #{{ row.booking }}
+                            </td>
+
+
+                        {% elif report_type == "platform_fees" or report_type == "worker_payments" or report_type == "ledger" %}
+
+                            <td>
+                                {{ row.date|date:"d M Y, h:i A" }}
+                            </td>
+
+                            <td>
+                                {{ row.worker }}
+                            </td>
+
+                            <td>
+                                {{ row.transaction }}
+                            </td>
+
+                            <td>
+                                ₹{{ row.amount|floatformat:2 }}
+                            </td>
+
+                            <td>
+                                {{ row.status }}
+                            </td>
+
+                            <td>
+                                {% if row.booking %}
+                                    #{{ row.booking }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+
+                        {% elif report_type == "outstanding" %}
+
+                            <td>
+                                {{ row.worker }}
+                            </td>
+
+                            <td>
+                                {{ row.mobile }}
+                            </td>
+
+                            <td>
+                                ₹{{ row.amount|floatformat:2 }}
+                            </td>
+
+
+                        {% elif report_type == "app_retention" %}
+
+                            <td>
+                                {{ row.metric }}
+                            </td>
+
+                            <td>
+                                {{ row.status }}
+                            </td>
+
+                        {% endif %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+            {% if not report_message %}
+
+            <div class="empty-report">
+
+                <div class="empty-report-icon">
+                    📭
+                </div>
+
+                <h4>
+                    No Records Found
+                </h4>
+
+                <p>
+                    No records match the selected report and date range.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     CUSTOM DATE BEHAVIOUR
+========================================================== -->
+
+<script>
+
+(function () {
+
+    const period =
+        document.getElementById("period");
+
+    const dateFields =
+        document.querySelectorAll(
+            ".custom-date-field"
+        );
+
+
+    function updateDateFields() {
+
+        const isCustom =
+            period.value === "custom";
+
+
+        dateFields.forEach(function (field) {
+
+            const input =
+                field.querySelector("input");
+
+            if (isCustom) {
+
+                field.style.opacity = "1";
+
+                if (input) {
+                    input.disabled = false;
+                }
+
+            } else {
+
+                field.style.opacity = ".55";
+
+                if (input) {
+                    input.disabled = true;
+                }
+
+            }
+
+        });
+
+    }
+
+
+    if (period) {
+
+        period.addEventListener(
+            "change",
+            updateDateFields
+        );
+
+        updateDateFields();
+
+    }
+
+})();
+
+</script>
+
+{% endblock %}
