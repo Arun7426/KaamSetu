@@ -36,6 +36,10 @@ from reportlab.platypus import (
     Spacer,
 )
 
+from .models import AuditLog
+
+from .audit_service import create_audit_log, get_client_ip
+
 # =========================================================
 # EXISTING STAFF CHECK
 # =========================================================
@@ -692,6 +696,18 @@ def admin_fee_settings(request):
         fee_setting.fee_value = fee_value
         fee_setting.is_active = is_active
         fee_setting.save()
+        create_audit_log(
+            admin=request.user,
+            action="UPDATE",
+            module="Fee Settings",
+            description=(
+                f"Platform fee updated to "
+                f"{fee_setting.fee_type} - "
+                f"{fee_setting.fee_value}"
+            ),
+            target_id=fee_setting.id,
+            ip_address=get_client_ip(request),
+        )
 
         messages.success(request, "Fee Settings updated successfully.")
         return redirect("admin_fee_settings")
@@ -786,6 +802,19 @@ def admin_promotion_create(request):
             ).update(
                 is_active=False
             )
+        create_audit_log(
+            admin=request.user,
+            action="CREATE",
+            module="Promotions",
+            description=(
+                f'Promotion "{promotion.name}" created '
+                f'with {promotion.free_bookings_limit} free bookings '
+                f'and status '
+                f'{"Active" if promotion.is_active else "Inactive"}.'
+            ),
+            target_id=promotion.id,
+            ip_address=get_client_ip(request),
+        )
 
         messages.success(
             request,
@@ -867,6 +896,20 @@ def admin_promotion_edit(request, promotion_id):
             ).update(
                 is_active=False
             )
+        
+        create_audit_log(
+            admin=request.user,
+            action="UPDATE",
+            module="Promotions",
+            description=(
+                f'Promotion "{promotion.name}" updated '
+                f'to {promotion.free_bookings_limit} free bookings '
+                f'and status '
+                f'{"Active" if promotion.is_active else "Inactive"}.'
+            ),
+            target_id=promotion.id,
+            ip_address=get_client_ip(request),
+        )
 
         messages.success(
             request,
@@ -902,6 +945,18 @@ def admin_promotion_toggle(request, promotion_id):
 
     promotion.is_active = not promotion.is_active
     promotion.save(update_fields=["is_active", "updated_at"])
+    
+    create_audit_log(
+        admin=request.user,
+        action="UPDATE",
+        module="Promotions",
+        description=(
+            f'Promotion "{promotion.name}" '
+            f'{"activated" if promotion.is_active else "deactivated"}.'
+        ),
+        target_id=promotion.id,
+        ip_address=get_client_ip(request),
+    )
 
     if promotion.is_active:
         Promotion.objects.exclude(
@@ -934,7 +989,20 @@ def admin_promotion_delete(request, promotion_id):
         raise PermissionDenied("Promotion not found.")
 
     if request.method == "POST":
+        
         name = promotion.name
+
+        create_audit_log(
+            admin=request.user,
+            action="DELETE",
+            module="Promotions",
+            description=(
+                f'Promotion "{name}" deleted.'
+            ),
+            target_id=promotion.id,
+            ip_address=get_client_ip(request),
+        )
+
         promotion.delete()
 
         messages.success(
@@ -3686,5 +3754,26 @@ def admin_management(request):
         {
             "admins": admins,
             "groups": groups,
+        }
+    )
+    
+# =========================================================
+# AUDIT LOGS
+# ADMIN ACCESS
+# =========================================================
+
+@admin_required
+def admin_audit_logs(request):
+
+    audit_logs = AuditLog.objects.select_related(
+        "admin",
+        "target_user",
+    ).all()
+
+    return render(
+        request,
+        "admin_dashboard/audit_logs.html",
+        {
+            "audit_logs": audit_logs,
         }
     )

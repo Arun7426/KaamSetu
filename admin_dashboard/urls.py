@@ -178,4 +178,15 @@ urlpatterns = [
         name="edit_admin"
     ),
 
+
+    # =====================================================
+    # AUDIT LOGS
+    # =====================================================
+
+    path(
+        "audit-logs/",
+        views.admin_audit_logs,
+        name="admin_audit_logs"
+    ),
+
 ]

@@ -1,0 +1,527 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block admin_content %}
+
+<style>
+    /* =====================================================
+       AUDIT LOGS PAGE
+       ===================================================== */
+
+    .audit-page-header {
+        margin-bottom: 24px;
+    }
+
+    .audit-page-header h1 {
+        margin: 0 0 6px;
+        font-size: 32px;
+        font-weight: 700;
+    }
+
+    .audit-page-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 15px;
+    }
+
+
+    /* =====================================================
+       SUMMARY CARD
+       ===================================================== */
+
+    .audit-summary-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .audit-summary-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: #eef4fb;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 23px;
+    }
+
+    .audit-summary-label {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .audit-summary-value {
+        display: block;
+        color: #17375e;
+        font-size: 25px;
+        font-weight: 700;
+    }
+
+
+    /* =====================================================
+       LOG CARD
+       ===================================================== */
+
+    .audit-log-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+        overflow: hidden;
+    }
+
+    .audit-card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .audit-card-header h2 {
+        margin: 0 0 5px;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .audit-card-header p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+
+    /* =====================================================
+       TABLE
+       ===================================================== */
+
+    .audit-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .audit-table {
+        width: 100%;
+        min-width: 1050px;
+        border-collapse: collapse;
+        table-layout: auto;
+    }
+
+    .audit-table th {
+        background: #17375e;
+        color: #ffffff;
+
+        padding: 14px 16px;
+        text-align: left;
+
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+
+        border-bottom: 1px solid #17375e;
+    }
+
+    .audit-table td {
+        padding: 15px 16px;
+
+        color: #334155;
+        font-size: 14px;
+        line-height: 1.45;
+
+        vertical-align: top;
+
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .audit-table tbody tr:nth-child(even) {
+        background: #f8fafc;
+    }
+
+    .audit-table tbody tr:hover {
+        background: #f1f5f9;
+    }
+
+
+    /* =====================================================
+       DATE / ADMIN
+       ===================================================== */
+
+    .audit-date {
+        white-space: nowrap;
+        color: #334155;
+    }
+
+    .audit-time {
+        display: block;
+        margin-top: 3px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .audit-admin-name {
+        display: block;
+        font-weight: 600;
+        color: #17375e;
+    }
+
+    .audit-admin-role {
+        display: block;
+        margin-top: 3px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+
+    /* =====================================================
+       ACTION BADGE
+       ===================================================== */
+
+    .audit-action-badge {
+        display: inline-flex;
+        align-items: center;
+
+        padding: 5px 10px;
+        border-radius: 20px;
+
+        background: #eef4fb;
+        color: #17375e;
+
+        font-size: 12px;
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       MODULE
+       ===================================================== */
+
+    .audit-module {
+        font-weight: 600;
+        color: #334155;
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       TARGET
+       ===================================================== */
+
+    .audit-target {
+        color: #475569;
+    }
+
+
+    /* =====================================================
+       DESCRIPTION
+       ===================================================== */
+
+    .audit-description {
+        min-width: 260px;
+        max-width: 420px;
+    }
+
+
+    /* =====================================================
+       IP
+       ===================================================== */
+
+    .audit-ip {
+        font-family: monospace;
+        font-size: 13px;
+        color: #475569;
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+       ===================================================== */
+
+    .audit-empty-state {
+        padding: 60px 24px;
+        text-align: center;
+    }
+
+    .audit-empty-icon {
+        font-size: 38px;
+        margin-bottom: 12px;
+    }
+
+    .audit-empty-state h3 {
+        margin: 0 0 8px;
+        font-size: 19px;
+    }
+
+    .audit-empty-state p {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 768px) {
+
+        .audit-page-header h1 {
+            font-size: 26px;
+        }
+
+        .audit-summary-card {
+            padding: 16px 18px;
+        }
+
+        .audit-card-header {
+            padding: 16px 18px;
+        }
+
+        .audit-table th,
+        .audit-table td {
+            padding: 12px;
+        }
+
+    }
+</style>
+
+
+<!-- =====================================================
+     PAGE HEADER
+     ===================================================== -->
+
+<div class="audit-page-header">
+
+    <h1>Audit Logs</h1>
+
+    <p>
+        Track important activities performed across the admin dashboard.
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     SUMMARY
+     ===================================================== -->
+
+<div class="audit-summary-card">
+
+    <div class="audit-summary-icon">
+        🧾
+    </div>
+
+    <div>
+        <span class="audit-summary-label">
+            Total Audit Logs
+        </span>
+
+        <span class="audit-summary-value">
+            {{ audit_logs|length }}
+        </span>
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ACTIVITY HISTORY
+     ===================================================== -->
+
+<div class="audit-log-card">
+
+    <div class="audit-card-header">
+
+        <h2>
+            Activity History
+        </h2>
+
+        <p>
+            Administrative actions recorded by KaamSetu.
+        </p>
+
+    </div>
+
+
+    {% if audit_logs %}
+
+        <div class="audit-table-wrapper">
+
+            <table class="audit-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Admin / User</th>
+                        <th>Action</th>
+                        <th>Module</th>
+                        <th>Target</th>
+                        <th>Description</th>
+                        <th>IP Address</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for log in audit_logs %}
+
+                        <tr>
+
+                            <!-- DATE & TIME -->
+                            <td class="audit-date">
+
+                                {{ log.created_at|date:"d M Y" }}
+
+                                <span class="audit-time">
+                                    {{ log.created_at|time:"h:i A" }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- ADMIN / USER -->
+                            <td>
+
+                                {% if log.admin %}
+
+                                    <span class="audit-admin-name">
+                                        {{ log.admin.username }}
+                                    </span>
+
+                                    <span class="audit-admin-role">
+
+                                        {% if log.admin.is_superuser %}
+                                            Super Admin
+                                        {% elif log.admin.is_staff %}
+                                            Admin
+                                        {% else %}
+                                            User
+                                        {% endif %}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="audit-admin-name">
+                                        System
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTION -->
+                            <td>
+
+                                <span class="audit-action-badge">
+                                    {{ log.get_action_display }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- MODULE -->
+                            <td>
+
+                                <span class="audit-module">
+                                    {{ log.module }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- TARGET -->
+                            <td class="audit-target">
+
+                                {% if log.target_user %}
+
+                                    {{ log.target_user.username }}
+
+                                {% elif log.target_id %}
+
+                                    #{{ log.target_id }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- DESCRIPTION -->
+                            <td class="audit-description">
+                                {{ log.description }}
+                            </td>
+
+
+                            <!-- IP ADDRESS -->
+                            <td>
+
+                                {% if log.ip_address %}
+
+                                    <span class="audit-ip">
+                                        {{ log.ip_address }}
+                                    </span>
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <!-- =================================================
+             EMPTY STATE
+             ================================================= -->
+
+        <div class="audit-empty-state">
+
+            <div class="audit-empty-icon">
+                🧾
+            </div>
+
+            <h3>
+                No Audit Logs Yet
+            </h3>
+
+            <p>
+                Administrative activities will appear here
+                once audit logging is triggered.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
