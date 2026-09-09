@@ -397,7 +397,14 @@ KaamSetu Admin
 
                 <!-- System Settings -->
 
-                <a href="#" class="admin-nav-item admin-nav-disabled" title="System Settings — Coming Soon">
+                {% if request.user.is_superuser %}
+
+                <a href="{% url 'admin_system_settings' %}"
+                    class="admin-nav-item
+                    {% if request.resolver_match.url_name == 'admin_system_settings' %}
+                        active
+                    {% endif %}"
+                    title="System Settings">
 
                     <span class="admin-nav-icon">
                         ⚙️
@@ -407,11 +414,9 @@ KaamSetu Admin
                         System Settings
                     </span>
 
-                    <small class="coming-soon-badge">
-                        Soon
-                    </small>
-
                 </a>
+
+                {% endif %}
 
             </div>
 
@@ -640,6 +645,10 @@ KaamSetu Admin
 
 
 
+                        <div class="admin-dropdown-divider"></div>
+                        
+
+
                         <a href="{% url 'home' %}" class="admin-dropdown-item">
 
                             <span>
@@ -652,6 +661,25 @@ KaamSetu Admin
 
                         </a>
 
+
+                        {% if request.user.is_superuser %}
+
+                        <a
+                            href="{% url 'change_super_admin_password' %}"
+                            class="admin-dropdown-item"
+                        >
+
+                            <span>
+                                🔐
+                            </span>
+
+                            <span>
+                                Change Password
+                            </span>
+
+                        </a>
+
+                        {% endif %}
 
 
                         <a href="{% url 'logout' %}" class="admin-dropdown-item logout">

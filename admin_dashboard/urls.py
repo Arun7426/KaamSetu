@@ -178,6 +178,17 @@ urlpatterns = [
         name="edit_admin"
     ),
 
+    path(
+        "admin-management/change-password/<int:user_id>/",
+        admin_management.change_admin_password,
+        name="change_admin_password"
+    ),
+
+    path(
+        "admin-management/delete/<int:user_id>/",
+        admin_management.delete_admin,
+        name="delete_admin"
+    ),
 
     # =====================================================
     # AUDIT LOGS
@@ -188,5 +199,16 @@ urlpatterns = [
         views.admin_audit_logs,
         name="admin_audit_logs"
     ),
+    
+    path(
+        "system-settings/",
+        views.admin_system_settings,
+        name="admin_system_settings"
+    ),
 
+    path(
+        "password-management/super-admin/",
+        views.change_super_admin_password,
+        name="change_super_admin_password"
+    ),
 ]

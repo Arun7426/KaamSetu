@@ -62,3 +62,46 @@ class AuditLog(models.Model):
     def __str__(self):
         admin_name = self.admin.username if self.admin else "System"
         return f"{admin_name} - {self.action} - {self.module}"
+    
+class SystemSetting(models.Model):
+    maintenance_mode = models.BooleanField(
+        default=False,
+    )
+
+    maintenance_message = models.TextField(
+        blank=True,
+        default="KaamSetu is currently under maintenance. Please check back soon.",
+    )
+
+    support_email = models.EmailField(
+        blank=True,
+    )
+
+    support_phone = models.CharField(
+        max_length=20,
+        blank=True,
+    )
+
+    app_version = models.CharField(
+        max_length=50,
+        default="1.0.0",
+    )
+
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="system_settings_updates",
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    class Meta:
+        verbose_name = "System Setting"
+        verbose_name_plural = "System Settings"
+
+    def __str__(self):
+        return "KaamSetu System Settings"

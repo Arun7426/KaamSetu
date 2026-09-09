@@ -1,9 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 
+from .audit_service import create_audit_log, get_client_ip
 
 # =========================================================
 # SUPER ADMIN SECURITY
@@ -405,3 +407,113 @@ def edit_admin(request, user_id):
             "groups": groups,
         }
     )
+
+# ============================================================
+# ADMIN PASSWORD CHANGE
+# SUPER ADMIN ONLY
+# ============================================================
+
+@super_admin_required
+def change_admin_password(request, user_id):
+    admin_user = get_object_or_404(
+        User,
+        id=user_id,
+        is_staff=True,
+        is_superuser=False
+    )
+
+    if request.method == "POST":
+        password = request.POST.get("password", "")
+        confirm_password = request.POST.get("confirm_password", "")
+
+        if not password:
+            messages.error(request, "Password is required.")
+            return redirect("change_admin_password", user_id=admin_user.id)
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect("change_admin_password", user_id=admin_user.id)
+
+        try:
+            validate_password(password, admin_user)
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)
+
+            return redirect(
+                "change_admin_password",
+                user_id=admin_user.id
+            )
+
+        admin_user.set_password(password)
+        admin_user.save()
+
+        create_audit_log(
+            admin=request.user,
+            action="UPDATE",
+            module="Admin Management",
+            description=(
+                f"Password changed for Admin account: "
+                f"{admin_user.username}."
+            ),
+            target_user=admin_user,
+            target_id=admin_user.id,
+            ip_address=get_client_ip(request),
+        )
+
+        messages.success(
+            request,
+            f"Password changed successfully for {admin_user.username}."
+        )
+
+        return redirect("admin_management")
+
+    return render(
+        request,
+        "admin_dashboard/change_admin_password.html",
+        {
+            "admin_user": admin_user,
+        }
+    )
+
+
+# ============================================================
+# DELETE ADMIN
+# SUPER ADMIN ONLY
+# ============================================================
+
+@super_admin_required
+def delete_admin(request, user_id):
+    admin_user = get_object_or_404(
+        User,
+        id=user_id,
+        is_staff=True,
+        is_superuser=False
+    )
+
+    if request.method != "POST":
+        return redirect("admin_management")
+
+    username = admin_user.username
+    admin_id = admin_user.id
+
+    create_audit_log(
+        admin=request.user,
+        action="DELETE",
+        module="Admin Management",
+        description=(
+            f"Admin account deleted: {username}."
+        ),
+        target_user=admin_user,
+        target_id=admin_id,
+        ip_address=get_client_ip(request),
+    )
+
+    admin_user.delete()
+
+    messages.success(
+        request,
+        f"Admin account '{username}' deleted successfully."
+    )
+
+    return redirect("admin_management")

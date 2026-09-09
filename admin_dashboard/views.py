@@ -36,9 +36,12 @@ from reportlab.platypus import (
     Spacer,
 )
 
-from .models import AuditLog
+from .models import AuditLog, SystemSetting
 
 from .audit_service import create_audit_log, get_client_ip
+
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 # =========================================================
 # EXISTING STAFF CHECK
@@ -3775,5 +3778,164 @@ def admin_audit_logs(request):
         "admin_dashboard/audit_logs.html",
         {
             "audit_logs": audit_logs,
+        }
+    )
+
+# =========================================================
+# SYSTEM SETTINGS
+# SUPER ADMIN ONLY
+# =========================================================
+
+@super_admin_required
+def admin_system_settings(request):
+
+    system_settings = SystemSetting.objects.first()
+
+    # Create default settings if none exist
+    if system_settings is None:
+        system_settings = SystemSetting.objects.create(
+            maintenance_mode=False,
+            maintenance_message=(
+                "KaamSetu is currently under maintenance. "
+                "Please check back soon."
+            ),
+            support_email="",
+            support_phone="",
+            app_version="1.0.0",
+        )
+
+    if request.method == "POST":
+
+        maintenance_mode = (
+            request.POST.get("maintenance_mode") == "on"
+        )
+
+        maintenance_message = (
+            request.POST.get(
+                "maintenance_message",
+                ""
+            ).strip()
+        )
+
+        support_email = (
+            request.POST.get(
+                "support_email",
+                ""
+            ).strip()
+        )
+
+        support_phone = (
+            request.POST.get(
+                "support_phone",
+                ""
+            ).strip()
+        )
+
+        app_version = (
+            request.POST.get(
+                "app_version",
+                ""
+            ).strip()
+        )
+
+        # -------------------------------------------------
+        # VALIDATION
+        # -------------------------------------------------
+
+        if not app_version:
+            messages.error(
+                request,
+                "Application version is required."
+            )
+            return redirect("admin_system_settings")
+
+        if maintenance_mode and not maintenance_message:
+            messages.error(
+                request,
+                "Please enter a maintenance message."
+            )
+            return redirect("admin_system_settings")
+
+        # -------------------------------------------------
+        # SAVE
+        # -------------------------------------------------
+
+        system_settings.maintenance_mode = maintenance_mode
+        system_settings.maintenance_message = maintenance_message
+        system_settings.support_email = support_email
+        system_settings.support_phone = support_phone
+        system_settings.app_version = app_version
+        system_settings.updated_by = request.user
+
+        system_settings.save()
+
+        # -------------------------------------------------
+        # AUDIT LOG
+        # -------------------------------------------------
+
+        create_audit_log(
+            admin=request.user,
+            action="UPDATE",
+            module="System Settings",
+            description=(
+                "System Settings updated. "
+                f"Maintenance Mode: "
+                f"{'ON' if maintenance_mode else 'OFF'}, "
+                f"App Version: {app_version}."
+            ),
+            target_id=system_settings.id,
+            ip_address=get_client_ip(request),
+        )
+
+        messages.success(
+            request,
+            "System Settings updated successfully."
+        )
+
+        return redirect("admin_system_settings")
+
+    return render(
+        request,
+        "admin_dashboard/system_settings.html",
+        {
+            "system_settings": system_settings,
+        }
+    )
+
+@super_admin_required
+def change_super_admin_password(request):
+    form = PasswordChangeForm(
+        user=request.user,
+        data=request.POST or None
+    )
+
+    if request.method == "POST" and form.is_valid():
+        user = form.save()
+
+        # Keep Super Admin logged in after password change
+        update_session_auth_hash(request, user)
+
+        create_audit_log(
+            admin=request.user,
+            action="UPDATE",
+            module="Password Management",
+            description="Super Admin password changed successfully.",
+            target_user=request.user,
+            target_id=request.user.id,
+            ip_address=get_client_ip(request),
+        )
+
+        messages.success(
+            request,
+            "Super Admin password changed successfully."
+        )
+
+        return redirect("change_super_admin_password")
+
+    return render(
+        request,
+        "admin_dashboard/change_super_admin_password.html",
+        {
+            "form": form,
         }
     )

@@ -1342,3 +1342,313 @@
     }
 
 }
+/* =====================================================
+   SYSTEM SETTINGS
+   ===================================================== */
+
+.system-settings-page {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.system-settings-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+}
+
+
+/* =====================================================
+   SETTINGS HEADER
+   ===================================================== */
+
+.system-settings-header {
+    margin-bottom: 28px;
+}
+
+.system-settings-header h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.system-settings-header p {
+    margin: 7px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   SETTINGS SECTION
+   ===================================================== */
+
+.system-settings-section {
+    padding: 24px 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+.system-settings-section:first-of-type {
+    padding-top: 0;
+    border-top: none;
+}
+
+.system-settings-section h3 {
+    margin: 0 0 18px;
+    color: #17375e;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   FORM GRID
+   ===================================================== */
+
+.system-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.system-settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.system-settings-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.system-settings-field label {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.system-settings-field input,
+.system-settings-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #111827;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.system-settings-field input {
+    height: 42px;
+}
+
+.system-settings-field textarea {
+    min-height: 105px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.system-settings-field input:focus,
+.system-settings-field textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.system-settings-field small {
+    color: #6b7280;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   MAINTENANCE TOGGLE
+   ===================================================== */
+
+.system-settings-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px;
+    margin-bottom: 18px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+}
+
+.system-settings-toggle-info strong {
+    display: block;
+    color: #111827;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.system-settings-toggle-info span {
+    display: block;
+    margin-top: 4px;
+    color: #6b7280;
+    font-size: 11px;
+}
+
+
+/* Toggle */
+
+.system-settings-switch {
+    position: relative;
+    width: 48px;
+    min-width: 48px;
+    height: 26px;
+}
+
+.system-settings-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.system-settings-slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    background: #cbd5e1;
+    border-radius: 30px;
+    transition: background 0.2s ease;
+}
+
+.system-settings-slider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
+    transition: transform 0.2s ease;
+}
+
+.system-settings-switch input:checked + .system-settings-slider {
+    background: #2563eb;
+}
+
+.system-settings-switch input:checked + .system-settings-slider::before {
+    transform: translateX(22px);
+}
+
+
+/* =====================================================
+   SYSTEM INFORMATION
+   ===================================================== */
+
+.system-settings-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.system-settings-info-box {
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+}
+
+.system-settings-info-box span {
+    display: block;
+    margin-bottom: 6px;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.system-settings-info-box strong {
+    display: block;
+    color: #111827;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   ACTIONS
+   ===================================================== */
+
+.system-settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 24px;
+    margin-top: 4px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.system-settings-save-btn {
+    min-width: 135px;
+    height: 42px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 9px;
+    background: #17375e;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.system-settings-save-btn:hover {
+    background: #0f2744;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(15, 39, 68, 0.18);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 700px) {
+
+    .system-settings-card {
+        padding: 20px;
+        border-radius: 13px;
+    }
+
+    .system-settings-grid,
+    .system-settings-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .system-settings-field.full-width {
+        grid-column: auto;
+    }
+
+    .system-settings-toggle-row {
+        align-items: flex-start;
+    }
+
+    .system-settings-actions {
+        justify-content: stretch;
+    }
+
+    .system-settings-save-btn {
+        width: 100%;
+    }
+}

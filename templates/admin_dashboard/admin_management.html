@@ -591,7 +591,67 @@ Manage KaamSetu administrators and their assigned permission groups
         text-decoration: none;
     }
 
+    /* =====================================================
+    PASSWORD & DELETE ACTIONS
+    ===================================================== */
 
+    .am-password-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 7px 11px;
+        border-radius: 7px;
+        border: 1px solid #dbe7f4;
+        background: #eef4fb;
+        color: #17375e;
+        font-size: 11px;
+        font-weight: 800;
+        text-decoration: none;
+        white-space: nowrap;
+        transition:
+            background 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .am-password-btn:hover {
+        background: #e1edf9;
+        border-color: #cbd9e8;
+        color: #17375e;
+        text-decoration: none;
+    }
+
+    .am-delete-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 7px 11px;
+        border-radius: 7px;
+        border: 1px solid #fecaca;
+        background: #fef2f2;
+        color: #b91c1c;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+            background 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .am-delete-btn:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        color: #991b1b;
+    }
+
+    .am-action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
     /* =====================================================
        RESPONSIVE
     ===================================================== */
@@ -909,20 +969,46 @@ Manage KaamSetu administrators and their assigned permission groups
 
 
                         <!-- ACTION -->
-
                         <td>
-
                             {% if request.user.is_superuser %}
 
-                            <a
-                                href="{% url 'edit_admin' admin.id %}"
-                                class="am-edit-btn"
-                            >
-                                ✏️ Edit
-                            </a>
+                            <div class="am-action-buttons">
+
+                                <a
+                                    href="{% url 'edit_admin' admin.id %}"
+                                    class="am-edit-btn"
+                                >
+                                    ✏️ Edit
+                                </a>
+
+                                <a
+                                    href="{% url 'change_admin_password' admin.id %}"
+                                    class="am-password-btn"
+                                >
+                                    🔐 Password
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'delete_admin' admin.id %}"
+                                    style="display: inline;"
+                                    onsubmit="return confirm(
+                                        'Are you sure you want to permanently delete this Admin account?'
+                                    );"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="am-delete-btn"
+                                    >
+                                        🗑️ Delete
+                                    </button>
+                                </form>
+
+                            </div>
 
                             {% endif %}
-
                         </td>
 
                     </tr>
