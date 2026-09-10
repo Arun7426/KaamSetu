@@ -428,27 +428,63 @@ body{
     align-items:center;
 }
 
+/* ==========================================
+   FEATURED WORKERS SLIDER
+========================================== */
+
+.worker-slider-wrapper{
+    position:relative;
+    display:flex;
+    align-items:center;
+    width:100%;
+}
+
 .worker-slider{
     display:flex;
     gap:25px;
-    overflow-x:hidden;
-    scroll-behavior:smooth;
+
     width:100%;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    scroll-behavior:smooth;
+    scroll-snap-type:x mandatory;
+
     padding:15px 5px;
+
+    scrollbar-width:none;
+
+    -webkit-overflow-scrolling:touch;
+
+    overscroll-behavior-x:contain;
 }
 
 .worker-slider::-webkit-scrollbar{
     display:none;
 }
 
+
+/* Worker Card */
+
 .worker-card{
     flex:0 0 280px;
+
     background:#fff;
     border-radius:20px;
+
     padding:30px 25px;
+
     text-align:center;
+
     box-shadow:0 10px 30px rgba(0,0,0,.08);
-    transition:.35s;
+
+    transition:
+        transform .35s ease,
+        box-shadow .35s ease;
+
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
 }
 
 .worker-card:hover{
@@ -456,90 +492,48 @@ body{
     box-shadow:0 18px 40px rgba(0,0,0,.15);
 }
 
-.worker-card img{
-    width:110px;
-    height:110px;
-    border-radius:50%;
-    object-fit:cover;
-    border:5px solid #eef3ff;
-    margin-bottom:18px;
-}
-
-.worker-card h3{
-    font-size:22px;
-    color:#0B4DA2;
-    margin-bottom:5px;
-}
-
-.profession{
-    display:inline-block;
-    padding:6px 16px;
-    background:#eef5ff;
-    color:#0B4DA2;
-    border-radius:25px;
-    font-size:14px;
-    margin-bottom:15px;
-}
-
-.rating{
-    color:#ffb400;
-    margin:12px 0;
-    font-size:17px;
-}
-
-.rating span{
-    color:#555;
-    font-weight:600;
-    margin-left:6px;
-}
-
-.worker-card p{
-    color:#666;
-    margin:8px 0;
-}
-
-.worker-card h4{
-    color:#ff7a00;
-    font-size:26px;
-    margin:18px 0;
-}
-
-.book-btn{
-    display:inline-block;
-    width:100%;
-    padding:13px;
-    background:#0B4DA2;
-    color:#fff;
-    text-decoration:none;
-    border-radius:10px;
-    font-weight:600;
-    transition:.3s;
-}
-
-.book-btn:hover{
-    background:#083a7b;
-}
 
 /* Arrow Buttons */
 
 .slider-btn{
     width:52px;
     height:52px;
+
     border:none;
     border-radius:50%;
+
     background:#0B4DA2;
     color:#fff;
+
     font-size:24px;
+
     cursor:pointer;
+
     position:absolute;
     top:50%;
+
     transform:translateY(-50%);
+
     z-index:10;
-    transition:.3s;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:
+        background .25s ease,
+        transform .25s ease,
+        box-shadow .25s ease;
 }
 
 .slider-btn:hover{
     background:#ff7a00;
+
+    transform:
+        translateY(-50%)
+        scale(1.06);
+
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
 }
 
 .slider-prev{
@@ -550,18 +544,101 @@ body{
     right:-25px;
 }
 
-/* Responsive */
+
+/* ==========================================
+   SLIDER RESPONSIVE
+========================================== */
 
 @media(max-width:768px){
 
+    .worker-slider-wrapper{
+        padding:0 8px;
+    }
+
+    .worker-slider{
+
+        gap:16px;
+
+        padding:
+            15px 4px 20px;
+
+        scroll-snap-type:x mandatory;
+    }
+
     .worker-card{
-        flex:0 0 240px;
+
+        /*
+         * One card comfortably fits
+         * inside the mobile screen.
+         */
+        flex:0 0 calc(100vw - 70px);
+
+        max-width:320px;
+
+        scroll-snap-align:center;
     }
 
     .slider-btn{
+
         width:42px;
         height:42px;
+
         font-size:18px;
+    }
+
+    .slider-prev{
+        left:-4px;
+    }
+
+    .slider-next{
+        right:-4px;
+    }
+
+}
+
+
+@media(max-width:480px){
+
+    .worker-slider-wrapper{
+        padding:0;
+    }
+
+    .worker-slider{
+
+        gap:12px;
+
+        padding-left:8px;
+        padding-right:8px;
+
+        scroll-padding-left:8px;
+        scroll-padding-right:8px;
+    }
+
+    .worker-card{
+
+        flex:0 0 calc(100vw - 64px);
+
+        max-width:none;
+
+        padding:25px 20px;
+
+        scroll-snap-align:center;
+    }
+
+    .slider-btn{
+
+        width:38px;
+        height:38px;
+
+        font-size:16px;
+    }
+
+    .slider-prev{
+        left:-2px;
+    }
+
+    .slider-next{
+        right:-2px;
     }
 
 }

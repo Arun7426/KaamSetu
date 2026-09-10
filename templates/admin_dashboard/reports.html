@@ -651,6 +651,15 @@ Generate, review and export specific platform reports
 
                         </optgroup>
 
+                        <optgroup label="System">
+                            <option
+                                value="audit_logs"
+                                {% if report_type == "audit_logs" %}selected{% endif %}
+                            >
+                                🛡️ Audit Logs
+                            </option>
+                        </optgroup>
+
                     </select>
 
                 </div>
@@ -1117,6 +1126,17 @@ Generate, review and export specific platform reports
                             <td>
                                 ₹{{ row.amount|floatformat:2 }}
                             </td>
+
+                        {% elif report_type == "audit_logs" %}
+
+                            <td>{{ row.date|date:"d M Y, h:i A" }}</td>
+                            <td>{{ row.admin }}</td>
+                            <td>{{ row.action }}</td>
+                            <td>{{ row.module }}</td>
+                            <td>{{ row.description }}</td>
+                            <td>{{ row.target_user }}</td>
+                            <td>{{ row.target_id }}</td>
+                            <td>{{ row.ip_address }}</td>
 
 
                         {% elif report_type == "app_retention" %}

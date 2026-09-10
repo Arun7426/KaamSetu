@@ -1998,6 +1998,7 @@ def admin_reports(request):
         "outstanding",
         "ledger",
         "app_retention",
+        "audit_logs",
     ]
 
     if report_type not in allowed_reports:
@@ -2305,6 +2306,17 @@ def admin_reports(request):
             "category": "App & Retention",
             "description":
                 "App installation, activity and retention analytics.",
+        },
+        
+        # -------------------------------------------------
+        # AUDIT LOGS
+        # -------------------------------------------------
+
+        "audit_logs": {
+            "label": "Audit Logs",
+            "category": "System",
+            "description":
+                "Administrative activity and system audit history.",
         },
     }
 
@@ -2848,6 +2860,72 @@ def admin_reports(request):
 
             report_count = len(report_rows)
 
+    # =====================================================
+    # AUDIT LOGS
+    # =====================================================
+
+    elif report_type == "audit_logs":
+
+        audit_logs = AuditLog.objects.select_related(
+            "admin",
+            "target_user",
+        ).order_by(
+            "-created_at"
+        )
+
+        if start_date:
+            audit_logs = audit_logs.filter(
+                created_at__date__gte=start_date,
+                created_at__date__lte=end_date,
+            )
+
+        report_columns = [
+            "Date & Time",
+            "Admin",
+            "Action",
+            "Module",
+            "Description",
+            "Target User",
+            "Target ID",
+            "IP Address",
+        ]
+
+        for log in audit_logs:
+            report_rows.append({
+                "date":
+                    log.created_at,
+
+                "admin":
+                    log.admin.username
+                    if log.admin
+                    else "System",
+
+                "action":
+                    log.get_action_display(),
+
+                "module":
+                    log.module,
+
+                "description":
+                    log.description
+                    or "-",
+
+                "target_user":
+                    log.target_user.username
+                    if log.target_user
+                    else "-",
+
+                "target_id":
+                    log.target_id
+                    or "-",
+
+                "ip_address":
+                    log.ip_address
+                    or "-",
+            })
+
+        report_count = len(report_rows)
+        
     # =====================================================
     # APP RETENTION
     # =====================================================
