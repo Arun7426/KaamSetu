@@ -1,0 +1,465 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block admin_content %}
+
+<div class="dashboard-section">
+
+    <div style="margin-bottom:25px;">
+        <h2 style="margin:0 0 6px;">
+            📋 Manage Career Application
+        </h2>
+
+        <p style="margin:0;color:#6b7280;">
+            Review applicant details and update the application status.
+        </p>
+    </div>
+
+
+    <div style="
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:20px;
+        align-items:start;
+    ">
+
+        <!-- Applicant Details -->
+        <div style="
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:14px;
+            padding:25px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.05);
+        ">
+
+            <h3 style="
+                margin:0 0 20px;
+                color:#111827;
+            ">
+                👤 Applicant Details
+            </h3>
+
+            <div style="margin-bottom:16px;">
+                <strong>Full Name</strong>
+                <div style="color:#4b5563;margin-top:4px;">
+                    {{ application.full_name }}
+                </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <strong>Email</strong>
+                <div style="color:#4b5563;margin-top:4px;">
+                    {{ application.email }}
+                </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <strong>Mobile</strong>
+                <div style="color:#4b5563;margin-top:4px;">
+                    {{ application.mobile }}
+                </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <strong>Opportunity</strong>
+                <div style="color:#4b5563;margin-top:4px;">
+                    {{ application.vacancy.title }}
+                </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <strong>Education</strong>
+                <div style="color:#4b5563;margin-top:4px;">
+                    {% if application.education %}
+                        {{ application.education }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <strong>Experience</strong>
+                <div style="color:#4b5563;margin-top:4px;">
+                    {% if application.experience %}
+                        {{ application.experience }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <strong>Applied On</strong>
+                <div style="color:#4b5563;margin-top:4px;">
+                    {{ application.applied_at|date:"d M Y, h:i A" }}
+                </div>
+            </div>
+
+
+            {% if application.cover_letter %}
+
+                <div style="margin-top:22px;">
+
+                    <strong>Cover Letter</strong>
+
+                    <div style="
+                        margin-top:8px;
+                        background:#f8fafc;
+                        border:1px solid #e5e7eb;
+                        border-radius:8px;
+                        padding:14px;
+                        color:#4b5563;
+                        line-height:1.6;
+                        white-space:pre-line;
+                    ">
+                        {{ application.cover_letter }}
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+            {% if application.cv %}
+
+                <div style="margin-top:22px;">
+
+                    <a href="{{ application.cv.url }}"
+                       target="_blank"
+                       rel="noopener"
+                       style="
+                            display:inline-block;
+                            background:#eff6ff;
+                            color:#1d4ed8;
+                            text-decoration:none;
+                            padding:10px 15px;
+                            border-radius:8px;
+                            font-size:14px;
+                            font-weight:600;
+                       ">
+                        📄 View / Download CV
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Application Management -->
+        <div style="
+            background:#fff;
+            border:1px solid #e5e7eb;
+            border-radius:14px;
+            padding:25px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.05);
+        ">
+
+            <h3 style="
+                margin:0 0 20px;
+                color:#111827;
+            ">
+                ⚙️ Application Management
+            </h3>
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <!-- Status -->
+                <div style="margin-bottom:20px;">
+
+                    <label style="
+                        display:block;
+                        margin-bottom:7px;
+                        font-weight:600;
+                        color:#374151;
+                    ">
+                        Application Status
+                    </label>
+
+                    <select
+                        name="status"
+                        required
+                        style="
+                            width:100%;
+                            padding:11px 13px;
+                            border:1px solid #d1d5db;
+                            border-radius:8px;
+                            font-size:14px;
+                            background:#fff;
+                            box-sizing:border-box;
+                        "
+                    >
+
+                        <option value="APPLIED"
+                            {% if application.status == "APPLIED" %}selected{% endif %}>
+                            Applied
+                        </option>
+
+                        <option value="UNDER_REVIEW"
+                            {% if application.status == "UNDER_REVIEW" %}selected{% endif %}>
+                            Under Review
+                        </option>
+
+                        <option value="SHORTLISTED"
+                            {% if application.status == "SHORTLISTED" %}selected{% endif %}>
+                            Shortlisted
+                        </option>
+
+                        <option value="INTERVIEW"
+                            {% if application.status == "INTERVIEW" %}selected{% endif %}>
+                            Interview
+                        </option>
+
+                        <option value="SELECTED"
+                            {% if application.status == "SELECTED" %}selected{% endif %}>
+                            Selected
+                        </option>
+
+                        <option value="REJECTED"
+                            {% if application.status == "REJECTED" %}selected{% endif %}>
+                            Rejected
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Admin Notes -->
+                <div style="margin-bottom:20px;">
+
+                    <label style="
+                        display:block;
+                        margin-bottom:7px;
+                        font-weight:600;
+                        color:#374151;
+                    ">
+                        Admin Notes
+                    </label>
+
+                    <textarea
+                        name="admin_notes"
+                        rows="5"
+                        placeholder="Add internal notes about this applicant..."
+                        style="
+                            width:100%;
+                            padding:11px 13px;
+                            border:1px solid #d1d5db;
+                            border-radius:8px;
+                            font-size:14px;
+                            box-sizing:border-box;
+                            resize:vertical;
+                        "
+                    >{{ application.admin_notes }}</textarea>
+
+                </div>
+
+
+                <!-- Interview Section -->
+                <div style="
+                    margin-bottom:20px;
+                    padding:18px;
+                    background:#f8fafc;
+                    border:1px solid #e5e7eb;
+                    border-radius:10px;
+                ">
+
+                    <h4 style="
+                        margin:0 0 16px;
+                        color:#111827;
+                    ">
+                        🗓️ Interview Details
+                    </h4>
+
+
+                    <div style="margin-bottom:16px;">
+
+                        <label style="
+                            display:block;
+                            margin-bottom:7px;
+                            font-weight:600;
+                            color:#374151;
+                        ">
+                            Interview Date & Time
+                        </label>
+
+                        <input
+                            type="datetime-local"
+                            name="interview_date"
+                            value="{% if application.interview_date %}{{ application.interview_date|date:'Y-m-d\TH:i' }}{% endif %}"
+                            style="
+                                width:100%;
+                                padding:11px 13px;
+                                border:1px solid #d1d5db;
+                                border-radius:8px;
+                                font-size:14px;
+                                box-sizing:border-box;
+                            "
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label style="
+                            display:block;
+                            margin-bottom:7px;
+                            font-weight:600;
+                            color:#374151;
+                        ">
+                            Interview Notes
+                        </label>
+
+                        <textarea
+                            name="interview_notes"
+                            rows="4"
+                            placeholder="Interview remarks or scheduling notes..."
+                            style="
+                                width:100%;
+                                padding:11px 13px;
+                                border:1px solid #d1d5db;
+                                border-radius:8px;
+                                font-size:14px;
+                                box-sizing:border-box;
+                                resize:vertical;
+                            "
+                        >{{ application.interview_notes }}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Certificate -->
+                <div style="
+                    margin-bottom:25px;
+                    padding:18px;
+                    background:#fffbeb;
+                    border:1px solid #fde68a;
+                    border-radius:10px;
+                ">
+
+                    <h4 style="
+                        margin:0 0 15px;
+                        color:#92400e;
+                    ">
+                        🎓 Certificate
+                    </h4>
+
+
+                    <label style="
+                        display:flex;
+                        align-items:center;
+                        gap:10px;
+                        margin-bottom:14px;
+                        cursor:pointer;
+                        color:#374151;
+                        font-weight:600;
+                    ">
+
+                        <input
+                            type="checkbox"
+                            name="certificate_eligible"
+                            {% if application.certificate_eligible %}checked{% endif %}
+                            style="
+                                width:17px;
+                                height:17px;
+                            "
+                        >
+
+                        Certificate Eligible
+
+                    </label>
+
+
+                    <label style="
+                        display:flex;
+                        align-items:center;
+                        gap:10px;
+                        cursor:pointer;
+                        color:#374151;
+                        font-weight:600;
+                    ">
+
+                        <input
+                            type="checkbox"
+                            name="certificate_issued"
+                            {% if application.certificate_issued %}checked{% endif %}
+                            style="
+                                width:17px;
+                                height:17px;
+                            "
+                        >
+
+                        Certificate Issued
+
+                    </label>
+
+                </div>
+
+
+                <!-- Buttons -->
+                <div style="
+                    display:flex;
+                    gap:10px;
+                    flex-wrap:wrap;
+                ">
+
+                    <button
+                        type="submit"
+                        style="
+                            background:#2563eb;
+                            color:#fff;
+                            border:none;
+                            border-radius:8px;
+                            padding:12px 20px;
+                            font-size:14px;
+                            font-weight:600;
+                            cursor:pointer;
+                        "
+                    >
+                        💾 Save Application
+                    </button>
+
+
+                    <a
+                        href="{% url 'admin_career_applications' %}"
+                        style="
+                            background:#f3f4f6;
+                            color:#374151;
+                            text-decoration:none;
+                            border-radius:8px;
+                            padding:12px 20px;
+                            font-size:14px;
+                            font-weight:600;
+                        "
+                    >
+                        ← Back to Applications
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+@media (max-width: 900px) {
+    .dashboard-section > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+{% endblock %}

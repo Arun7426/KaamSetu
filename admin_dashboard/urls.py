@@ -91,7 +91,7 @@ urlpatterns = [
         name="admin_notifications"
     ),
     
-        # =====================================================
+    # =====================================================
     # ANALYTICS
     # =====================================================
 
@@ -229,7 +229,38 @@ urlpatterns = [
         admin_management.delete_admin,
         name="delete_admin"
     ),
+    
+    path(
+        "careers/",
+        views.admin_careers,
+        name="admin_careers",
+    ),
+    path(
+        "careers/create/",
+        views.admin_career_create,
+        name="admin_career_create",
+    ),
+    path(
+        "careers/<int:vacancy_id>/edit/",
+        views.admin_career_edit,
+        name="admin_career_edit",
+    ),
+    path(
+        "careers/<int:vacancy_id>/toggle/",
+        views.admin_career_toggle,
+        name="admin_career_toggle",
+    ),
 
+    path(
+        "careers/applications/",
+        views.admin_career_applications,
+        name="admin_career_applications",
+    ),
+    path(
+        "careers/applications/<int:application_id>/edit/",
+        views.admin_career_application_edit,
+        name="admin_career_application_edit",
+    ),
     # =====================================================
     # AUDIT LOGS
     # =====================================================

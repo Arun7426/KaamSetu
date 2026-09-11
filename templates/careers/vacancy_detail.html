@@ -1,0 +1,688 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .career-detail-page {
+        max-width: 1100px;
+        margin: 45px auto 70px;
+        padding: 0 20px;
+    }
+
+    .career-header {
+        background: linear-gradient(135deg, #eff6ff, #fff7ed);
+        border-radius: 18px;
+        padding: 35px;
+        margin-bottom: 28px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .career-header h1 {
+        margin: 0 0 10px;
+        font-size: 32px;
+        color: #111827;
+        line-height: 1.25;
+    }
+
+    .career-header .career-type {
+        display: inline-block;
+        background: #2563eb;
+        color: #ffffff;
+        padding: 7px 13px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .career-header p {
+        margin: 0;
+        color: #4b5563;
+        font-size: 16px;
+        line-height: 1.7;
+    }
+
+    .career-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 420px;
+        gap: 28px;
+        align-items: start;
+    }
+
+    .career-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    .career-card h2 {
+        margin: 0 0 20px;
+        color: #111827;
+        font-size: 22px;
+    }
+
+    .career-section {
+        margin-bottom: 28px;
+    }
+
+    .career-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .career-section h3 {
+        margin: 0 0 12px;
+        color: #1f2937;
+        font-size: 17px;
+    }
+
+    .career-section p {
+        margin: 0;
+        color: #4b5563;
+        line-height: 1.75;
+        white-space: pre-line;
+    }
+
+    .career-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 25px;
+    }
+
+    .career-meta-item {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px;
+    }
+
+    .career-meta-label {
+        display: block;
+        color: #6b7280;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .career-meta-value {
+        display: block;
+        color: #111827;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .application-card {
+        position: sticky;
+        top: 25px;
+    }
+
+    .application-title {
+        margin-bottom: 6px !important;
+    }
+
+    .application-subtitle {
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0 0 25px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        color: #374151;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        background: #ffffff;
+        color: #111827;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-group input {
+        min-height: 44px;
+    }
+
+    .form-group textarea {
+        min-height: 125px;
+        resize: vertical;
+        line-height: 1.5;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .field-error {
+        color: #dc2626;
+        font-size: 12px;
+        margin-top: 6px;
+        line-height: 1.5;
+    }
+
+    .field-help {
+        color: #6b7280;
+        font-size: 12px;
+        margin-top: 6px;
+        line-height: 1.5;
+    }
+
+    .non-field-errors {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        border-radius: 9px;
+        padding: 12px 14px;
+        margin-bottom: 18px;
+        font-size: 13px;
+    }
+
+    .cv-box {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 10px;
+        padding: 15px;
+    }
+
+    .cv-box input {
+        border: none;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .submit-btn {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+        background: #2563eb;
+        color: #ffffff;
+        padding: 13px 18px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        margin-top: 5px;
+    }
+
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .submit-btn:active {
+        transform: translateY(1px);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 20px;
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    .success-message {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #047857;
+        border-radius: 10px;
+        padding: 13px 15px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    @media (max-width: 850px) {
+        .career-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .application-card {
+            position: static;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .career-detail-page {
+            margin-top: 25px;
+            padding: 0 14px;
+        }
+
+        .career-header {
+            padding: 25px 20px;
+            border-radius: 14px;
+        }
+
+        .career-header h1 {
+            font-size: 25px;
+        }
+
+        .career-card {
+            padding: 21px 18px;
+            border-radius: 14px;
+        }
+
+        .career-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+    }
+</style>
+
+
+<div class="career-detail-page">
+
+    <a href="{% url 'careers_vacancy_list' %}" class="back-link">
+        ← Back to Careers
+    </a>
+
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <!-- =====================================================
+         OPPORTUNITY HEADER
+    ====================================================== -->
+
+    <div class="career-header">
+
+        <span class="career-type">
+            {{ vacancy.internship_type }}
+        </span>
+
+        <h1>
+            {{ vacancy.title }}
+        </h1>
+
+        {% if vacancy.short_description %}
+            <p>
+                {{ vacancy.short_description }}
+            </p>
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <div class="career-layout">
+
+
+        <!-- =================================================
+             OPPORTUNITY DETAILS
+        ================================================== -->
+
+        <div class="career-card">
+
+            <div class="career-section">
+
+                <h2>
+                    Opportunity Details
+                </h2>
+
+                <h3>
+                    About the Opportunity
+                </h3>
+
+                <p>
+                    {{ vacancy.description }}
+                </p>
+
+            </div>
+
+
+            {% if vacancy.eligibility %}
+
+                <div class="career-section">
+
+                    <h3>
+                        Eligibility
+                    </h3>
+
+                    <p>
+                        {{ vacancy.eligibility }}
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- =================================================
+                 META INFORMATION
+            ================================================== -->
+
+            <div class="career-meta">
+
+                <div class="career-meta-item">
+
+                    <span class="career-meta-label">
+                        Type
+                    </span>
+
+                    <span class="career-meta-value">
+                        {{ vacancy.internship_type }}
+                    </span>
+
+                </div>
+
+
+                <div class="career-meta-item">
+
+                    <span class="career-meta-label">
+                        Openings
+                    </span>
+
+                    <span class="career-meta-value">
+                        {{ vacancy.openings }}
+                    </span>
+
+                </div>
+
+
+                <div class="career-meta-item">
+
+                    <span class="career-meta-label">
+                        Location
+                    </span>
+
+                    <span class="career-meta-value">
+
+                        {% if vacancy.location %}
+                            {{ vacancy.location }}
+                        {% else %}
+                            Not Specified
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <div class="career-meta-item">
+
+                    <span class="career-meta-label">
+                        Stipend
+                    </span>
+
+                    <span class="career-meta-value">
+
+                        {% if vacancy.stipend %}
+                            {{ vacancy.stipend }}
+                        {% else %}
+                            Volunteer / Unpaid
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <div class="career-meta-item">
+
+                    <span class="career-meta-label">
+                        Application Deadline
+                    </span>
+
+                    <span class="career-meta-value">
+
+                        {% if vacancy.application_deadline %}
+                            {{ vacancy.application_deadline|date:"d M Y" }}
+                        {% else %}
+                            No Deadline
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             APPLICATION FORM
+        ================================================== -->
+
+        <div class="career-card application-card">
+
+            <h2 class="application-title">
+                Apply Online
+            </h2>
+
+            <p class="application-subtitle">
+                Interested in joining KaamSetu?
+                Fill in your details and upload your CV / Resume
+                to submit your application.
+            </p>
+
+
+            <form method="post"
+                  enctype="multipart/form-data"
+                  novalidate>
+
+                {% csrf_token %}
+
+
+                {% if form.non_field_errors %}
+
+                    <div class="non-field-errors">
+
+                        {{ form.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- ================================
+                     PERSONAL DETAILS
+                ================================= -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.full_name.id_for_label }}">
+                        Full Name
+                    </label>
+
+                    {{ form.full_name }}
+
+                    {% if form.full_name.errors %}
+                        <div class="field-error">
+                            {{ form.full_name.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="{{ form.email.id_for_label }}">
+                            Email Address
+                        </label>
+
+                        {{ form.email }}
+
+                        {% if form.email.errors %}
+                            <div class="field-error">
+                                {{ form.email.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="{{ form.mobile.id_for_label }}">
+                            Mobile Number
+                        </label>
+
+                        {{ form.mobile }}
+
+                        {% if form.mobile.errors %}
+                            <div class="field-error">
+                                {{ form.mobile.errors }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================
+                     EDUCATION / EXPERIENCE
+                ================================= -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.education.id_for_label }}">
+                        Education / Qualification
+                    </label>
+
+                    {{ form.education }}
+
+                    {% if form.education.errors %}
+                        <div class="field-error">
+                            {{ form.education.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.experience.id_for_label }}">
+                        Experience
+                    </label>
+
+                    {{ form.experience }}
+
+                    {% if form.experience.errors %}
+                        <div class="field-error">
+                            {{ form.experience.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ================================
+                     COVER LETTER
+                ================================= -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.cover_letter.id_for_label }}">
+                        Cover Letter / Message
+                    </label>
+
+                    {{ form.cover_letter }}
+
+                    {% if form.cover_letter.errors %}
+                        <div class="field-error">
+                            {{ form.cover_letter.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ================================
+                     CV UPLOAD
+                ================================= -->
+
+                <div class="form-group">
+
+                    <label for="{{ form.cv.id_for_label }}">
+                        CV / Resume
+                    </label>
+
+                    <div class="cv-box">
+
+                        {{ form.cv }}
+
+                        <div class="field-help">
+                            Accepted formats: PDF, DOC, DOCX.
+                            Maximum file size: 5 MB.
+                        </div>
+
+                    </div>
+
+                    {% if form.cv.errors %}
+                        <div class="field-error">
+                            {{ form.cv.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ================================
+                     SUBMIT
+                ================================= -->
+
+                <button type="submit" class="submit-btn">
+                    Submit Application
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

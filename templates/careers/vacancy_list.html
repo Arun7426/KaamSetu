@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Careers | KaamSetu{% endblock %}
+
+{% block content %}
+
+<div class="container" style="max-width:1100px; margin:40px auto; padding:0 20px;">
+
+    <div style="text-align:center; margin-bottom:40px;">
+        <h1 style="margin-bottom:10px;">
+            Careers at KaamSetu
+        </h1>
+
+        <p style="color:#6b7280; font-size:16px;">
+            Join KaamSetu and become a part of our growing team.
+        </p>
+
+        <p style="color:#6b7280;">
+            Explore our current Volunteer Internship and career opportunities.
+        </p>
+    </div>
+
+
+    {% if vacancies %}
+
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+            gap:24px;
+        ">
+
+            {% for vacancy in vacancies %}
+
+                <div style="
+                    background:white;
+                    border:1px solid #e5e7eb;
+                    border-radius:16px;
+                    padding:24px;
+                    box-shadow:0 4px 15px rgba(0,0,0,0.06);
+                ">
+
+                    <h2 style="
+                        margin:0 0 12px;
+                        font-size:21px;
+                    ">
+                        {{ vacancy.title }}
+                    </h2>
+
+                    <div style="
+                        color:#f97316;
+                        font-weight:600;
+                        margin-bottom:12px;
+                    ">
+                        {{ vacancy.internship_type }}
+                    </div>
+
+                    {% if vacancy.location %}
+                        <p style="margin:8px 0; color:#4b5563;">
+                            📍 {{ vacancy.location }}
+                        </p>
+                    {% endif %}
+
+                    {% if vacancy.openings %}
+                        <p style="margin:8px 0; color:#4b5563;">
+                            👥 Openings: {{ vacancy.openings }}
+                        </p>
+                    {% endif %}
+
+                    <p style="
+                        color:#6b7280;
+                        line-height:1.6;
+                        margin:16px 0;
+                    ">
+                        {{ vacancy.short_description }}
+                    </p>
+
+                    {% if vacancy.application_deadline %}
+                        <p style="
+                            font-size:14px;
+                            color:#6b7280;
+                            margin-bottom:18px;
+                        ">
+                            Application Deadline:
+                            {{ vacancy.application_deadline|date:"d M Y" }}
+                        </p>
+                    {% endif %}
+
+                    <a
+                        href="{% url 'careers_vacancy_detail' vacancy.id %}"
+                        style="
+                            display:inline-block;
+                            background:#2563eb;
+                            color:white;
+                            text-decoration:none;
+                            padding:11px 18px;
+                            border-radius:8px;
+                            font-weight:600;
+                        "
+                    >
+                        View Details & Apply
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div style="
+            text-align:center;
+            background:white;
+            border:1px solid #e5e7eb;
+            border-radius:16px;
+            padding:50px 20px;
+        ">
+
+            <h2>No Current Openings</h2>
+
+            <p style="color:#6b7280;">
+                There are currently no open positions.
+                Please check back later for new opportunities.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

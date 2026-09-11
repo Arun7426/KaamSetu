@@ -4295,3 +4295,381 @@ def expire_pending_bookings_manual(request):
         )
 
     return redirect("admin_dashboard")
+
+# =========================================================
+# CAREERS / VOLUNTEER INTERNSHIP
+# ADMIN LEVEL MANAGEMENT
+# =========================================================
+
+from careers.models import Vacancy, Application
+
+
+@permission_required("careers.view_vacancy")
+def admin_careers(request):
+
+    vacancies = Vacancy.objects.order_by(
+        "-created_at"
+    )
+
+    return render(
+        request,
+        "admin_dashboard/careers.html",
+        {
+            "vacancies": vacancies,
+        }
+    )
+
+
+@permission_required("careers.add_vacancy")
+def admin_career_create(request):
+
+    if request.method == "POST":
+
+        title = request.POST.get("title", "").strip()
+        short_description = request.POST.get(
+            "short_description", ""
+        ).strip()
+        description = request.POST.get(
+            "description", ""
+        ).strip()
+        eligibility = request.POST.get(
+            "eligibility", ""
+        ).strip()
+        location = request.POST.get(
+            "location", ""
+        ).strip()
+        internship_type = request.POST.get(
+            "internship_type",
+            "Volunteer Internship"
+        ).strip()
+        stipend = request.POST.get(
+            "stipend", ""
+        ).strip()
+        openings = request.POST.get(
+            "openings", "1"
+        ).strip()
+        application_deadline = request.POST.get(
+            "application_deadline"
+        ) or None
+        is_active = request.POST.get(
+            "is_active"
+        ) == "on"
+
+        if not title or not short_description or not description:
+            messages.error(
+                request,
+                "Title, short description and description are required."
+            )
+            return redirect("admin_career_create")
+
+        try:
+            openings = int(openings)
+
+            if openings < 1:
+                raise ValueError
+
+        except (TypeError, ValueError):
+            messages.error(
+                request,
+                "Openings must be a valid number greater than 0."
+            )
+            return redirect("admin_career_create")
+
+        vacancy = Vacancy.objects.create(
+            title=title,
+            short_description=short_description,
+            description=description,
+            eligibility=eligibility,
+            location=location,
+            internship_type=internship_type or "Volunteer Internship",
+            stipend=stipend,
+            openings=openings,
+            application_deadline=application_deadline,
+            is_active=is_active,
+        )
+
+        create_audit_log(
+            admin=request.user,
+            action="CREATE",
+            module="Careers",
+            description=(
+                f'Career opportunity "{vacancy.title}" created.'
+            ),
+            target_id=vacancy.id,
+            ip_address=get_client_ip(request),
+        )
+
+        messages.success(
+            request,
+            "Career opportunity created successfully."
+        )
+
+        return redirect("admin_careers")
+
+    return render(
+        request,
+        "admin_dashboard/career_form.html",
+        {
+            "page_title": "Create Career Opportunity",
+            "form_action": "admin_career_create",
+            "vacancy": None,
+        }
+    )
+
+
+@permission_required("careers.change_vacancy")
+def admin_career_edit(request, vacancy_id):
+
+    vacancy = get_object_or_404(
+        Vacancy,
+        id=vacancy_id
+    )
+
+    if request.method == "POST":
+
+        vacancy.title = request.POST.get(
+            "title", ""
+        ).strip()
+
+        vacancy.short_description = request.POST.get(
+            "short_description", ""
+        ).strip()
+
+        vacancy.description = request.POST.get(
+            "description", ""
+        ).strip()
+
+        vacancy.eligibility = request.POST.get(
+            "eligibility", ""
+        ).strip()
+
+        vacancy.location = request.POST.get(
+            "location", ""
+        ).strip()
+
+        vacancy.internship_type = request.POST.get(
+            "internship_type",
+            "Volunteer Internship"
+        ).strip() or "Volunteer Internship"
+
+        vacancy.stipend = request.POST.get(
+            "stipend", ""
+        ).strip()
+
+        openings_raw = request.POST.get(
+            "openings", "1"
+        ).strip()
+
+        vacancy.application_deadline = (
+            request.POST.get("application_deadline")
+            or None
+        )
+
+        vacancy.is_active = (
+            request.POST.get("is_active") == "on"
+        )
+
+        try:
+            vacancy.openings = int(openings_raw)
+
+            if vacancy.openings < 1:
+                raise ValueError
+
+        except (TypeError, ValueError):
+            messages.error(
+                request,
+                "Openings must be a valid number greater than 0."
+            )
+            return redirect(
+                "admin_career_edit",
+                vacancy_id=vacancy.id
+            )
+
+        vacancy.save()
+
+        create_audit_log(
+            admin=request.user,
+            action="UPDATE",
+            module="Careers",
+            description=(
+                f'Career opportunity "{vacancy.title}" updated.'
+            ),
+            target_id=vacancy.id,
+            ip_address=get_client_ip(request),
+        )
+
+        messages.success(
+            request,
+            "Career opportunity updated successfully."
+        )
+
+        return redirect("admin_careers")
+
+    return render(
+        request,
+        "admin_dashboard/career_form.html",
+        {
+            "page_title": "Edit Career Opportunity",
+            "form_action": "admin_career_edit",
+            "vacancy": vacancy,
+        }
+    )
+
+
+@permission_required("careers.change_vacancy")
+@require_POST
+def admin_career_toggle(request, vacancy_id):
+
+    vacancy = get_object_or_404(
+        Vacancy,
+        id=vacancy_id
+    )
+
+    vacancy.is_active = not vacancy.is_active
+
+    vacancy.save(
+        update_fields=[
+            "is_active",
+            "updated_at",
+        ]
+    )
+
+    state = (
+        "activated"
+        if vacancy.is_active
+        else "deactivated"
+    )
+
+    create_audit_log(
+        admin=request.user,
+        action="UPDATE",
+        module="Careers",
+        description=(
+            f'Career opportunity "{vacancy.title}" '
+            f'was {state}.'
+        ),
+        target_id=vacancy.id,
+        ip_address=get_client_ip(request),
+    )
+
+    messages.success(
+        request,
+        f'Career opportunity "{vacancy.title}" '
+        f'{state} successfully.'
+    )
+
+    return redirect("admin_careers")
+
+# =========================================================
+# CAREERS / VOLUNTEER INTERNSHIP
+# APPLICATION MANAGEMENT
+# =========================================================
+
+from careers.models import Application
+
+
+@permission_required("careers.view_application")
+def admin_career_applications(request):
+    applications = Application.objects.select_related(
+        "vacancy"
+    ).order_by("-applied_at")
+
+    return render(
+        request,
+        "admin_dashboard/career_applications.html",
+        {
+            "applications": applications,
+        },
+    )
+
+
+@permission_required("careers.change_application")
+def admin_career_application_edit(request, application_id):
+    application = get_object_or_404(
+        Application,
+        id=application_id,
+    )
+
+    if request.method == "POST":
+        status = request.POST.get("status", "").strip()
+        admin_notes = request.POST.get("admin_notes", "").strip()
+        interview_date = request.POST.get("interview_date", "").strip()
+        interview_notes = request.POST.get("interview_notes", "").strip()
+
+        certificate_eligible = (
+            request.POST.get("certificate_eligible") == "on"
+        )
+
+        certificate_issued = (
+            request.POST.get("certificate_issued") == "on"
+        )
+
+        valid_statuses = {
+            choice[0]
+            for choice in Application.STATUS_CHOICES
+        }
+
+        if status not in valid_statuses:
+            messages.error(
+                request,
+                "Invalid application status."
+            )
+            return redirect(
+                "admin_career_application_edit",
+                application_id=application.id,
+            )
+
+        application.status = status
+        application.admin_notes = admin_notes
+        application.interview_notes = interview_notes
+        application.certificate_eligible = certificate_eligible
+        application.certificate_issued = certificate_issued
+
+        if interview_date:
+            try:
+                application.interview_date = datetime.fromisoformat(
+                    interview_date
+                )
+            except ValueError:
+                messages.error(
+                    request,
+                    "Invalid interview date/time."
+                )
+                return redirect(
+                    "admin_career_application_edit",
+                    application_id=application.id,
+                )
+        else:
+            application.interview_date = None
+
+        application.save()
+
+        create_audit_log(
+            admin=request.user,
+            action="UPDATE",
+            module="Careers",
+            description=(
+                f"Career application updated: "
+                f"{application.full_name} - "
+                f"{application.vacancy.title}. "
+                f"Status: {application.status}."
+            ),
+            ip_address=get_client_ip(request),
+        )
+
+        messages.success(
+            request,
+            "Career application updated successfully."
+        )
+
+        return redirect(
+            "admin_career_applications"
+        )
+
+    return render(
+        request,
+        "admin_dashboard/career_application_form.html",
+        {
+            "application": application,
+        },
+    )
