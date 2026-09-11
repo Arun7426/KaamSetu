@@ -33,10 +33,50 @@ urlpatterns = [
         name="admin_customers"
     ),
 
+    # =====================================================
+    # FRAUD CONTROL - SUPER ADMIN ONLY
+    # =====================================================
+
+    path(
+        "fraud-control/",
+        views.admin_fraud_control,
+        name="admin_fraud_control"
+    ),
+
+    path(
+        "fraud-control/worker/<int:worker_id>/toggle-block/",
+        views.admin_toggle_worker_block,
+        name="admin_toggle_worker_block"
+    ),
+
+    path(
+        "fraud-control/customer/<int:user_id>/toggle-block/",
+        views.admin_toggle_customer_block,
+        name="admin_toggle_customer_block"
+    ),
+
+    path(
+        "fraud-control/worker/<int:worker_id>/delete/",
+        views.admin_delete_worker,
+        name="admin_delete_worker"
+    ),
+
+    path(
+        "fraud-control/customer/<int:user_id>/delete/",
+        views.admin_delete_customer,
+        name="admin_delete_customer"
+    ),
+
     path(
         "bookings/",
         views.admin_bookings,
         name="admin_bookings"
+    ),
+    
+    path(
+        "bookings/expire-pending/",
+        views.expire_pending_bookings_manual,
+        name="expire_pending_bookings_manual"
     ),
 
     path(

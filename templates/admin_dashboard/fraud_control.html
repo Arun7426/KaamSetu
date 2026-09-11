@@ -1,0 +1,343 @@
+{% extends "admin_dashboard/admin_base.html" %}
+
+{% block admin_title %}
+Fraud Control
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .fraud-page {
+        max-width: 1250px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .fraud-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 18px;
+    }
+
+    .fraud-header h1 {
+        margin: 0;
+        color: #1f2937;
+    }
+
+    .fraud-header p {
+        margin: 6px 0 0;
+        color: #6b7280;
+    }
+
+    .back-btn {
+        text-decoration: none;
+        color: #2563eb;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .warning {
+        padding: 14px 16px;
+        margin-bottom: 22px;
+        border: 1px solid #fed7aa;
+        background: #fff7ed;
+        color: #9a3412;
+        border-radius: 10px;
+    }
+
+    .section-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow-x: auto;
+        box-shadow: 0 4px 15px rgba(0,0,0,.05);
+        margin-bottom: 28px;
+    }
+
+    .section-title {
+        padding: 18px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #1f2937;
+    }
+
+    .section-title h2 {
+        margin: 0;
+        font-size: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+    }
+
+    th {
+        background: #1e3a5f;
+        color: white;
+        padding: 13px 15px;
+        text-align: left;
+        font-size: 13px;
+    }
+
+    td {
+        padding: 14px 15px;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-active {
+        color: #15803d;
+        font-weight: 700;
+    }
+
+    .status-blocked {
+        color: #dc2626;
+        font-weight: 700;
+    }
+
+    .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .action-form {
+        margin: 0;
+    }
+
+    .btn {
+        border: 0;
+        border-radius: 7px;
+        padding: 8px 11px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-block {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .btn-unblock {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .empty {
+        text-align: center;
+        padding: 28px;
+        color: #6b7280;
+    }
+
+    @media (max-width: 700px) {
+        .fraud-page {
+            margin: 20px auto;
+            padding: 12px;
+        }
+
+        .fraud-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="fraud-page">
+
+    <div class="fraud-header">
+        <div>
+            <h1>🔐 Fraud Control</h1>
+            <p>Super Admin only — block, unblock or permanently delete suspicious accounts.</p>
+        </div>
+
+        <a href="{% url 'admin_dashboard' %}" class="back-btn">
+            ← Dashboard
+        </a>
+    </div>
+
+    <div class="warning">
+        <strong>Important:</strong> Blocking prevents the account from logging in.
+        Permanent deletion is destructive and may also remove related records through
+        the existing database relationships.
+    </div>
+
+    <!-- =========================
+         WORKERS
+    ========================== -->
+
+    <div class="section-card">
+
+        <div class="section-title">
+            <h2>👷 Workers</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Profession</th>
+                    <th>Mobile</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for worker in workers %}
+                <tr>
+                    <td><strong>{{ worker.name }}</strong></td>
+                    <td>{{ worker.user.username|default:"-" }}</td>
+                    <td>{{ worker.profession }}</td>
+                    <td>{{ worker.mobile }}</td>
+
+                    <td>
+                        {% if not worker.user %}
+                            <span style="color:#6b7280;font-weight:700;">● No Account</span>
+                        {% elif worker.user.is_active %}
+                            <span class="status-active">● Active</span>
+                        {% else %}
+                            <span class="status-blocked">● Blocked</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="actions">
+
+                            {% if worker.user %}
+                            <form method="post"
+                                  action="{% url 'admin_toggle_worker_block' worker.id %}"
+                                  class="action-form">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn {% if worker.user.is_active %}btn-block{% else %}btn-unblock{% endif %}"
+                                        onclick="return confirm('{% if worker.user.is_active %}Block this worker?{% else %}Unblock this worker?{% endif %}')">
+                                    {% if worker.user.is_active %}Block{% else %}Unblock{% endif %}
+                                </button>
+                            </form>
+                            {% else %}
+                                <span style="color:#6b7280;font-size:13px;font-weight:600;">No linked account</span>
+                            {% endif %}
+
+                            <form method="post"
+                                  action="{% url 'admin_delete_worker' worker.id %}"
+                                  class="action-form">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn btn-delete"
+                                        onclick="return confirm('PERMANENTLY delete this worker and linked account? This cannot be undone.')">
+                                    Delete
+                                </button>
+                            </form>
+
+                        </div>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty">No workers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- =========================
+         CUSTOMERS
+    ========================== -->
+
+    <div class="section-card">
+
+        <div class="section-title">
+            <h2>👤 Customers</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td><strong>{{ customer.username }}</strong></td>
+                    <td>{{ customer.get_full_name|default:"-" }}</td>
+                    <td>
+                        {% if customer.customer_profile %}
+                            {{ customer.customer_profile.mobile|default:"-" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ customer.date_joined|date:"d M Y" }}</td>
+
+                    <td>
+                        {% if customer.is_active %}
+                            <span class="status-active">● Active</span>
+                        {% else %}
+                            <span class="status-blocked">● Blocked</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="actions">
+
+                            <form method="post"
+                                  action="{% url 'admin_toggle_customer_block' customer.id %}"
+                                  class="action-form">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn {% if customer.is_active %}btn-block{% else %}btn-unblock{% endif %}"
+                                        onclick="return confirm('{% if customer.is_active %}Block this customer?{% else %}Unblock this customer?{% endif %}')">
+                                    {% if customer.is_active %}Block{% else %}Unblock{% endif %}
+                                </button>
+                            </form>
+
+                            <form method="post"
+                                  action="{% url 'admin_delete_customer' customer.id %}"
+                                  class="action-form">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="btn btn-delete"
+                                        onclick="return confirm('PERMANENTLY delete this customer and linked account? This cannot be undone.')">
+                                    Delete
+                                </button>
+                            </form>
+
+                        </div>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty">No customers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

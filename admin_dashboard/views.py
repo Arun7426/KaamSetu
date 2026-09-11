@@ -1,10 +1,11 @@
 from datetime import date, timedelta
 from decimal import Decimal
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.db.models import Sum, Q, Avg, Count
+from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from datetime import datetime
@@ -13,11 +14,13 @@ from functools import wraps
 
 from workers.models import Worker
 from bookings.models import Booking, Review, Notification
+from bookings.services import expire_pending_bookings
 from payments.models import WorkerLedger, WorkerPaymentAlert, FeeSetting, Promotion
 
 from io import BytesIO
 
 from django.http import HttpResponse
+from django.views.decorators.http import require_POST
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -438,6 +441,233 @@ def admin_customers(request):
             "customers": customers,
         }
     )
+
+
+# =========================================================
+# FRAUD CONTROL
+# SUPER ADMIN ONLY
+# =========================================================
+
+@super_admin_required
+def admin_fraud_control(request):
+    """
+    Central Super Admin-only fraud/safety control.
+
+    Blocking uses Django's existing User.is_active flag so a blocked
+    worker/customer cannot authenticate again. No new model or migration
+    is required.
+
+    Deleting a worker also deletes the linked User account and related
+    cascade records according to the existing model relationships.
+    """
+
+    workers = Worker.objects.select_related(
+        "user"
+    ).order_by(
+        "name"
+    )
+
+    customers = User.objects.filter(
+        is_staff=False,
+        worker_profile__isnull=True
+    ).select_related(
+        "customer_profile"
+    ).order_by(
+        "username"
+    )
+
+    return render(
+        request,
+        "admin_dashboard/fraud_control.html",
+        {
+            "workers": workers,
+            "customers": customers,
+        }
+    )
+
+
+@super_admin_required
+@require_POST
+def admin_toggle_worker_block(request, worker_id):
+    """Block or unblock a worker. Super Admin only."""
+
+    worker = get_object_or_404(
+        Worker.objects.select_related("user"),
+        id=worker_id
+    )
+
+    if worker.user is None:
+        messages.error(
+            request,
+            f"Worker '{worker.name}' has no linked user account."
+        )
+        return redirect("admin_fraud_control")
+
+    # A worker profile must never be allowed to control a staff account.
+    if worker.user.is_staff or worker.user.is_superuser:
+        messages.error(
+            request,
+            "This account cannot be managed through Fraud Control."
+        )
+        return redirect("admin_fraud_control")
+
+    was_blocked = not worker.user.is_active
+    worker.user.is_active = was_blocked
+    worker.user.save(update_fields=["is_active"])
+
+    action = "UPDATE"
+    state = "unblocked" if was_blocked else "blocked"
+
+    create_audit_log(
+        admin=request.user,
+        action=action,
+        module="Fraud Control",
+        description=(
+            f"Worker account '{worker.name}' "
+            f"(username: {worker.user.username}) was {state}."
+        ),
+        target_user=worker.user,
+        target_id=worker.id,
+        ip_address=get_client_ip(request),
+    )
+
+    messages.success(
+        request,
+        f"Worker '{worker.name}' {state} successfully."
+    )
+
+    return redirect("admin_fraud_control")
+
+
+@super_admin_required
+@require_POST
+def admin_toggle_customer_block(request, user_id):
+    """Block or unblock a customer. Super Admin only."""
+
+    customer = get_object_or_404(
+        User,
+        id=user_id,
+        is_staff=False,
+        is_superuser=False,
+        worker_profile__isnull=True,
+    )
+
+    was_blocked = not customer.is_active
+    customer.is_active = was_blocked
+    customer.save(update_fields=["is_active"])
+
+    state = "unblocked" if was_blocked else "blocked"
+
+    create_audit_log(
+        admin=request.user,
+        action="UPDATE",
+        module="Fraud Control",
+        description=(
+            f"Customer account '{customer.username}' was {state}."
+        ),
+        target_user=customer,
+        target_id=customer.id,
+        ip_address=get_client_ip(request),
+    )
+
+    messages.success(
+        request,
+        f"Customer '{customer.username}' {state} successfully."
+    )
+
+    return redirect("admin_fraud_control")
+
+
+@super_admin_required
+@require_POST
+def admin_delete_worker(request, worker_id):
+    """Permanently delete a worker and its linked user account."""
+
+    worker = get_object_or_404(
+        Worker.objects.select_related("user"),
+        id=worker_id
+    )
+
+    user = worker.user
+
+    if user and (user.is_staff or user.is_superuser):
+        messages.error(
+            request,
+            "This account cannot be deleted through Fraud Control."
+        )
+        return redirect("admin_fraud_control")
+
+    worker_name = worker.name
+    username = user.username if user else "No linked user"
+
+    with transaction.atomic():
+
+        create_audit_log(
+            admin=request.user,
+            action="DELETE",
+            module="Fraud Control",
+            description=(
+                f"Worker account '{worker_name}' "
+                f"(username: {username}) was permanently deleted "
+                f"by Super Admin."
+            ),
+            target_user=user,
+            target_id=worker.id,
+            ip_address=get_client_ip(request),
+        )
+
+        if user:
+            user.delete()
+        else:
+            worker.delete()
+
+    messages.success(
+        request,
+        f"Worker '{worker_name}' deleted successfully."
+    )
+
+    return redirect("admin_fraud_control")
+
+
+@super_admin_required
+@require_POST
+def admin_delete_customer(request, user_id):
+    """Permanently delete a customer account."""
+
+    customer = get_object_or_404(
+        User,
+        id=user_id,
+        is_staff=False,
+        is_superuser=False,
+        worker_profile__isnull=True,
+    )
+
+    username = customer.username
+    customer_id = customer.id
+
+    with transaction.atomic():
+
+        create_audit_log(
+            admin=request.user,
+            action="DELETE",
+            module="Fraud Control",
+            description=(
+                f"Customer account '{username}' "
+                f"was permanently deleted by Super Admin."
+            ),
+            target_user=customer,
+            target_id=customer_id,
+            ip_address=get_client_ip(request),
+        )
+
+        customer.delete()
+
+    messages.success(
+        request,
+        f"Customer '{username}' deleted successfully."
+    )
+
+    return redirect("admin_fraud_control")
 
 
 # =========================================================
@@ -4017,3 +4247,51 @@ def change_super_admin_password(request):
             "form": form,
         }
     )
+
+# =========================================================
+# BOOKING EXPIRY
+# SUPER ADMIN ONLY - MANUAL TRIGGER
+# =========================================================
+
+@super_admin_required
+def expire_pending_bookings_manual(request):
+
+    if request.method != "POST":
+        raise PermissionDenied(
+            "Invalid request method."
+        )
+
+    expired_count = expire_pending_bookings()
+
+    # -----------------------------------------------------
+    # AUDIT LOG
+    # -----------------------------------------------------
+
+    create_audit_log(
+        admin=request.user,
+        action="UPDATE",
+        module="Booking Expiry",
+        description=(
+            f"Manual pending booking expiry executed. "
+            f"{expired_count} booking(s) expired."
+        ),
+        ip_address=get_client_ip(request),
+    )
+
+    # -----------------------------------------------------
+    # SUCCESS MESSAGE
+    # -----------------------------------------------------
+
+    if expired_count:
+        messages.success(
+            request,
+            f"{expired_count} pending booking(s) "
+            "expired successfully."
+        )
+    else:
+        messages.info(
+            request,
+            "No pending booking(s) older than 1 hour found."
+        )
+
+    return redirect("admin_dashboard")

@@ -118,8 +118,8 @@ Admin Dashboard | KaamSetu
 
     .recent-activity-grid {
         gap: 30px !important;
-        
-        
+
+
     }
 
     .recent-activity-card {
@@ -128,7 +128,7 @@ Admin Dashboard | KaamSetu
         margin-top: 28px !important;
     }
 
-    .recent-activity-card > div:first-child {
+    .recent-activity-card>div:first-child {
         margin-bottom: 25px !important;
     }
 
@@ -418,8 +418,61 @@ Admin Dashboard | KaamSetu
 
     </div>
 
+    {% if request.user.is_superuser %}
 
+    <!-- ==========================
+     MANUAL BOOKING EXPIRY
+========================== -->
 
+    <div class="dashboard-section">
+
+        <h2>
+            ⏱️ Booking Request Expiry
+        </h2>
+
+        <div style="
+        background:white;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        padding:24px;
+        box-shadow:0 4px 15px rgba(0,0,0,0.05);
+    ">
+
+            <p style="
+            margin:0 0 18px;
+            color:#6b7280;
+            line-height:1.6;
+        ">
+                Pending booking requests older than 1 hour can be
+                automatically cancelled from here.
+            </p>
+
+            <form method="post" action="{% url 'expire_pending_bookings_manual' %}" onsubmit="return confirm(
+                  'Are you sure you want to expire pending bookings older than 1 hour?'
+              );">
+
+                {% csrf_token %}
+
+                <button type="submit" style="
+                        background:#dc2626;
+                        color:white;
+                        border:none;
+                        border-radius:8px;
+                        padding:12px 20px;
+                        font-size:14px;
+                        font-weight:600;
+                        cursor:pointer;
+                    ">
+                    ⏱️ Expire Pending Bookings
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    {% endif %}
     <!-- ==========================
          PAYMENT OVERVIEW
     ========================== -->
@@ -646,438 +699,423 @@ Admin Dashboard | KaamSetu
 
 
 
-<!-- ==========================
+    <!-- ==========================
      RECENT ACTIVITY
 ========================== -->
 
-<div class="dashboard-section">
+    <div class="dashboard-section">
 
-    <h2>
-        Recent Activity
-    </h2>
+        <h2>
+            Recent Activity
+        </h2>
 
 
-    <div
-        class="recent-activity-grid"
-        style="
+        <div class="recent-activity-grid" style="
             display:grid;
             grid-template-columns:repeat(2, 1fr);
-        "
-    >
+        ">
 
-    
-        <!-- ==========================
+
+            <!-- ==========================
              RECENT BOOKINGS
         ========================== -->
 
-        <div
-            class="recent-activity-card"
-            style="
+            <div class="recent-activity-card" style="
                 background:white;
                 border:1px solid #e5e7eb;
                 border-radius:14px;
                 box-shadow:0 4px 15px rgba(0,0,0,0.05);
-            "
-        >
+            ">
 
-            <div style="
+                <div style="
                 display:flex;
                 justify-content:space-between;
                 align-items:center;
                 margin-bottom:18px;
             ">
 
-                <h3 style="
+                    <h3 style="
                     margin:0;
                     color:#1f2937;
                 ">
-                    📋 Recent Bookings
-                </h3>
+                        📋 Recent Bookings
+                    </h3>
 
-                <a href="{% url 'admin_bookings' %}" style="
+                    <a href="{% url 'admin_bookings' %}" style="
                         color:#2563eb;
                         text-decoration:none;
                         font-size:14px;
                         font-weight:600;
                     ">
-                    View All
-                </a>
+                        View All
+                    </a>
 
-            </div>
+                </div>
 
 
-            {% for booking in recent_bookings %}
+                {% for booking in recent_bookings %}
 
-            <div class="recent-activity-item" style="
+                <div class="recent-activity-item" style="
                 border-bottom:1px solid #e5e7eb;
             ">
 
-                <div style="
+                    <div style="
                     display:flex;
                     justify-content:space-between;
                     gap:15px;
                 ">
 
-                    <div>
+                        <div>
 
-                        <strong>
-                            #{{ booking.id }}
-                        </strong>
+                            <strong>
+                                #{{ booking.id }}
+                            </strong>
 
-                        <div style="
+                            <div style="
                             margin-top:4px;
                             color:#6b7280;
                             font-size:14px;
                         ">
-                            {{ booking.customer_name }}
-                            → {{ booking.worker.name }}
+                                {{ booking.customer_name }}
+                                → {{ booking.worker.name }}
+                            </div>
+
                         </div>
 
-                    </div>
 
-
-                    <div style="
+                        <div style="
                         text-align:right;
                         font-size:13px;
                     ">
 
-                        <div style="
+                            <div style="
                             font-weight:600;
                         ">
-                            {{ booking.status }}
-                        </div>
+                                {{ booking.status }}
+                            </div>
 
-                        <div style="
+                            <div style="
                             color:#9ca3af;
                             margin-top:3px;
                         ">
-                            {{ booking.created_at|date:"d M Y" }}
+                                {{ booking.created_at|date:"d M Y" }}
+                            </div>
+
                         </div>
 
                     </div>
 
                 </div>
 
-            </div>
+                {% empty %}
 
-            {% empty %}
-
-            <p style="
+                <p style="
                 color:#6b7280;
             ">
-                No recent bookings.
-            </p>
+                    No recent bookings.
+                </p>
 
-            {% endfor %}
+                {% endfor %}
 
-        </div>
-
-        
+            </div>
 
 
-        <!-- ==========================
+
+
+            <!-- ==========================
              RECENT PAYMENTS
         ========================== -->
 
-        <div
-            class="recent-activity-card"
-            style="
+            <div class="recent-activity-card" style="
                 background:white;
                 border:1px solid #e5e7eb;
                 border-radius:14px;
                 box-shadow:0 4px 15px rgba(0,0,0,0.05);
-            "
-        >
+            ">
 
-            <div style="
+                <div style="
                 display:flex;
                 justify-content:space-between;
                 align-items:center;
                 margin-bottom:18px;
             ">
 
-                <h3 style="
+                    <h3 style="
                     margin:0;
                     color:#1f2937;
                 ">
-                    💰 Recent Payments
-                </h3>
+                        💰 Recent Payments
+                    </h3>
 
-                <a href="{% url 'admin_payments' %}" style="
+                    <a href="{% url 'admin_payments' %}" style="
                         color:#2563eb;
                         text-decoration:none;
                         font-size:14px;
                         font-weight:600;
                     ">
-                    View All
-                </a>
+                        View All
+                    </a>
 
-            </div>
+                </div>
 
 
-            {% for entry in recent_payments %}
+                {% for entry in recent_payments %}
 
-            <div class="recent-activity-item" style="
+                <div class="recent-activity-item" style="
                 border-bottom:1px solid #e5e7eb;
             ">
 
-                <div style="
+                    <div style="
                     display:flex;
                     justify-content:space-between;
                     gap:15px;
                 ">
 
-                    <div>
+                        <div>
 
-                        <strong>
-                            {{ entry.worker.name }}
-                        </strong>
+                            <strong>
+                                {{ entry.worker.name }}
+                            </strong>
 
-                        <div style="
+                            <div style="
                             margin-top:4px;
                             color:#6b7280;
                             font-size:14px;
                         ">
 
-                            {{ entry.transaction_type }}
+                                {{ entry.transaction_type }}
 
-                            {% if entry.booking %}
-                            · Booking #{{ entry.booking.id }}
-                            {% endif %}
+                                {% if entry.booking %}
+                                · Booking #{{ entry.booking.id }}
+                                {% endif %}
+
+                            </div>
 
                         </div>
 
-                    </div>
 
-
-                    <div style="
+                        <div style="
                         text-align:right;
                     ">
 
-                        <div style="
+                            <div style="
                             font-weight:700;
                         ">
-                            ₹{{ entry.amount }}
-                        </div>
+                                ₹{{ entry.amount }}
+                            </div>
 
-                        <div style="
+                            <div style="
                             color:#6b7280;
                             font-size:13px;
                             margin-top:3px;
                         ">
-                            {{ entry.status }}
+                                {{ entry.status }}
+                            </div>
+
                         </div>
 
                     </div>
 
                 </div>
 
-            </div>
+                {% empty %}
 
-            {% empty %}
-
-            <p style="
+                <p style="
                 color:#6b7280;
             ">
-                No recent payment activity.
-            </p>
+                    No recent payment activity.
+                </p>
 
-            {% endfor %}
+                {% endfor %}
 
-        </div>
-        {% endif %}
+            </div>
+            {% endif %}
 
 
-        <!-- ==========================
+            <!-- ==========================
              RECENT WORKERS
         ========================== -->
 
-        <div
-            class="recent-activity-card"
-            style="
+            <div class="recent-activity-card" style="
                 background:white;
                 border:1px solid #e5e7eb;
                 border-radius:14px;
                 box-shadow:0 4px 15px rgba(0,0,0,0.05);
-            "
-        >
+            ">
 
-            <div style="
+                <div style="
                 display:flex;
                 justify-content:space-between;
                 align-items:center;
                 margin-bottom:18px;
             ">
 
-                <h3 style="
+                    <h3 style="
                     margin:0;
                     color:#1f2937;
                 ">
-                    👷 Recent Workers
-                </h3>
+                        👷 Recent Workers
+                    </h3>
 
-                <a href="{% url 'admin_workers' %}" style="
+                    <a href="{% url 'admin_workers' %}" style="
                         color:#2563eb;
                         text-decoration:none;
                         font-size:14px;
                         font-weight:600;
                     ">
-                    View All
-                </a>
+                        View All
+                    </a>
 
-            </div>
+                </div>
 
 
-            {% for worker in recent_workers %}
+                {% for worker in recent_workers %}
 
-            <div class="recent-activity-item" style="
+                <div class="recent-activity-item" style="
                 border-bottom:1px solid #e5e7eb;
             ">
 
-                <div style="
+                    <div style="
                     display:flex;
                     justify-content:space-between;
                     gap:15px;
                 ">
 
-                    <div>
+                        <div>
 
-                        <strong>
-                            {{ worker.name }}
-                        </strong>
+                            <strong>
+                                {{ worker.name }}
+                            </strong>
 
-                        <div style="
+                            <div style="
                             margin-top:4px;
                             color:#6b7280;
                             font-size:14px;
                         ">
-                            {{ worker.profession }}
+                                {{ worker.profession }}
+                            </div>
+
+                        </div>
+
+
+                        <div style="
+                        color:#9ca3af;
+                        font-size:13px;
+                    ">
+                            {{ worker.user.date_joined|date:"d M Y" }}
                         </div>
 
                     </div>
 
-
-                    <div style="
-                        color:#9ca3af;
-                        font-size:13px;
-                    ">
-                        {{ worker.user.date_joined|date:"d M Y" }}
-                    </div>
-
                 </div>
+
+                {% empty %}
+
+                <p style="
+                color:#6b7280;
+            ">
+                    No workers found.
+                </p>
+
+                {% endfor %}
 
             </div>
 
-            {% empty %}
-
-            <p style="
-                color:#6b7280;
-            ">
-                No workers found.
-            </p>
-
-            {% endfor %}
-
-        </div>
 
 
-
-        <!-- ==========================
+            <!-- ==========================
              RECENT CUSTOMERS
         ========================== -->
 
-        <div
-            class="recent-activity-card"
-            style="
+            <div class="recent-activity-card" style="
                 background:white;
                 border:1px solid #e5e7eb;
                 border-radius:14px;
                 box-shadow:0 4px 15px rgba(0,0,0,0.05);
-            "
-        >
+            ">
 
-            <div style="
+                <div style="
                 display:flex;
                 justify-content:space-between;
                 align-items:center;
                 margin-bottom:18px;
             ">
 
-                <h3 style="
+                    <h3 style="
                     margin:0;
                     color:#1f2937;
                 ">
-                    👤 Recent Customers
-                </h3>
+                        👤 Recent Customers
+                    </h3>
 
-                <a href="{% url 'admin_customers' %}" style="
+                    <a href="{% url 'admin_customers' %}" style="
                         color:#2563eb;
                         text-decoration:none;
                         font-size:14px;
                         font-weight:600;
                     ">
-                    View All
-                </a>
+                        View All
+                    </a>
 
-            </div>
+                </div>
 
 
-            {% for customer in recent_customers %}
+                {% for customer in recent_customers %}
 
-            <div class="recent-activity-item" style="
+                <div class="recent-activity-item" style="
                 border-bottom:1px solid #e5e7eb;
             ">
 
-                <div style="
+                    <div style="
                     display:flex;
                     justify-content:space-between;
                     gap:15px;
                 ">
 
-                    <div>
+                        <div>
 
-                        <strong>
-                            {{ customer.get_full_name|default:customer.username }}
-                        </strong>
+                            <strong>
+                                {{ customer.get_full_name|default:customer.username }}
+                            </strong>
 
-                        <div style="
+                            <div style="
                             margin-top:4px;
                             color:#6b7280;
                             font-size:14px;
                         ">
-                            {{ customer.username }}
+                                {{ customer.username }}
+                            </div>
+
+                        </div>
+
+
+                        <div style="
+                        color:#9ca3af;
+                        font-size:13px;
+                    ">
+                            {{ customer.date_joined|date:"d M Y" }}
                         </div>
 
                     </div>
 
-
-                    <div style="
-                        color:#9ca3af;
-                        font-size:13px;
-                    ">
-                        {{ customer.date_joined|date:"d M Y" }}
-                    </div>
-
                 </div>
+
+                {% empty %}
+
+                <p style="
+                color:#6b7280;
+            ">
+                    No customers found.
+                </p>
+
+                {% endfor %}
 
             </div>
 
-            {% empty %}
-
-            <p style="
-                color:#6b7280;
-            ">
-                No customers found.
-            </p>
-
-            {% endfor %}
 
         </div>
 
-
     </div>
-
-</div>
 </div>
 
 {% endblock %}
