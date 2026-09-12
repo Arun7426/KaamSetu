@@ -19,6 +19,17 @@ class Worker(models.Model):
     ("Welder", "वेल्डर"),
     ("Helper", "हेल्पर"),
     ("AC Repair", "AC रिपेयर"),
+
+    ("Cleaner", "क्लीनर"),
+    ("Mechanic", "मैकेनिक"),
+    ("Driver", "ड्राइवर"),
+    ("House Maid", "घरेलू सहायिका"),
+    ("Cook", "कुक"),
+    ("Gardener", "माली"),
+    ("Labour", "मजदूर"),
+    ("Tiles Worker", "टाइल्स वर्कर"),
+    ("POP Worker", "POP वर्कर"),
+    ("Other", "अन्य"),
 ]
 
     name = models.CharField(max_length=100)

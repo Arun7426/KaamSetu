@@ -70,6 +70,12 @@ urlpatterns = [
         name="update_booking_status",
     ),
 
+    path(
+        "services/", 
+        views.all_services, 
+        name="all_services"
+    ),
+    
     # =========================================
     # Profession
     # =========================================

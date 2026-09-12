@@ -23,7 +23,11 @@
             </div>
 
         </a>
+        <!-- Mobile Menu Button -->
 
+        <button class="mobile-menu-toggle" type="button" aria-label="Open menu">
+            ☰
+        </button>
 
         <!-- Menu -->
 
@@ -147,3 +151,29 @@
     </div>
 
 </nav>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const menuToggle = document.querySelector(".mobile-menu-toggle");
+    const navMenu = document.querySelector(".nav-menu");
+    const navButtons = document.querySelector(".nav-buttons");
+
+    if (menuToggle) {
+        menuToggle.addEventListener("click", function () {
+
+            navMenu.classList.toggle("active");
+            navButtons.classList.toggle("active");
+
+            if (navMenu.classList.contains("active")) {
+                menuToggle.textContent = "✕";
+                menuToggle.setAttribute("aria-label", "Close menu");
+            } else {
+                menuToggle.textContent = "☰";
+                menuToggle.setAttribute("aria-label", "Open menu");
+            }
+        });
+    }
+
+});
+</script>

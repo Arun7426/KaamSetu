@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -80,6 +81,28 @@ def user_login(request):
             messages.error(
                 request,
                 "Please select Customer or Worker."
+            )
+
+            return render(
+                request,
+                "login.html"
+            )
+
+        # ==========================
+        # Blocked account check
+        # ==========================
+
+        # Fraud Control blocks accounts by setting User.is_active=False.
+        # Check this before authenticate(), because Django intentionally
+        # returns None for inactive users and would otherwise show the
+        # generic "Invalid Username or Password" message.
+        existing_user = User.objects.filter(username=username).first()
+
+        if existing_user is not None and not existing_user.is_active:
+
+            messages.error(
+                request,
+                "🔴 आपका अकाउंट व्यवस्थापक द्वारा ब्लॉक कर दिया गया है। कृपया सहायता के लिए KaamSetu सहायता केंद्र से 0120-3280669 पर संपर्क करें।"
             )
 
             return render(

@@ -185,7 +185,28 @@ KaamSetu Admin
 
             </div>
 
+            <!-- Careers -->
 
+            {% if request.user.is_superuser or perms.careers.view_vacancy %}
+
+            <a href="{% url 'admin_careers' %}"
+                class="admin-nav-item
+                {% if request.resolver_match.url_name == 'admin_careers' or request.resolver_match.url_name == 'admin_career_create' or request.resolver_match.url_name == 'admin_career_edit' %}
+                    active
+                {% endif %}"
+                title="Careers / Volunteer Internship">
+
+                <span class="admin-nav-icon">
+                    💼
+                </span>
+
+                <span class="admin-nav-label">
+                    Careers
+                </span>
+
+            </a>
+
+            {% endif %}
 
             <!-- =========================
                  FINANCE
@@ -393,6 +414,30 @@ KaamSetu Admin
                     <span class="admin-nav-icon">🧾</span>
                     <span class="admin-nav-label">Audit Logs</span>
                 </a>
+
+
+                <!-- Fraud Control -->
+
+                {% if request.user.is_superuser %}
+
+                <a href="{% url 'admin_fraud_control' %}"
+                    class="admin-nav-item
+                    {% if request.resolver_match.url_name == 'admin_fraud_control' %}
+                        active
+                    {% endif %}"
+                    title="Fraud Control">
+
+                    <span class="admin-nav-icon">
+                        🔐
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Fraud Control
+                    </span>
+
+                </a>
+
+                {% endif %}
 
 
                 <!-- System Settings -->

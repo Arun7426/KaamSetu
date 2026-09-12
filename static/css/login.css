@@ -552,145 +552,235 @@ body{
 
 }
 
-
 /* ===========================
    RESPONSIVE
 =========================== */
 
-@media(max-width:1100px){
+/* ==========================================
+   TABLET
+========================================== */
 
-.left-panel{
+@media (max-width:1100px){
 
+    .login-wrapper{
+        display:flex;
+        min-height:100vh;
+    }
 
-justify-content: space-between;
+    .left-panel{
+        width:42%;
+    }
 
-}
+    .right-panel{
+        width:58%;
+        padding:30px;
+    }
 
-.right-panel{
-
-width:100%;
-
-padding:30px;
-
-}
-
-.login-card{
-
-width:100%;
-
-max-width:520px;
-
-}
-
-}
-
-@media(max-width:768px){
-
-.login-card{
-
-padding:28px;
-
-border-radius:18px;
+    .login-card{
+        width:100%;
+        max-width:520px;
+    }
 
 }
 
-.login-card h2{
 
-font-size:32px;
+/* ==========================================
+   MOBILE LOGIN
+========================================== */
+
+@media (max-width:768px){
+
+    /* Main layout */
+    .login-wrapper{
+        display:block;
+        width:100%;
+        min-height:100vh;
+        overflow-x:hidden;
+    }
+
+
+    /* Hide left promotional panel */
+    .left-panel{
+        display:none !important;
+    }
+
+
+    /* Right panel becomes full screen */
+    .right-panel{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+
+        min-height:100vh;
+
+        padding:20px 15px !important;
+
+        display:flex;
+        justify-content:center;
+        align-items:flex-start;
+
+        box-sizing:border-box;
+    }
+
+
+    /* Login card */
+    .login-card{
+        width:100% !important;
+        max-width:520px !important;
+
+        padding:28px !important;
+
+        border-radius:18px;
+
+        box-sizing:border-box;
+    }
+
+
+    /* Main heading */
+    .login-heading{
+        font-size:32px !important;
+        line-height:1.25;
+        text-align:center;
+    }
+
+
+    /* Subtitle */
+    .subtitle{
+        font-size:16px;
+        line-height:1.5;
+        text-align:center;
+    }
+
+
+    /* Customer / Worker */
+    .role-tabs{
+        width:100%;
+        display:flex;
+        gap:10px;
+    }
+
+    .role-tab{
+        flex:1;
+        min-width:0;
+
+        padding:16px;
+        font-size:15px;
+    }
+
+    .role-tab i{
+        font-size:24px;
+    }
+
+
+    /* Input fields */
+    .input-group{
+        width:100%;
+        box-sizing:border-box;
+    }
+
+    .input-group input{
+        width:100%;
+        box-sizing:border-box;
+    }
+
+
+    /* Login options */
+    .login-options{
+        width:100%;
+        box-sizing:border-box;
+    }
+
+
+    /* Login button */
+    .login-btn{
+        width:100%;
+        box-sizing:border-box;
+    }
+
+
+    /* Register button */
+    .register-btn{
+        width:100%;
+        box-sizing:border-box;
+        text-align:center;
+    }
 
 }
 
-.role-tabs{
 
-gap:10px;
+/* ==========================================
+   SMALL MOBILE
+========================================== */
 
-}
+@media (max-width:480px){
 
-.role-tab{
+    .right-panel{
+        padding:15px 10px !important;
+    }
 
-padding:16px;
 
-font-size:15px;
+    .login-card{
+        padding:22px 16px !important;
+    }
 
-}
 
-.role-tab i{
+    .login-heading{
+        font-size:28px !important;
+    }
 
-font-size:24px;
 
-}
+    .subtitle{
+        font-size:15px;
+    }
 
-.branding h2{
 
-font-size:30px;
+    .role-tabs{
+        gap:8px;
+    }
 
-}
 
-}
+    .role-tab{
+        padding:14px 8px;
+    }
 
-@media(max-width:480px){
 
-.login-options{
+    .login-options{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+    }
 
-flex-direction:column;
 
-align-items:flex-start;
-
-gap:12px;
-
-}
-
-.login-btn{
-
-font-size:16px;
-
-height:54px;
-
-}
-
-.register-btn{
-
-width:100%;
+    .login-btn{
+        font-size:16px;
+        height:54px;
+    }
 
 }
 
-.role-tab{
 
-padding:14px 8px;
+/* ==========================================
+   ROLE TAB ACTIVE STATE
+========================================== */
 
-}
-
-}
 .role-tab.active{
-
     background:#0d6efd;
-
     color:#fff;
-
     border-color:#0d6efd;
-
 }
 
 .role-tab.active i{
-
     color:#fff;
-
 }
 
 .role-tab{
-
     transition:.3s;
-
 }
 
 .login-heading{
-
     transition:.3s;
-
 }
 
 .subtitle{
-
     transition:.3s;
-
 }

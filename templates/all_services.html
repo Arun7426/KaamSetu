@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include 'components/navbar.html' %}
+
+<section class="all-services-page">
+    <div class="container">
+
+        <div class="all-services-header">
+            <a href="{% url 'home' %}" class="back-link">
+                ← होम
+            </a>
+
+            <h1>सभी सेवाएँ</h1>
+
+            <p>
+                अपनी जरूरत की सेवा चुनें और भरोसेमंद कारीगर देखें।
+            </p>
+        </div>
+
+        <div class="services-grid">
+
+            {% for value, label in services %}
+
+            <a href="{% url 'workers_by_profession' value %}" class="service-link">
+
+                <div class="service-card">
+
+                    <div class="service-icon">
+                        {% if value == "Rajmistri" %}
+                            🧱
+                        {% elif value == "Plumber" %}
+                            🔧
+                        {% elif value == "Electrician" %}
+                            ⚡
+                        {% elif value == "Painter" %}
+                            🎨
+                        {% elif value == "Carpenter" %}
+                            🪚
+                        {% elif value == "Welder" %}
+                            🔥
+                        {% elif value == "Helper" %}
+                            🧰
+                        {% elif value == "AC Repair" %}
+                            ❄️
+                        {% elif value == "Cleaner" %}
+                            🧹
+                        {% elif value == "Mechanic" %}
+                            🔩
+                        {% elif value == "Driver" %}
+                            🚗
+                        {% elif value == "House Maid" %}
+                            🏠
+                        {% elif value == "Cook" %}
+                            👨‍🍳
+                        {% elif value == "Gardener" %}
+                            🌱
+                        {% elif value == "Labour" %}
+                            👷
+                        {% elif value == "Tiles Worker" %}
+                            🧱
+                        {% elif value == "POP Worker" %}
+                            🏗️
+                        {% else %}
+                            🛠️
+                        {% endif %}
+                    </div>
+
+                    <h3>{{ label }}</h3>
+
+                    <p>इस सेवा के कारीगर देखें</p>
+
+                </div>
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

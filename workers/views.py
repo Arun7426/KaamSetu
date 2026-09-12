@@ -219,6 +219,13 @@ def workers_by_profession(request, profession):
         },
     )
 
+def all_services(request):
+    services = Worker.PROFESSION_CHOICES
+
+    return render(request, "all_services.html", {
+        "services": services,
+    })
+    
 
 def filter_workers_for_customer(request, workers):
     """Apply a worker's service radius when a customer has shared a location."""
