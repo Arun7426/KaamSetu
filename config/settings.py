@@ -25,10 +25,12 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-mst2)b4*9b7^hnj%128z*d(n4&p*obzntrij)5dl3k#zq0qe4*'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+SERVE_MEDIA_LOCALLY = os.getenv("SERVE_MEDIA_LOCALLY", "False").lower() == "true"
+
 
 ALLOWED_HOSTS = [
     "kaamsetu-yjdr.onrender.com",
@@ -36,6 +38,9 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://kaamsetu-yjdr.onrender.com",
+]
 
 # Application definition
 
@@ -157,3 +162,15 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
 
 LOGOUT_REDIRECT_URL = "home"
+
+# Security settings
+PRODUCTION = os.getenv("PRODUCTION", "False").lower() == "true"
+
+SECURE_SSL_REDIRECT = PRODUCTION
+SESSION_COOKIE_SECURE = PRODUCTION
+CSRF_COOKIE_SECURE = PRODUCTION
+
+# HSTS - enable only in production
+SECURE_HSTS_SECONDS = 31536000 if PRODUCTION else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = PRODUCTION
+SECURE_HSTS_PRELOAD = PRODUCTION

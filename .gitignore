@@ -1,10 +1,19 @@
 .env
 venv/
+
 __pycache__/
 *.pyc
+
 db.sqlite3
 db_backup_before_postgresql.sqlite3
+
 # Database migration backups
 sqlite_data_backup.json
 sqlite_data_backup_utf8.json
 neon_data.json
+
+# Django generated static files
+staticfiles/
+
+# User uploaded media
+media/
