@@ -15,5 +15,3 @@ neon_data.json
 # Django generated static files
 staticfiles/
 
-# User uploaded media
-media/
