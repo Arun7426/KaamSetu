@@ -225,11 +225,150 @@ def settle_worker_payment(worker, amount):
             # Partial payment will be handled later
             break
         # -----------------------------------------
-    # PAYMENT ALERT CHECK
-    # -----------------------------------------
+        # PAYMENT ALERT CHECK
+        # -----------------------------------------
 
-    check_worker_payment_alert(
-        worker
+        check_worker_payment_alert(
+            worker
+        )
+
+        return True
+
+import razorpay
+from django.conf import settings
+
+
+def get_razorpay_client():
+    """
+    Return configured Razorpay client.
+    """
+
+    if not settings.RAZORPAY_KEY_ID:
+        raise ValueError("Razorpay Key ID is not configured.")
+
+    if not settings.RAZORPAY_KEY_SECRET:
+        raise ValueError("Razorpay Key Secret is not configured.")
+
+    return razorpay.Client(
+        auth=(
+            settings.RAZORPAY_KEY_ID,
+            settings.RAZORPAY_KEY_SECRET
+        )
     )
 
-    return True
+def create_razorpay_order(worker, amount, transaction):
+    """
+    Create a Razorpay order for a worker payment transaction.
+    """
+
+    client = get_razorpay_client()
+
+    amount = Decimal(amount)
+
+    if amount <= 0:
+        raise ValueError("Payment amount must be greater than zero.")
+
+    razorpay_order = client.order.create({
+        "amount": int(amount * Decimal("100")),
+        "currency": "INR",
+        "receipt": f"KS-PAY-{transaction.id}",
+    })
+
+    transaction.provider = "Razorpay"
+    transaction.provider_order_id = razorpay_order["id"]
+    transaction.status = "Pending"
+
+    transaction.save(
+        update_fields=[
+            "provider",
+            "provider_order_id",
+            "status",
+            "updated_at",
+        ]
+    )
+
+    return razorpay_order
+
+
+def verify_razorpay_payment(
+    order_id,
+    payment_id,
+    signature,
+    expected_amount,
+):
+    """
+    Verify a successful Razorpay payment server-side.
+
+    Checks:
+    1. Razorpay checkout signature.
+    2. Payment belongs to the expected order.
+    3. Currency is INR.
+    4. Razorpay amount exactly matches the server-side transaction amount.
+    5. Razorpay payment status is captured.
+
+    This function only verifies the gateway payment. It does not
+    settle WorkerLedger; settlement remains a separate operation.
+    """
+
+    client = get_razorpay_client()
+
+    expected_amount = Decimal(expected_amount).quantize(
+        Decimal("0.01"),
+        rounding=ROUND_HALF_UP,
+    )
+
+    if expected_amount <= 0:
+        raise ValueError(
+            "Expected payment amount must be greater than zero."
+        )
+
+    # 1. Server-side signature verification
+    client.utility.verify_payment_signature({
+        "razorpay_order_id": order_id,
+        "razorpay_payment_id": payment_id,
+        "razorpay_signature": signature,
+    })
+
+    # 2. Fetch the payment directly from Razorpay
+    payment = client.payment.fetch(payment_id)
+
+    fetched_order_id = payment.get("order_id")
+    fetched_amount = payment.get("amount")
+    fetched_currency = payment.get("currency")
+    fetched_status = payment.get("status")
+
+    if fetched_order_id != order_id:
+        raise ValueError(
+            "Razorpay payment does not belong to the expected order."
+        )
+
+    if fetched_currency != "INR":
+        raise ValueError(
+            "Razorpay payment currency does not match INR."
+        )
+
+    if fetched_amount is None:
+        raise ValueError(
+            "Razorpay payment amount is missing."
+        )
+
+    # Razorpay stores amount in paise.
+    fetched_amount_rupees = (
+        Decimal(fetched_amount) / Decimal("100")
+    ).quantize(
+        Decimal("0.01"),
+        rounding=ROUND_HALF_UP,
+    )
+
+    if fetched_amount_rupees != expected_amount:
+        raise ValueError(
+            "Razorpay payment amount does not match the transaction amount."
+        )
+
+    if fetched_status != "captured":
+        raise ValueError(
+            f"Razorpay payment is not captured. Current status: "
+            f"{fetched_status or 'unknown'}."
+        )
+
+    return payment

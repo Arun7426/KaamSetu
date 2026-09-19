@@ -129,6 +129,66 @@ class WorkerLedger(models.Model):
             f"₹{self.amount} - "
             f"{self.transaction_type}"
         )
+
+class WorkerPaymentTransaction(models.Model):
+
+    STATUS_CHOICES = [
+        ("Created", "Created"),
+        ("Pending", "Pending"),
+        ("Verified", "Verified"),
+        ("Failed", "Failed"),
+        ("Cancelled", "Cancelled"),
+    ]
+
+    worker = models.ForeignKey(
+        Worker,
+        on_delete=models.CASCADE,
+        related_name="payment_transactions"
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="Created"
+    )
+
+    provider = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    provider_order_id = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True
+    )
+
+    provider_payment_id = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def __str__(self):
+        return (
+            f"{self.worker.name} - "
+            f"₹{self.amount} - "
+            f"{self.status}"
+        )
+
         
 class WorkerPaymentAlert(models.Model):
 

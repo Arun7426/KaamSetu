@@ -18,6 +18,15 @@ from .views import (
     customer_respond_counter_api,
     worker_update_booking_status_api,
     add_review_api,
+    worker_payment_summary,
+    worker_payment_ledger,
+    worker_payment_history,
+    initiate_worker_payment,
+    verify_worker_payment,
+    notification_list,
+    notification_unread_count,
+    notification_mark_read,
+    notification_mark_all_read,
 )
 
 
@@ -121,7 +130,7 @@ urlpatterns = [
     ),
     
     # -------------------------------------------------
-    # MODULE 4 — BOOKING NEGOTIATION
+    # MODULE 5 — BOOKING NEGOTIATION
     # -------------------------------------------------
 
     path(
@@ -143,12 +152,74 @@ urlpatterns = [
     ),
     
     # -------------------------------------------------
-    # MODULE 5 — REVIEWS & RATINGS
+    # MODULE 6 — REVIEWS & RATINGS
     # -------------------------------------------------
 
     path(
         "bookings/<int:booking_id>/review/",
         add_review_api,
         name="booking-review",
+    ),
+    
+    # -------------------------------------------------
+    # MODULE 7 — PAYMENTS
+    # -------------------------------------------------
+
+    path(
+        "payments/summary/",
+        worker_payment_summary,
+        name="worker-payment-summary",
+    ),
+    
+    path(
+        "payments/ledger/",
+        worker_payment_ledger,
+        name="worker-payment-ledger",
+    ),
+    
+    path(
+        "payments/history/",
+        worker_payment_history,
+        name="worker-payment-history",
+    ),
+    
+    path(
+        "payments/initiate/",
+        initiate_worker_payment,
+        name="worker-payment-initiate",
+    ),
+    
+    path(
+        "payments/verify/",
+        verify_worker_payment,
+        name="worker-payment-verify",
+    ),
+    
+    # -------------------------------------------------
+    # MODULE 8 — NOTIFICATIONS
+    # -------------------------------------------------
+
+    path(
+        "notifications/",
+        notification_list,
+        name="notification-list",
+    ),
+
+    path(
+        "notifications/unread-count/",
+        notification_unread_count,
+        name="notification-unread-count",
+    ),
+
+    path(
+        "notifications/<int:notification_id>/read/",
+        notification_mark_read,
+        name="notification-mark-read",
+    ),
+
+    path(
+        "notifications/read-all/",
+        notification_mark_all_read,
+        name="notification-mark-all-read",
     ),
 ]

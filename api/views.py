@@ -1,12 +1,19 @@
 import secrets
+import traceback
 
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import Avg
 from django.utils import timezone
+from django.conf import settings
 
+from django.db.models import Sum
 
+from decimal import Decimal
+import razorpay
+
+from django.db import transaction as db_transaction
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -22,7 +29,7 @@ from rest_framework.response import Response
 from accounts.models import CustomerProfile
 from workers.models import Worker
 
-from bookings.models import Booking, Review
+from bookings.models import Booking, Review, Notification
 from bookings.views import (
     get_customer_offer_suggestions,
     get_worker_counter_suggestions,
@@ -31,7 +38,17 @@ from bookings.notifications import create_notification
 from payments.services import (
     can_worker_receive_booking,
     create_booking_fee,
+    get_worker_outstanding,
+    get_active_promotion,
+    create_razorpay_order,
+    verify_razorpay_payment,
 )
+
+from payments.models import (
+    WorkerLedger,
+    WorkerPaymentTransaction,
+)
+from .serializers import WorkerLedgerSerializer
 
 from .models import MobileOTP
 from .serializers import (
@@ -50,6 +67,9 @@ from .serializers import (
     CustomerCounterResponseSerializer,
     WorkerBookingStatusSerializer,
     ReviewCreateSerializer,
+    WorkerPaymentInitiateSerializer,
+    WorkerPaymentVerifySerializer,
+    NotificationSerializer,
 )
 from .services import (
     create_mobile_otp,
@@ -1081,6 +1101,598 @@ def my_profile(request):
     )
 
 # =========================================================
+# MODULE 7 — PAYMENTS API
+# =========================================================
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def worker_payment_summary(request):
+    """
+    Return payment summary for the authenticated worker.
+
+    Financial information is strictly limited to the
+    worker's own account.
+    """
+
+    # -----------------------------------------------------
+    # WORKER ONLY
+    # -----------------------------------------------------
+
+    try:
+        worker = request.user.worker_profile
+    except AttributeError:
+        return Response(
+            {
+                "status": "error",
+                "message": "Only workers can access payment information.",
+            },
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    # -----------------------------------------------------
+    # OUTSTANDING
+    # -----------------------------------------------------
+
+    outstanding = get_worker_outstanding(worker)
+
+    # -----------------------------------------------------
+    # SUCCESSFUL BOOKINGS
+    # -----------------------------------------------------
+
+    successful_bookings = Booking.objects.filter(
+        worker=worker,
+        negotiation_status="Accepted",
+    ).count()
+
+    # -----------------------------------------------------
+    # PROMOTION / FREE BOOKINGS
+    # -----------------------------------------------------
+
+    promotion = get_active_promotion()
+
+    if promotion:
+        free_booking_limit = promotion.free_bookings_limit
+    else:
+        free_booking_limit = 0
+
+    free_bookings_used = min(
+        successful_bookings,
+        free_booking_limit,
+    )
+
+    free_bookings_remaining = max(
+        free_booking_limit - successful_bookings,
+        0,
+    )
+
+    chargeable_bookings = max(
+        successful_bookings - free_booking_limit,
+        0,
+    )
+
+    # -----------------------------------------------------
+    # LEDGER TOTALS
+    # -----------------------------------------------------
+
+    booking_fee_total = (
+        WorkerLedger.objects.filter(
+            worker=worker,
+            transaction_type="Booking Fee",
+        ).aggregate(
+            total=Sum("amount")
+        )["total"]
+        or 0
+    )
+
+    pending_fee_total = (
+        WorkerLedger.objects.filter(
+            worker=worker,
+            transaction_type="Booking Fee",
+            status="Pending",
+        ).aggregate(
+            total=Sum("amount")
+        )["total"]
+        or 0
+    )
+
+    paid_fee_total = (
+        WorkerLedger.objects.filter(
+            worker=worker,
+            transaction_type="Booking Fee",
+            status="Paid",
+        ).aggregate(
+            total=Sum("amount")
+        )["total"]
+        or 0
+    )
+
+    # -----------------------------------------------------
+    # BOOKING ELIGIBILITY
+    # -----------------------------------------------------
+
+    can_receive_booking = can_worker_receive_booking(
+        worker
+    )
+
+    # -----------------------------------------------------
+    # RESPONSE
+    # -----------------------------------------------------
+
+    return Response(
+        {
+            "status": "success",
+            "payment_summary": {
+                "currency": "INR",
+
+                "successful_bookings": successful_bookings,
+
+                "free_booking_limit": free_booking_limit,
+                "free_bookings_used": free_bookings_used,
+                "free_bookings_remaining": free_bookings_remaining,
+
+                "chargeable_bookings": chargeable_bookings,
+
+                "total_booking_fees": booking_fee_total,
+                "pending_fees": pending_fee_total,
+                "paid_fees": paid_fee_total,
+
+                "outstanding": outstanding,
+                "outstanding_limit": "200.00",
+
+                "can_receive_booking": can_receive_booking,
+            },
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def initiate_worker_payment(request):
+    """
+    Initiate a Razorpay payment for the authenticated worker's
+    outstanding platform fees.
+    """
+
+    try:
+        worker = request.user.worker_profile
+    except AttributeError:
+        return Response(
+            {
+                "status": "error",
+                "message": "Only workers can initiate payments."
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    serializer = WorkerPaymentInitiateSerializer(
+        data=request.data
+    )
+
+    if not serializer.is_valid():
+        return Response(
+            {
+                "status": "error",
+                "errors": serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    amount = serializer.validated_data["amount"]
+
+    outstanding = get_worker_outstanding(worker)
+
+    if outstanding <= 0:
+        return Response(
+            {
+                "status": "error",
+                "message": "You have no outstanding payment."
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if amount > outstanding:
+        return Response(
+            {
+                "status": "error",
+                "message": (
+                    "Payment amount cannot exceed "
+                    "outstanding amount."
+                ),
+                "outstanding": str(outstanding)
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    with db_transaction.atomic():
+
+        payment_transaction = WorkerPaymentTransaction.objects.create(
+            worker=worker,
+            amount=amount,
+            status="Created",
+            provider="Razorpay"
+        )
+
+        try:
+            razorpay_order = create_razorpay_order(
+                worker=worker,
+                amount=amount,
+                transaction=payment_transaction
+            )
+
+        except Exception as exc:
+            print("\n========== RAZORPAY ORDER ERROR ==========")
+            print(f"Error Type: {type(exc).__name__}")
+            print(f"Error: {exc}")
+            traceback.print_exc()
+            print("==========================================\n")
+
+            payment_transaction.status = "Failed"
+
+            payment_transaction.save(
+                update_fields=[
+                    "status",
+                    "updated_at"
+                ]
+            )
+
+            return Response(
+                {
+                    "status": "error",
+                    "message": "Unable to create Razorpay payment order."
+                },
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+
+    return Response(
+        {
+            "status": "success",
+            "payment": {
+                "transaction_id": payment_transaction.id,
+                "provider": "Razorpay",
+                "order_id": razorpay_order["id"],
+                "amount": str(amount),
+                "currency": "INR",
+                "key_id": settings.RAZORPAY_KEY_ID,
+                "status": payment_transaction.status,
+            }
+        },
+        status=status.HTTP_201_CREATED
+    )
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+@transaction.atomic
+def verify_worker_payment(request):
+    """
+    Verify a Razorpay payment for the authenticated worker.
+
+    The payment is verified using Razorpay's server-side
+    signature verification mechanism.
+    """
+
+    # -----------------------------------------
+    # WORKER ONLY
+    # -----------------------------------------
+
+    try:
+        worker = request.user.worker_profile
+    except AttributeError:
+        return Response(
+            {
+                "status": "error",
+                "message": "Only workers can verify payments."
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    # -----------------------------------------
+    # VALIDATE REQUEST
+    # -----------------------------------------
+
+    serializer = WorkerPaymentVerifySerializer(
+        data=request.data
+    )
+
+    if not serializer.is_valid():
+        return Response(
+            {
+                "status": "error",
+                "errors": serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    data = serializer.validated_data
+
+    transaction_id = data["transaction_id"]
+    razorpay_order_id = data["razorpay_order_id"]
+    razorpay_payment_id = data["razorpay_payment_id"]
+    razorpay_signature = data["razorpay_signature"]
+
+    # -----------------------------------------
+    # FIND TRANSACTION
+    # Lock row to prevent duplicate verification
+    # -----------------------------------------
+
+    payment_transaction = (
+        WorkerPaymentTransaction.objects
+        .select_for_update()
+        .filter(
+            id=transaction_id,
+            worker=worker,
+        )
+        .first()
+    )
+
+    if payment_transaction is None:
+        return Response(
+            {
+                "status": "error",
+                "message": "Payment transaction not found."
+            },
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # -----------------------------------------
+    # IDEMPOTENCY
+    # -----------------------------------------
+
+    if payment_transaction.status == "Verified":
+        return Response(
+            {
+                "status": "success",
+                "message": "Payment is already verified.",
+                "payment": {
+                    "transaction_id": payment_transaction.id,
+                    "provider": payment_transaction.provider,
+                    "order_id": payment_transaction.provider_order_id,
+                    "payment_id": payment_transaction.provider_payment_id,
+                    "amount": str(payment_transaction.amount),
+                    "currency": "INR",
+                    "status": payment_transaction.status,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
+
+    # -----------------------------------------
+    # ORDER ID MATCH
+    # -----------------------------------------
+
+    if payment_transaction.provider_order_id != razorpay_order_id:
+        return Response(
+            {
+                "status": "error",
+                "message": "Razorpay order ID does not match."
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # -----------------------------------------
+    # ONLY PENDING TRANSACTIONS
+    # -----------------------------------------
+
+    if payment_transaction.status != "Pending":
+        return Response(
+            {
+                "status": "error",
+                "message": (
+                    f"Payment cannot be verified from "
+                    f"current status: {payment_transaction.status}."
+                )
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # -----------------------------------------
+    # RAZORPAY SERVER-SIDE SIGNATURE VERIFICATION
+    # -----------------------------------------
+
+    try:
+
+        client = razorpay.Client(
+            auth=(
+                settings.RAZORPAY_KEY_ID,
+                settings.RAZORPAY_KEY_SECRET,
+            )
+        )
+
+        verify_razorpay_payment(
+            order_id=razorpay_order_id,
+            payment_id=razorpay_payment_id,
+            signature=razorpay_signature,
+            expected_amount=payment_transaction.amount,
+        )
+
+    except razorpay.errors.SignatureVerificationError:
+
+        payment_transaction.status = "Failed"
+
+        payment_transaction.save(
+            update_fields=[
+                "status",
+                "updated_at",
+            ]
+        )
+
+        return Response(
+            {
+                "status": "error",
+                "message": "Payment signature verification failed."
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    except Exception as exc:
+
+        print("\n========== RAZORPAY VERIFICATION ERROR ==========")
+        print(f"Error Type: {type(exc).__name__}")
+        print(f"Error: {exc}")
+        traceback.print_exc()
+        print("==================================================\n")
+
+        return Response(
+            {
+                "status": "error",
+                "message": "Unable to verify Razorpay payment."
+            },
+            status=status.HTTP_502_BAD_GATEWAY
+        )
+
+    # -----------------------------------------
+    # PAYMENT VERIFIED
+    # -----------------------------------------
+
+    payment_transaction.provider_payment_id = (
+        razorpay_payment_id
+    )
+
+    payment_transaction.status = "Verified"
+
+    payment_transaction.save(
+        update_fields=[
+            "provider_payment_id",
+            "status",
+            "updated_at",
+        ]
+    )
+
+    return Response(
+        {
+            "status": "success",
+            "message": "Payment verified successfully.",
+            "payment": {
+                "transaction_id": payment_transaction.id,
+                "provider": payment_transaction.provider,
+                "order_id": payment_transaction.provider_order_id,
+                "payment_id": payment_transaction.provider_payment_id,
+                "amount": str(payment_transaction.amount),
+                "currency": "INR",
+                "status": payment_transaction.status,
+            }
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def worker_payment_ledger(request):
+    """
+    Return the authenticated worker's own payment ledger.
+    """
+
+    try:
+        worker = request.user.worker_profile
+    except AttributeError:
+        return Response(
+            {
+                "status": "error",
+                "message": "Only workers can access payment information.",
+            },
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    ledger_entries = (
+        WorkerLedger.objects
+        .filter(worker=worker)
+        .select_related("booking")
+        .order_by("-created_at")
+    )
+
+    data = []
+
+    for entry in ledger_entries:
+        data.append(
+            {
+                "id": entry.id,
+                "transaction_type": entry.transaction_type,
+                "amount": float(entry.amount),
+                "status": entry.status,
+                "description": entry.description,
+                "created_at": entry.created_at.isoformat(),
+                "paid_at": (
+                    entry.paid_at.isoformat()
+                    if entry.paid_at
+                    else None
+                ),
+                "booking_id": (
+                    entry.booking.id
+                    if entry.booking
+                    else None
+                ),
+            }
+        )
+
+    return Response(
+        {
+            "status": "success",
+            "ledger": data,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def worker_payment_history(request):
+    """
+    Return payment transactions made by the authenticated worker.
+    """
+
+    try:
+        worker = request.user.worker_profile
+    except AttributeError:
+        return Response(
+            {
+                "status": "error",
+                "message": "Only workers can access payment information.",
+            },
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    payment_entries = (
+        WorkerLedger.objects
+        .filter(
+            worker=worker,
+            transaction_type="Payment",
+        )
+        .order_by("-paid_at", "-created_at")
+    )
+
+    data = []
+
+    for entry in payment_entries:
+        data.append(
+            {
+                "id": entry.id,
+                "amount": float(entry.amount),
+                "status": entry.status,
+                "description": entry.description,
+                "created_at": entry.created_at.isoformat(),
+                "paid_at": (
+                    entry.paid_at.isoformat()
+                    if entry.paid_at
+                    else None
+                ),
+            }
+        )
+
+    return Response(
+        {
+            "status": "success",
+            "payment_history": data,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+# =========================================================
 # MODULE 4 — BOOKING API
 # =========================================================
 
@@ -1616,7 +2228,7 @@ def worker_respond_offer_api(request, booking_id):
         create_booking_fee(booking)
 
         create_notification(
-            user=booking.customer,
+            recipient=booking.customer,
             notification_type="accepted",
             message=f"Your offer of ₹{booking.final_amount} was accepted for booking #{booking.id}.",
             booking=booking,
@@ -1833,6 +2445,20 @@ def add_review_api(request, booking_id):
             "reviews",
         ]
     )
+    
+    # -----------------------------------------
+    # NOTIFY WORKER ABOUT NEW REVIEW
+    # -----------------------------------------
+
+    create_notification(
+        recipient=worker.user,
+        booking=booking,
+        notification_type="review",
+        message=(
+            f"{request.user.get_full_name() or request.user.username} "
+            f"submitted a {review.rating}-star review for booking #{booking.id}."
+        ),
+    )
 
     # -----------------------------------------
     # RESPONSE
@@ -1858,4 +2484,127 @@ def add_review_api(request, booking_id):
             },
         },
         status=status.HTTP_201_CREATED,
+    )
+
+# =========================================================
+# MODULE 8 — NOTIFICATIONS API
+# =========================================================
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def notification_list(request):
+    """
+    Return notifications belonging only to the
+    authenticated user.
+    """
+
+    notifications = (
+        Notification.objects
+        .filter(recipient=request.user)
+        .select_related("booking")
+        .order_by("-created_at")
+    )
+
+    serializer = NotificationSerializer(
+        notifications,
+        many=True
+    )
+
+    return Response(
+        {
+            "status": "success",
+            "count": notifications.count(),
+            "results": serializer.data,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def notification_unread_count(request):
+    """
+    Return unread notification count for the
+    authenticated user only.
+    """
+
+    unread_count = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False
+    ).count()
+
+    return Response(
+        {
+            "status": "success",
+            "unread_count": unread_count,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def notification_mark_read(
+    request,
+    notification_id
+):
+    """
+    Mark one notification as read.
+
+    The notification must belong to the
+    authenticated user.
+    """
+
+    notification = get_object_or_404(
+        Notification,
+        id=notification_id,
+        recipient=request.user
+    )
+
+    if not notification.is_read:
+
+        notification.is_read = True
+
+        notification.save(
+            update_fields=["is_read"]
+        )
+
+    return Response(
+        {
+            "status": "success",
+            "message": "Notification marked as read.",
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def notification_mark_all_read(request):
+    """
+    Mark all unread notifications belonging to
+    the authenticated user as read.
+    """
+
+    updated_count = (
+        Notification.objects
+        .filter(
+            recipient=request.user,
+            is_read=False
+        )
+        .update(is_read=True)
+    )
+
+    return Response(
+        {
+            "status": "success",
+            "message": "All notifications marked as read.",
+            "updated_count": updated_count,
+        },
+        status=status.HTTP_200_OK,
     )

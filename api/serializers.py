@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from accounts.models import CustomerProfile
 from workers.models import Worker
+from payments.models import WorkerLedger
+from decimal import Decimal
 
 
 
@@ -459,7 +461,7 @@ class WorkerProfileAPISerializer(serializers.Serializer):
 # MODULE 4 — BOOKING API
 # =========================================================
 
-from bookings.models import Booking
+from bookings.models import Booking, Notification
 
 
 class BookingCreateSerializer(serializers.Serializer):
@@ -574,3 +576,103 @@ class ReviewCreateSerializer(serializers.Serializer):
         required=False,
         allow_blank=True,
     )
+
+class WorkerLedgerSerializer(serializers.ModelSerializer):
+    booking_id = serializers.IntegerField(
+        source="booking.id",
+        read_only=True
+    )
+
+    class Meta:
+        model = WorkerLedger
+        fields = [
+            "id",
+            "transaction_type",
+            "amount",
+            "status",
+            "description",
+            "booking_id",
+            "created_at",
+            "paid_at",
+        ]
+        read_only_fields = fields
+
+class WorkerPaymentInitiateSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        min_value=Decimal("1.00")
+    )
+
+class WorkerPaymentVerifySerializer(serializers.Serializer):
+
+    transaction_id = serializers.IntegerField(
+        min_value=1
+    )
+
+    razorpay_order_id = serializers.CharField(
+        max_length=150
+    )
+
+    razorpay_payment_id = serializers.CharField(
+        max_length=150
+    )
+
+    razorpay_signature = serializers.CharField(
+        max_length=255
+    )
+
+# =========================================================
+# MODULE 8 — NOTIFICATIONS API
+# =========================================================
+
+from bookings.models import Notification
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+
+    booking_id = serializers.IntegerField(
+        source="booking.id",
+        read_only=True,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = Notification
+
+        fields = [
+            "id",
+            "notification_type",
+            "message",
+            "booking_id",
+            "is_read",
+            "created_at",
+        ]
+
+        read_only_fields = fields
+
+# =========================================================
+# MODULE 8 — NOTIFICATIONS API
+# =========================================================
+
+class NotificationSerializer(serializers.ModelSerializer):
+
+    booking_id = serializers.IntegerField(
+        source="booking.id",
+        read_only=True,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = Notification
+
+        fields = [
+            "id",
+            "notification_type",
+            "message",
+            "booking_id",
+            "is_read",
+            "created_at",
+        ]
+
+        read_only_fields = fields

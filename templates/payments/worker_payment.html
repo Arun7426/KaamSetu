@@ -23,28 +23,31 @@ KaamSetu Payment
             border-radius:16px;
             padding:30px;
             box-shadow:0 8px 25px rgba(0,0,0,0.08);
-            text-align:center;
         ">
 
-            <h2 style="
-                margin-bottom:10px;
-            ">
-                KaamSetu Payment
-            </h2>
+            <div style="text-align:center;">
 
-            <p style="
-                color:#666;
-                margin-bottom:25px;
-            ">
-                अपना बकाया KaamSetu शुल्क जमा करें।
-            </p>
+                <h2 style="margin-bottom:10px;">
+                    KaamSetu Payment
+                </h2>
+
+                <p style="
+                    color:#666;
+                    margin-bottom:25px;
+                ">
+                    अपना KaamSetu बकाया शुल्क जमा करें।
+                </p>
+
+            </div>
 
 
+            <!-- Outstanding -->
             <div style="
                 background:#f8fafc;
                 border-radius:12px;
                 padding:20px;
                 margin-bottom:25px;
+                text-align:center;
             ">
 
                 <p style="
@@ -63,10 +66,81 @@ KaamSetu Payment
             </div>
 
 
+            {% if not payment_created %}
+
+            <!-- Amount Selection -->
             <form method="POST">
 
                 {% csrf_token %}
 
+                <label style="
+                    display:block;
+                    margin-bottom:8px;
+                    font-weight:600;
+                ">
+                    Payment Amount
+                </label>
+
+                <div style="
+                    display:flex;
+                    align-items:center;
+                    border:1px solid #ddd;
+                    border-radius:10px;
+                    overflow:hidden;
+                    margin-bottom:12px;
+                ">
+
+                    <span style="
+                        padding-left:14px;
+                        color:#555;
+                        font-size:18px;
+                    ">
+                        ₹
+                    </span>
+
+                    <input
+                        type="number"
+                        name="payment_amount"
+                        id="payment_amount"
+                        value="{{ outstanding }}"
+                        min="1"
+                        max="{{ outstanding }}"
+                        step="0.01"
+                        required
+                        style="
+                            width:100%;
+                            border:none;
+                            outline:none;
+                            padding:13px;
+                            font-size:17px;
+                        "
+                    >
+
+                </div>
+
+
+                <!-- Full Outstanding -->
+                <button
+                    type="button"
+                    onclick="payFullAmount()"
+                    style="
+                        width:100%;
+                        background:#f1f5f9;
+                        color:#333;
+                        border:1px solid #ddd;
+                        padding:11px 20px;
+                        border-radius:10px;
+                        font-size:14px;
+                        font-weight:600;
+                        cursor:pointer;
+                        margin-bottom:12px;
+                    "
+                >
+                    Pay Full Outstanding ₹{{ outstanding }}
+                </button>
+
+
+                <!-- Continue -->
                 <button
                     type="submit"
                     style="
@@ -81,28 +155,199 @@ KaamSetu Payment
                         cursor:pointer;
                     "
                 >
-                    💳 Confirm Payment
+                    💳 Proceed to Payment
                 </button>
 
             </form>
 
+            {% else %}
 
-            <a
-                href="{% url 'worker_dashboard' %}"
-                style="
-                    display:inline-block;
-                    margin-top:15px;
+            <!-- Razorpay Checkout -->
+            <div style="
+                background:#f8fafc;
+                border-radius:12px;
+                padding:20px;
+                margin-bottom:20px;
+                text-align:center;
+            ">
+
+                <p style="
+                    margin:0;
                     color:#666;
-                    text-decoration:none;
+                ">
+                    Payment Amount
+                </p>
+
+                <h2 style="
+                    margin:8px 0 0;
+                ">
+                    ₹{{ payment_transaction.amount }}
+                </h2>
+
+            </div>
+
+
+            <button
+                id="rzp-button"
+                style="
+                    width:100%;
+                    background:#16a34a;
+                    color:white;
+                    border:none;
+                    padding:13px 20px;
+                    border-radius:10px;
+                    font-size:16px;
+                    font-weight:600;
+                    cursor:pointer;
                 "
             >
-                ← Back to Dashboard
-            </a>
+                💳 Pay ₹{{ payment_transaction.amount }}
+            </button>
+
+            {% endif %}
+
+
+            <div style="text-align:center;">
+
+                <a
+                    href="{% url 'worker_dashboard' %}"
+                    style="
+                        display:inline-block;
+                        margin-top:15px;
+                        color:#666;
+                        text-decoration:none;
+                    "
+                >
+                    ← Back to Dashboard
+                </a>
+
+            </div>
 
         </div>
 
     </div>
 
 </section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+function payFullAmount() {
+    document.getElementById("payment_amount").value =
+        "{{ outstanding }}";
+}
+
+
+{% if payment_created %}
+
+var options = {
+
+    "key": "{{ razorpay_key_id }}",
+
+    "amount": "{{ razorpay_amount }}",
+
+    "currency": "INR",
+
+    "name": "KaamSetu",
+
+    "description": "KaamSetu Outstanding Payment",
+
+    "order_id": "{{ razorpay_order.id }}",
+
+    "handler": function (response) {
+
+        fetch("{% url 'worker-payment-verify' %}", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+
+            body: JSON.stringify({
+
+                transaction_id:
+                    {{ payment_transaction.id }},
+
+                razorpay_order_id:
+                    response.razorpay_order_id,
+
+                razorpay_payment_id:
+                    response.razorpay_payment_id,
+
+                razorpay_signature:
+                    response.razorpay_signature
+
+            })
+
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.status === "success") {
+
+                window.location.href =
+                    "{% url 'worker_dashboard' %}";
+
+            } else {
+
+                alert(
+                    data.message ||
+                    "Payment verification failed."
+                );
+
+            }
+
+        })
+        .catch(error => {
+
+            console.error(error);
+
+            alert(
+                "Payment verification में समस्या हुई।"
+            );
+
+        });
+
+    },
+
+    "prefill": {
+
+        "name":
+            "{{ worker.user.get_full_name|escapejs }}",
+
+        "contact":
+            "{{ worker.mobile|default:''|escapejs }}"
+
+    },
+
+    "theme": {
+
+        "color": "#16a34a"
+
+    }
+
+};
+
+
+var rzp = new Razorpay(options);
+
+document.getElementById("rzp-button").onclick =
+    function(e) {
+
+        rzp.open();
+
+        e.preventDefault();
+
+    };
+
+{% endif %}
+
+</script>
+
+
+
 
 {% endblock %}

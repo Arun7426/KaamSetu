@@ -27,6 +27,10 @@ load_dotenv(BASE_DIR / '.env')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+# Razorpay
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 SERVE_MEDIA_LOCALLY = os.getenv("SERVE_MEDIA_LOCALLY", "False").lower() == "true"
