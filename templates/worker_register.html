@@ -9,71 +9,55 @@
 
     <div class="register-container">
 
-        <!-- Left Side -->
-
+        <!-- LEFT PANEL -->
         <div class="left-panel">
 
-            <h1>👷 Become a Worker</h1>
+            <h1>👷 कामगार बनें</h1>
 
             <p class="tagline">
                 KaamSetu के साथ जुड़ें और रोज़गार के नए अवसर पाएँ।
             </p>
 
             <ul class="benefits">
-
-                <li>✅ Verified Worker Profile</li>
-
-                <li>✅ Daily Job Opportunities</li>
-
-                <li>✅ Trusted Customers</li>
-
-                <li>✅ Secure Booking System</li>
-
-                <li>✅ Grow Your Income</li>
-
+                <li>✅ सत्यापित कामगार प्रोफ़ाइल</li>
+                <li>✅ रोज़गार के नए अवसर</li>
+                <li>✅ भरोसेमंद ग्राहक</li>
+                <li>✅ सुरक्षित बुकिंग सिस्टम</li>
+                <li>✅ अपनी कमाई बढ़ाएँ</li>
             </ul>
 
-            <img src="{% static 'images/worker-register.png' %}" alt="Worker" class="worker-image">
-            <div class="login-box">
+            <img
+                src="{% static 'images/worker-register.png' %}"
+                alt="कामगार"
+                class="worker-image"
+            >
 
-                <p>Already have an account?</p>
+            <div class="login-box">
+                <p>क्या आपका पहले से खाता है?</p>
 
                 <a href="{% url 'login' %}" class="login-link">
-
-                    Login Now →
-
+                    अभी लॉगिन करें →
                 </a>
-
             </div>
 
         </div>
 
 
-        <!-- Right Side -->
-
+        <!-- RIGHT PANEL -->
         <div class="right-panel">
 
-            <h2>Worker Registration</h2>
+            <h2>कामगार पंजीकरण</h2>
 
             <form method="POST" enctype="multipart/form-data">
+
                 {% if form.errors %}
+                <div style="background:#fee2e2;color:#991b1b;padding:15px;border-radius:10px;margin-bottom:20px;">
 
-                <div style="
-    background:#fee2e2;
-    color:#991b1b;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:20px;
-">
-
-                    <strong>
-                        Please correct the following errors:
-                    </strong>
+                    <strong>कृपया नीचे दी गई गलतियों को ठीक करें:</strong>
 
                     {{ form.errors }}
 
                 </div>
-
                 {% endif %}
 
                 {% csrf_token %}
@@ -81,66 +65,64 @@
                 <div class="form-grid">
 
                     <div class="form-group">
-                        <label>Full Name</label>
+                        <label>पूरा नाम</label>
                         {{ form.name }}
                     </div>
 
                     <div class="form-group">
-                        <label>Mobile Number</label>
+                        <label>मोबाइल नंबर</label>
                         {{ form.mobile }}
                     </div>
 
                     <div class="form-group">
-                        <label>Profession</label>
+                        <label>काम / पेशा</label>
                         {{ form.profession }}
                     </div>
 
                     <div class="form-group">
-                        <label>Experience (Years)</label>
+                        <label>अनुभव (वर्षों में)</label>
                         {{ form.experience }}
                     </div>
 
                     <div class="form-group">
-                        <label>City</label>
+                        <label>शहर</label>
                         {{ form.city }}
                     </div>
 
                     <div class="form-group">
-                        <label>Area</label>
+                        <label>क्षेत्र / मोहल्ला</label>
                         {{ form.area }}
                     </div>
 
                     <div class="form-group">
-                        <label>Daily Wage (₹)</label>
+                        <label>दैनिक मजदूरी (₹)</label>
                         {{ form.daily_wage }}
                     </div>
 
                     <div class="form-group full-width">
-                        <label>About Yourself</label>
+                        <label>अपने बारे में बताइए</label>
                         {{ form.about }}
                     </div>
 
                     <div class="form-group full-width">
-                        <label>Profile Photo</label>
+                        <label>प्रोफ़ाइल फोटो</label>
                         {{ form.profile_photo }}
                     </div>
 
                     <div class="form-group">
-                        <label>Username</label>
+                        <label>यूज़रनेम</label>
                         {{ form.username }}
                     </div>
 
                     <div class="form-group">
-                        <label>Password</label>
+                        <label>पासवर्ड</label>
                         {{ form.password }}
                     </div>
 
                 </div>
 
                 <button type="submit" class="register-btn">
-
-                    Register as Worker
-
+                    कामगार के रूप में पंजीकरण करें
                 </button>
 
             </form>

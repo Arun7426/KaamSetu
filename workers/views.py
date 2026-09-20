@@ -22,15 +22,63 @@ from payments.services import get_worker_outstanding
 
 # Hindi service words → database profession names
 SEARCH_ALIASES = {
-    "पेंटर": "Painter",
-    "प्लंबर": "Plumber",
-    "प्लम्बर": "Plumber",
-    "इलेक्ट्रीशियन": "Electrician",
-    "बिजली मिस्त्री": "Electrician",
     "राजमिस्त्री": "Rajmistri",
     "राज मिस्त्री": "Rajmistri",
+
+    "ब्यूटी पार्लर": "Beauty Parlour",
+    "ब्यूटी": "Beauty Parlour",
+
+    "प्लंबर": "Plumber",
+    "प्लम्बर": "Plumber",
+    "नल मिस्त्री": "Plumber",
+
+    "इलेक्ट्रीशियन": "Electrician",
+    "इलेक्ट्रिशियन": "Electrician",
+    "बिजली मिस्त्री": "Electrician",
+
+    "पेंटर": "Painter",
+    "रंग मिस्त्री": "Painter",
+
     "कारपेंटर": "Carpenter",
     "बढ़ई": "Carpenter",
+
+    "वेल्डर": "Welder",
+    "वेल्डिंग": "Welder",
+
+    "हेल्पर": "Helper",
+
+    "एसी रिपेयर": "AC Repair",
+    "एसी": "AC Repair",
+    "AC रिपेयर": "AC Repair",
+
+    "क्लीनर": "Cleaner",
+    "सफाई": "Cleaner",
+
+    "मैकेनिक": "Mechanic",
+
+    "ड्राइवर": "Driver",
+    "चालक": "Driver",
+
+    "घरेलू सहायिका": "House Maid",
+    "कामवाली": "House Maid",
+    "घर की सहायिका": "House Maid",
+
+    "कुक": "Cook",
+    "रसोइया": "Cook",
+
+    "माली": "Gardener",
+    "बागवानी": "Gardener",
+
+    "मजदूर": "Labour",
+    "लेबर": "Labour",
+
+    "टाइल्स वर्कर": "Tiles Worker",
+    "टाइल्स": "Tiles Worker",
+
+    "POP वर्कर": "POP Worker",
+    "POP": "POP Worker",
+
+    "अन्य": "Other",
 }
 
 

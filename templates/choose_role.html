@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Sign Up | KaamSetu{% endblock %}
+{% block title %}खाता बनाएँ | KaamSetu{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/choose_role.css' %}">
-
 {% endblock %}
 
 {% block content %}
@@ -14,10 +13,10 @@
 
     <div class="role-header">
 
-        <h1>Create Your Account</h1>
+        <h1>अपना खाता बनाएँ</h1>
 
         <p>
-            Choose how you want to use <strong>KaamSetu</strong>
+            आप <strong>KaamSetu</strong> का उपयोग कैसे करना चाहते हैं, चुनें
         </p>
 
     </div>
@@ -32,16 +31,16 @@
                 👤
             </div>
 
-            <h2>Hire Workers</h2>
+            <h2>कामगार खोजें</h2>
 
             <p>
-                Find trusted workers near you and
-                book them easily.
+                अपने आसपास भरोसेमंद कामगार खोजें और
+                आसानी से बुक करें।
             </p>
 
             <a href="{% url 'customer_register' %}" class="customer-btn">
 
-                Continue as Customer
+                ग्राहक के रूप में आगे बढ़ें
 
             </a>
 
@@ -56,16 +55,16 @@
                 👷
             </div>
 
-            <h2>Become a Worker</h2>
+            <h2>कामगार बनें</h2>
 
             <p>
-                Register yourself and start
-                getting work from customers.
+                अपना पंजीकरण करें और ग्राहकों से
+                काम पाना शुरू करें।
             </p>
 
             <a href="{% url 'worker_register' %}" class="worker-btn">
 
-                Continue as Worker
+                कामगार के रूप में आगे बढ़ें
 
             </a>
 

@@ -4,10 +4,14 @@ from .models import Worker
 
 class WorkerRegistrationForm(forms.ModelForm):
 
-    username = forms.CharField(max_length=150)
+    username = forms.CharField(
+        max_length=150,
+        label="यूज़रनेम",
+    )
 
     password = forms.CharField(
-        widget=forms.PasswordInput()
+        widget=forms.PasswordInput(),
+        label="पासवर्ड",
     )
 
     class Meta:
@@ -27,6 +31,18 @@ class WorkerRegistrationForm(forms.ModelForm):
             "password",
         ]
 
+        labels = {
+            "name": "पूरा नाम",
+            "mobile": "मोबाइल नंबर",
+            "profession": "काम / पेशा",
+            "experience": "अनुभव (वर्षों में)",
+            "city": "शहर",
+            "area": "क्षेत्र / मोहल्ला",
+            "daily_wage": "दैनिक मजदूरी (₹)",
+            "about": "अपने बारे में बताइए",
+            "profile_photo": "प्रोफ़ाइल फोटो",
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -38,11 +54,11 @@ class WorkerRegistrationForm(forms.ModelForm):
 
         self.fields["about"].widget.attrs.update({
             "rows": 5,
-            "placeholder": "Apne baare mein likhiye..."
+            "placeholder": "अपने बारे में बताइए..."
         })
 
         self.fields["password"].widget.attrs.update({
-            "placeholder": "Password"
+            "placeholder": "पासवर्ड"
         })
 
         self.fields["profile_photo"].widget.attrs.update({
@@ -51,7 +67,7 @@ class WorkerRegistrationForm(forms.ModelForm):
 
         # Profession Dropdown
         self.fields["profession"].choices = [
-            ("", "Select Profession"),
+            ("", "काम / पेशा चुनें"),
             *Worker.PROFESSION_CHOICES,
         ]
 

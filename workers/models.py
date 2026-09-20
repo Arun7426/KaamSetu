@@ -12,6 +12,7 @@ class Worker(models.Model):
     )
     PROFESSION_CHOICES = [
     ("Rajmistri", "राजमिस्त्री"),
+    ("Beauty Parlour", "ब्यूटी पार्लर"),
     ("Plumber", "प्लम्बर"),
     ("Electrician", "इलेक्ट्रिशियन"),
     ("Painter", "पेंटर"),

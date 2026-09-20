@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Customer Registration | KaamSetu{% endblock %}
+{% block title %}ग्राहक पंजीकरण | KaamSetu{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/customer_register.css' %}">
@@ -17,16 +17,16 @@
 
         <div class="register-left">
 
-            <h1>Hire Trusted Workers</h1>
+            <h1>भरोसेमंद कामगार खोजें</h1>
 
             <p>
-                Create your customer account and book verified workers
-                for home, office and business work in just a few clicks.
+                अपना ग्राहक खाता बनाएँ और घर, ऑफिस एवं व्यवसाय के काम के लिए
+                सत्यापित कामगारों को कुछ ही क्लिक में बुक करें।
             </p>
 
             <img
-                src="{% static 'images/customer-register.png' %}"
-                alt="Customer Registration"
+                src="{% static 'images/customer.png' %}"
+                alt="ग्राहक पंजीकरण"
             >
 
         </div>
@@ -36,10 +36,10 @@
 
         <div class="register-card">
 
-            <h2>Create Customer Account</h2>
+            <h2>ग्राहक खाता बनाएँ</h2>
 
             <p class="subtitle">
-                Join KaamSetu as a Customer
+                KaamSetu से ग्राहक के रूप में जुड़ें
             </p>
 
             <form method="POST">
@@ -48,7 +48,7 @@
 
                 <div class="form-group">
 
-                    <label>Full Name</label>
+                    <label>पूरा नाम</label>
 
                     {{ form.first_name }}
 
@@ -63,7 +63,7 @@
 
                 <div class="form-group">
 
-                    <label>Username</label>
+                    <label>यूज़रनेम</label>
 
                     {{ form.username }}
 
@@ -78,7 +78,7 @@
 
                 <div class="form-group">
 
-                    <label>Email Address</label>
+                    <label>ईमेल पता</label>
 
                     {{ form.email }}
 
@@ -88,9 +88,12 @@
                         </small>
                     {% endif %}
 
-                </div><div class="form-group">
+                </div>
 
-                    <label>Mobile Number</label>
+
+                <div class="form-group">
+
+                    <label>मोबाइल नंबर</label>
 
                     {{ form.mobile }}
 
@@ -103,11 +106,9 @@
                 </div>
 
 
-
-
                 <div class="form-group">
 
-                    <label>Password</label>
+                    <label>पासवर्ड</label>
 
                     {{ form.password1 }}
 
@@ -122,7 +123,7 @@
 
                 <div class="form-group">
 
-                    <label>Confirm Password</label>
+                    <label>पासवर्ड की पुष्टि करें</label>
 
                     {{ form.password2 }}
 
@@ -148,18 +149,19 @@
 
                 <button type="submit" class="register-btn">
 
-                    Create Account
+                    खाता बनाएँ
 
                 </button>
 
             </form>
 
+
             <div class="login-link">
 
-                Already have an account?
+                क्या आपका पहले से खाता है?
 
                 <a href="{% url 'login' %}">
-                    Login
+                    लॉगिन करें
                 </a>
 
             </div>
