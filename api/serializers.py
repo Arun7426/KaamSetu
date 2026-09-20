@@ -619,9 +619,12 @@ class WorkerPaymentVerifySerializer(serializers.Serializer):
     )
 
     razorpay_signature = serializers.CharField(
-        max_length=255
+        max_length=255,
+        required=False,
+        allow_blank=True,
+        allow_null=True,
     )
-
+    
 # =========================================================
 # MODULE 8 — NOTIFICATIONS API
 # =========================================================
@@ -651,28 +654,3 @@ class NotificationSerializer(serializers.ModelSerializer):
 
         read_only_fields = fields
 
-# =========================================================
-# MODULE 8 — NOTIFICATIONS API
-# =========================================================
-
-class NotificationSerializer(serializers.ModelSerializer):
-
-    booking_id = serializers.IntegerField(
-        source="booking.id",
-        read_only=True,
-        allow_null=True,
-    )
-
-    class Meta:
-        model = Notification
-
-        fields = [
-            "id",
-            "notification_type",
-            "message",
-            "booking_id",
-            "is_read",
-            "created_at",
-        ]
-
-        read_only_fields = fields

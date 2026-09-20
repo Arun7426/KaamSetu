@@ -185,31 +185,97 @@ def settle_worker_payment(worker, amount):
     Settle the worker's outstanding platform fees.
 
     Payment is applied to the oldest pending booking fees first.
+
+    Supports:
+    - Full payment
+    - Partial payment
+    - Multiple pending ledger entries
+
+    For partial payment, the remaining amount of the oldest
+    pending booking-fee ledger entry is kept as Pending.
+
+    Returns:
+        True  -> payment amount was successfully applied
+        False -> invalid amount or no outstanding balance
     """
 
     amount = Decimal(amount)
 
+    # ---------------------------------------------------------
+    # VALIDATE PAYMENT AMOUNT
+    # ---------------------------------------------------------
+
     if amount <= 0:
         return False
 
-    pending_entries = WorkerLedger.objects.filter(
-        worker=worker,
-        transaction_type="Booking Fee",
-        status="Pending"
-    ).order_by(
-        "created_at"
+    # ---------------------------------------------------------
+    # GET PENDING BOOKING FEES
+    #
+    # Oldest fee is settled first.
+    # select_for_update() prevents concurrent payments from
+    # modifying the same ledger entries simultaneously.
+    # ---------------------------------------------------------
+
+    pending_entries = (
+        WorkerLedger.objects
+        .select_for_update()
+        .filter(
+            worker=worker,
+            transaction_type="Booking Fee",
+            status="Pending",
+        )
+        .order_by(
+            "created_at",
+            "id",
+        )
     )
 
+    # ---------------------------------------------------------
+    # CALCULATE TOTAL OUTSTANDING
+    # ---------------------------------------------------------
+
+    total_pending = sum(
+        (
+            Decimal(entry.amount)
+            for entry in pending_entries
+        ),
+        Decimal("0.00"),
+    )
+
+    # ---------------------------------------------------------
+    # PAYMENT CANNOT EXCEED OUTSTANDING
+    #
+    # initiate_worker_payment() already protects this at API
+    # level, but this service-level protection is important too.
+    # ---------------------------------------------------------
+
+    if total_pending <= 0:
+        return False
+
+    if amount > total_pending:
+        return False
+
+    # ---------------------------------------------------------
+    # APPLY PAYMENT
+    # ---------------------------------------------------------
+
     remaining_amount = amount
+    payment_applied = False
 
     for entry in pending_entries:
 
         if remaining_amount <= 0:
             break
 
-        if remaining_amount >= entry.amount:
+        entry_amount = Decimal(entry.amount)
 
-            remaining_amount -= entry.amount
+        # -----------------------------------------------------
+        # FULL SETTLEMENT
+        # -----------------------------------------------------
+
+        if remaining_amount >= entry_amount:
+
+            remaining_amount -= entry_amount
 
             entry.status = "Paid"
             entry.paid_at = timezone.now()
@@ -217,22 +283,40 @@ def settle_worker_payment(worker, amount):
             entry.save(
                 update_fields=[
                     "status",
-                    "paid_at"
+                    "paid_at",
                 ]
             )
 
+            payment_applied = True
+
+        # -----------------------------------------------------
+        # PARTIAL SETTLEMENT
+        # -----------------------------------------------------
+
         else:
-            # Partial payment will be handled later
-            break
-        # -----------------------------------------
-        # PAYMENT ALERT CHECK
-        # -----------------------------------------
 
-        check_worker_payment_alert(
-            worker
-        )
+            entry.amount = (
+                entry_amount - remaining_amount
+            )
 
-        return True
+            entry.save(
+                update_fields=[
+                    "amount",
+                ]
+            )
+
+            remaining_amount = Decimal("0.00")
+
+            payment_applied = True
+
+    # ---------------------------------------------------------
+    # PAYMENT ALERT
+    # ---------------------------------------------------------
+
+    if payment_applied:
+        check_worker_payment_alert(worker)
+
+    return payment_applied
 
 import razorpay
 from django.conf import settings

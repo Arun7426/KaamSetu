@@ -1365,8 +1365,6 @@ def initiate_worker_payment(request):
         },
         status=status.HTTP_201_CREATED
     )
-
-
 @api_view(["POST"])
 @authentication_classes([
     TokenAuthentication,
@@ -1376,15 +1374,24 @@ def initiate_worker_payment(request):
 @transaction.atomic
 def verify_worker_payment(request):
     """
-    Verify a Razorpay payment for the authenticated worker.
+    Verify and settle a Razorpay payment for the authenticated worker.
 
-    The payment is verified using Razorpay's server-side
-    signature verification mechanism.
+    Normal checkout:
+        Razorpay order_id + payment_id + signature are verified.
+
+    Recovery:
+        If the checkout callback was missed and the signature is unavailable,
+        Razorpay's server-side API is used to confirm that the exact order
+        is paid and the exact payment is captured for the exact amount.
+
+    After successful gateway verification:
+        1. WorkerPaymentTransaction becomes Verified.
+        2. The paid amount is applied to pending WorkerLedger entries.
     """
 
-    # -----------------------------------------
+    # =========================================================
     # WORKER ONLY
-    # -----------------------------------------
+    # =========================================================
 
     try:
         worker = request.user.worker_profile
@@ -1397,9 +1404,9 @@ def verify_worker_payment(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-    # -----------------------------------------
+    # =========================================================
     # VALIDATE REQUEST
-    # -----------------------------------------
+    # =========================================================
 
     serializer = WorkerPaymentVerifySerializer(
         data=request.data
@@ -1419,12 +1426,15 @@ def verify_worker_payment(request):
     transaction_id = data["transaction_id"]
     razorpay_order_id = data["razorpay_order_id"]
     razorpay_payment_id = data["razorpay_payment_id"]
-    razorpay_signature = data["razorpay_signature"]
 
-    # -----------------------------------------
+    razorpay_signature = data.get(
+        "razorpay_signature"
+    )
+
+    # =========================================================
     # FIND TRANSACTION
     # Lock row to prevent duplicate verification
-    # -----------------------------------------
+    # =========================================================
 
     payment_transaction = (
         WorkerPaymentTransaction.objects
@@ -1445,9 +1455,9 @@ def verify_worker_payment(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # -----------------------------------------
+    # =========================================================
     # IDEMPOTENCY
-    # -----------------------------------------
+    # =========================================================
 
     if payment_transaction.status == "Verified":
         return Response(
@@ -1467,11 +1477,14 @@ def verify_worker_payment(request):
             status=status.HTTP_200_OK
         )
 
-    # -----------------------------------------
+    # =========================================================
     # ORDER ID MATCH
-    # -----------------------------------------
+    # =========================================================
 
-    if payment_transaction.provider_order_id != razorpay_order_id:
+    if (
+        payment_transaction.provider_order_id
+        != razorpay_order_id
+    ):
         return Response(
             {
                 "status": "error",
@@ -1480,9 +1493,9 @@ def verify_worker_payment(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # -----------------------------------------
+    # =========================================================
     # ONLY PENDING TRANSACTIONS
-    # -----------------------------------------
+    # =========================================================
 
     if payment_transaction.status != "Pending":
         return Response(
@@ -1490,15 +1503,16 @@ def verify_worker_payment(request):
                 "status": "error",
                 "message": (
                     f"Payment cannot be verified from "
-                    f"current status: {payment_transaction.status}."
+                    f"current status: "
+                    f"{payment_transaction.status}."
                 )
             },
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # -----------------------------------------
-    # RAZORPAY SERVER-SIDE SIGNATURE VERIFICATION
-    # -----------------------------------------
+    # =========================================================
+    # RAZORPAY VERIFICATION
+    # =========================================================
 
     try:
 
@@ -1509,12 +1523,147 @@ def verify_worker_payment(request):
             )
         )
 
-        verify_razorpay_payment(
-            order_id=razorpay_order_id,
-            payment_id=razorpay_payment_id,
-            signature=razorpay_signature,
-            expected_amount=payment_transaction.amount,
-        )
+        # =====================================================
+        # NORMAL CHECKOUT VERIFICATION
+        # =====================================================
+
+        if razorpay_signature:
+
+            verify_razorpay_payment(
+                order_id=razorpay_order_id,
+                payment_id=razorpay_payment_id,
+                signature=razorpay_signature,
+                expected_amount=payment_transaction.amount,
+            )
+
+            verified_payment_id = razorpay_payment_id
+
+        # =====================================================
+        # RECOVERY / RECONCILIATION
+        # =====================================================
+
+        else:
+
+            razorpay_order = client.order.fetch(
+                razorpay_order_id
+            )
+
+            # -------------------------------------------------
+            # Order must be paid
+            # -------------------------------------------------
+
+            if razorpay_order.get("status") != "paid":
+                return Response(
+                    {
+                        "status": "error",
+                        "message": (
+                            "Razorpay order is not marked as paid."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # -------------------------------------------------
+            # Exact amount verification
+            # -------------------------------------------------
+
+            expected_amount_paise = int(
+                payment_transaction.amount * 100
+            )
+
+            razorpay_amount_paid = int(
+                razorpay_order.get(
+                    "amount_paid",
+                    0
+                )
+            )
+
+            if (
+                razorpay_amount_paid
+                != expected_amount_paise
+            ):
+                return Response(
+                    {
+                        "status": "error",
+                        "message": (
+                            "Razorpay paid amount does not "
+                            "match the transaction amount."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # -------------------------------------------------
+            # Get payments for exact Razorpay order
+            # -------------------------------------------------
+
+            payments_response = client.order.payments(
+                razorpay_order_id
+            )
+
+            payments = payments_response.get(
+                "items",
+                []
+            )
+
+            matched_payment = None
+
+            for payment in payments:
+
+                if (
+                    payment.get("id")
+                    != razorpay_payment_id
+                ):
+                    continue
+
+                if (
+                    payment.get("order_id")
+                    != razorpay_order_id
+                ):
+                    continue
+
+                if (
+                    payment.get("status")
+                    != "captured"
+                ):
+                    continue
+
+                if (
+                    int(payment.get("amount", 0))
+                    != expected_amount_paise
+                ):
+                    continue
+
+                if (
+                    payment.get("currency")
+                    != "INR"
+                ):
+                    continue
+
+                matched_payment = payment
+                break
+
+            # -------------------------------------------------
+            # Matching captured payment required
+            # -------------------------------------------------
+
+            if matched_payment is None:
+                return Response(
+                    {
+                        "status": "error",
+                        "message": (
+                            "No matching captured Razorpay "
+                            "payment was found for this order."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            verified_payment_id = matched_payment["id"]
+
+    # =========================================================
+    # SIGNATURE VERIFICATION FAILURE
+    # =========================================================
 
     except razorpay.errors.SignatureVerificationError:
 
@@ -1530,33 +1679,49 @@ def verify_worker_payment(request):
         return Response(
             {
                 "status": "error",
-                "message": "Payment signature verification failed."
+                "message": (
+                    "Payment signature verification failed."
+                )
             },
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    # =========================================================
+    # RAZORPAY API / OTHER ERROR
+    # =========================================================
+
     except Exception as exc:
 
-        print("\n========== RAZORPAY VERIFICATION ERROR ==========")
-        print(f"Error Type: {type(exc).__name__}")
-        print(f"Error: {exc}")
+        print(
+            "\n========== RAZORPAY VERIFICATION ERROR =========="
+        )
+        print(
+            f"Error Type: {type(exc).__name__}"
+        )
+        print(
+            f"Error: {exc}"
+        )
         traceback.print_exc()
-        print("==================================================\n")
+        print(
+            "==================================================\n"
+        )
 
         return Response(
             {
                 "status": "error",
-                "message": "Unable to verify Razorpay payment."
+                "message": (
+                    "Unable to verify Razorpay payment."
+                )
             },
             status=status.HTTP_502_BAD_GATEWAY
         )
 
-    # -----------------------------------------
-    # PAYMENT VERIFIED
-    # -----------------------------------------
+    # =========================================================
+    # MARK PAYMENT VERIFIED
+    # =========================================================
 
     payment_transaction.provider_payment_id = (
-        razorpay_payment_id
+        verified_payment_id
     )
 
     payment_transaction.status = "Verified"
@@ -1569,23 +1734,63 @@ def verify_worker_payment(request):
         ]
     )
 
+    # =========================================================
+    # SETTLE WORKER OUTSTANDING
+    #
+    # IMPORTANT:
+    # This runs only after the transaction changes from
+    # Pending -> Verified.
+    #
+    # Therefore a repeated verification request hits the
+    # idempotency block above and does not settle twice.
+    # =========================================================
+
+    from payments.services import settle_worker_payment
+
+    settlement_success = settle_worker_payment(
+        worker=worker,
+        amount=payment_transaction.amount,
+    )
+
+    if not settlement_success:
+
+        # The Razorpay payment is verified, but the local
+        # ledger could not be settled. Raising an exception
+        # rolls back the database transaction so that the
+        # payment does not remain Verified without settlement.
+
+        raise RuntimeError(
+            "Payment verified but worker ledger settlement failed."
+        )
+
+    # =========================================================
+    # SUCCESS
+    # =========================================================
+
     return Response(
         {
             "status": "success",
-            "message": "Payment verified successfully.",
+            "message": (
+                "Payment verified and settled successfully."
+            ),
             "payment": {
                 "transaction_id": payment_transaction.id,
                 "provider": payment_transaction.provider,
-                "order_id": payment_transaction.provider_order_id,
-                "payment_id": payment_transaction.provider_payment_id,
-                "amount": str(payment_transaction.amount),
+                "order_id": (
+                    payment_transaction.provider_order_id
+                ),
+                "payment_id": (
+                    payment_transaction.provider_payment_id
+                ),
+                "amount": str(
+                    payment_transaction.amount
+                ),
                 "currency": "INR",
                 "status": payment_transaction.status,
             }
         },
         status=status.HTTP_200_OK
     )
-
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
