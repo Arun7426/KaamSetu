@@ -16,7 +16,10 @@ import razorpay
 from django.db import transaction as db_transaction
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.authentication import TokenAuthentication
+from rest_framework.authentication import (
+    TokenAuthentication,
+    SessionAuthentication,
+)
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
@@ -1365,7 +1368,10 @@ def initiate_worker_payment(request):
 
 
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
+@authentication_classes([
+    TokenAuthentication,
+    SessionAuthentication,
+])
 @permission_classes([IsAuthenticated])
 @transaction.atomic
 def verify_worker_payment(request):
