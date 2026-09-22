@@ -309,14 +309,28 @@ def settle_worker_payment(worker, amount):
 
             payment_applied = True
 
-    # ---------------------------------------------------------
-    # PAYMENT ALERT
-    # ---------------------------------------------------------
+        # ---------------------------------------------------------
+        # RECORD ACTUAL PAYMENT RECEIVED
+        # ---------------------------------------------------------
 
-    if payment_applied:
-        check_worker_payment_alert(worker)
+        if payment_applied:
+            WorkerLedger.objects.create(
+                worker=worker,
+                transaction_type="Payment",
+                amount=amount,
+                status="Paid",
+                description="Worker payment received",
+                paid_at=timezone.now(),
+            )
 
-    return payment_applied
+        # ---------------------------------------------------------
+        # PAYMENT ALERT
+        # ---------------------------------------------------------
+
+        if payment_applied:
+            check_worker_payment_alert(worker)
+
+        return payment_applied
 
 import razorpay
 from django.conf import settings

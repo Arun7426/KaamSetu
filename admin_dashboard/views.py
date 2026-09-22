@@ -294,6 +294,13 @@ def admin_dashboard(request):
                 status="Paid"
             )
         )
+        total_received = sum(
+            entry.amount
+            for entry in WorkerLedger.objects.filter(
+                transaction_type="Payment",
+                status="Paid"
+            )
+        )
 
         workers_with_outstanding = Worker.objects.annotate(
             outstanding=Sum(
@@ -309,10 +316,14 @@ def admin_dashboard(request):
             "-outstanding"
         )
 
-        recent_payments = WorkerLedger.objects.select_related(
+        recent_payments = WorkerLedger.objects.filter(
+            transaction_type="Payment",
+            status="Paid"
+        ).select_related(
             "worker",
             "booking"
         ).order_by(
+            "-paid_at",
             "-created_at"
         )[:5]
 
@@ -379,6 +390,7 @@ def admin_dashboard(request):
 
             "total_outstanding": total_outstanding,
             "total_paid": total_paid,
+            "total_received": total_received,
             "workers_with_outstanding":
                 workers_with_outstanding,
             "recent_payments":

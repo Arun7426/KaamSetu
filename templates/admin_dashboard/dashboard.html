@@ -531,7 +531,34 @@ Admin Dashboard | KaamSetu
 
                 </div>
 
+                        </a>
+
+
+            <!-- ==========================
+                 TOTAL RECEIVED PAYMENTS
+            ========================== -->
+
+            <a href="{% url 'admin_payments' %}?status=Paid&transaction=Payment"
+                style="text-decoration:none; color:inherit;">
+
+                <div class="payment-card">
+
+                    <div class="stat-icon">
+                        💳
+                    </div>
+
+                    <div class="stat-title">
+                        Total Received Payments
+                    </div>
+
+                    <div class="payment-value">
+                        ₹{{ total_received }}
+                    </div>
+
+                </div>
+
             </a>
+
 
             <!-- ==========================
                     WORKER OUTSTANDING
